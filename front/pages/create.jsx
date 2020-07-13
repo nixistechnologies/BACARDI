@@ -47,20 +47,24 @@ function CreateProduct(){
     },[product.products.items.length])
     
 
-    const fillMedicineInfo = (id,medicine,qty,price,expiry,e)=>{
+    const fillProductInfo = (e)=>{
         // console.log("tap")
         // setQlabel(` (${qty})`)
         setValue([
-            {"id":id},
-            {"medicine":medicine},
-            // {"qty":qty},
-            {"mrp":price},
-            {"qty":qty},
-            {"exp_date":expiry},
-            {"mfg":e.mfg},
-            {"purchase":e.purchaseFrom},
+            {"id":e.id},
+            {"product":e.product},
+            {"qty":e.qty},
             {"typeofpack":e.typeOfPacking},
-            {"gst":e.GST},
+            
+            {"mrp":e.mrp},
+            {"cost":e.cost},
+            {"listprice":e.price},
+            
+            {"mfg":e.mfg},
+            {"exp_date":e.expiryDate},
+            {"exp_time":e.expiryTime},
+
+            
             {"discount":e.discount},
             {"hsn":e.hsn},
             {"batch":e.batch}
@@ -119,19 +123,30 @@ function CreateProduct(){
                 onSubmit={handleSubmit(onSubmit)}
             >
 
-
-            <div className="i_row">
+            <div className="i_row" style={{display:"flex"}}>
                 <div>
-                    <label className="label">Medicine Name</label>
+                    <label className="label">Category Name</label>
+                    <input type="text" className="input is-small" placeholder="Category Name" name="category"/>
+                </div>
+                <div>
+                    <label className="label">Sub Category</label>
+                    <input type="text" className="input is-small" placeholder="Sub Category Name" name="subCategory"/>
+                </div>
+                
+
+            </div>
+            <div className="i_row" style={{display:"flex"}}>
+                <div>
+                    <label className="label">Product Name</label>
                     <input className="input is-small" ref={register}
                     // onChange={()=>setMedicine(medicine)}  value={medicine} 
                     autoComplete="off"
                     onChange={selectMedicineOption}
-                     name="medicine" type="text"placeholder="Medicine Name" required/>
+                     name="product" type="text"placeholder="Product Name" required/>
 
                         <div style={{'padding':0,'maxWidth':'350px', position:'absolute',zIndex:'1',background:'white',display:list.length?"block":"none"}} role="combobox" className="_list">
                             { list.map((e)=>{
-                            return <div className="_list-item" key={e.id} onClick={()=>fillMedicineInfo(e.id,e.name,e.qty,e.price,e.expiryDate,e)}>
+                            return <div className="_list-item" key={e.id} onClick={()=>fillProductInfo(e)}>
                                 <div key={e.id} >
                                         <span className="left">{e.name}</span>
                                         <span className="right">&#x20b9; {e.price}</span>
@@ -141,9 +156,6 @@ function CreateProduct(){
                         </div>
                 </div>
                 
-            </div>
-            
-            <div className="i_row" style={{display:'flex'}}>
                 <div>
                     <label className="label">Quantity</label>
                     <input className="input is-small" ref={register}
@@ -151,15 +163,45 @@ function CreateProduct(){
                      type="text" name="qty"  placeholder="Quantity" required/>
                 </div>
                 <div>
+                    <label className="label">Type of packing</label>
+                    <input className="input is-small" ref={register}
+                    //  onChange={()=>setTypeofpack(typeofpack)} value={typeofpack} 
+                    type="text" name="typeofpack" placeholder="Type of Packing" required/>
+                </div>
+                
+            </div>
+            
+            <div className="i_row" style={{display:'flex'}}>
+                <div>
                     <label className="label">MRP</label>
                     <input className="input is-small" ref={register}
                     // onChange={()=>setMrp(mrp)} value={mrp} 
-                    type="text" name="mrp" placeholder="Price" required/>
+                    type="text" name="mrp" placeholder="MRP" required/>
                 </div>
+                <div>
+                    <label className="label">Cost Price</label>
+                    <input className="input is-small" ref={register}
+                    //  onChange={()=>setQty(qty)} value={qty} 
+                     type="text" name="cost"  placeholder="Cost Price" required/>
+                </div>
+                <div>
+                    <label className="label">List Price</label>
+                    <input className="input is-small" ref={register}
+                    //  onChange={()=>setQty(qty)} value={qty} 
+                     type="text" name="listprice"  placeholder="List Price" required/>
+                </div>
+
             </div>
 
 
             <div className="i_row" style={{display:'flex'}}>
+                <div>
+                    <label className="label">Brand/Manufeacture</label>
+                    <input className="input is-small"  ref={register}
+                    // onChange={()=>setExt(exp)}  value={exp} 
+                    type="text" name="mfg"  placeholder="Manfacturing" required/>
+                </div>
+                
                 <div>
                     <label className="label">Expiry Date</label>
                     <input className="input is-small"  ref={register}
@@ -167,45 +209,35 @@ function CreateProduct(){
                     type="date" name="exp_date"  placeholder="Expiry Date" required/>
                 </div>
                 <div>
-                    <label className="label">MFG.</label>
+                    <label className="label">Expiry Time (in months)</label>
                     <input className="input is-small"  ref={register}
                     // onChange={()=>setExt(exp)}  value={exp} 
-                    type="text" name="mfg"  placeholder="Manfacturing" required/>
+                    type="text" name="exp_time"  placeholder="Expiry Time" required/>
                 </div>
+                
             </div> 
 
 
-            <div className="i_row" style={{display:'flex'}}>
+            {/* <div className="i_row" style={{display:'flex'}}>
                 <div>
                     <label className="label">Purchase From</label>
                     <input className="input is-small" ref={register}
-                    //  onChange={()=>setPurchase(purchase)} value={purchase} 
                     type="text" name="purchase" placeholder="Purchase from" required/>
                 </div>
                 <div>
                     <label className="label">Type of packing</label>
                     <input className="input is-small" ref={register}
-                    //  onChange={()=>setTypeofpack(typeofpack)} value={typeofpack} 
                     type="text" name="typeofpack" placeholder="Type of Packing" required/>
                 </div>
-            </div> 
+            </div> */}
+
             <div className="i_row" style={{display:'flex'}}>
                 <div>
-                    <label className="label">GST</label>
-                    <input className="input is-small" ref={register}
-                    //  onChange={()=>setQty(qty)} value={qty} 
-                     type="text" name="gst"  placeholder="GST" required/>
-                </div>
-                <div>
-                    <label className="label">Discount</label>
+                    <label className="label">Discount(%)</label>
                     <input className="input is-small" ref={register}
                     // onChange={()=>setMrp(mrp)} value={mrp} 
                     type="text" name="discount" placeholder="Discount" required/>
                 </div>
-            </div>
-
-
-            <div className="i_row" style={{display:'flex'}}>
                 <div>
                     <label className="label">HSN</label>
                     <input className="input is-small" ref={register}
@@ -219,6 +251,11 @@ function CreateProduct(){
                     type="text" name="batch" placeholder="batch" required/>
                 </div>
             </div>
+
+
+            {/* <div className="i_row" style={{display:'flex'}}>
+
+            </div> */}
 
 
 

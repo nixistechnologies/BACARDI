@@ -146,17 +146,22 @@ export const createProduct =(data) =>{
         return client.mutate({
             mutation:createProductQuery,
             variables:{
-                "medicine": data.medicine,
+                "name": data.product,
                 "qty": data.qty,
-                "mrp": data.mrp,
-                "purchase": data.purchase,
                 "typeofpack": data.typeofpack,
-                "gst": data.gst,
+
+                "mrp": data.mrp,
+                "list":data.listprice,
+                "cost":data.cost,
+
+                "mfg":data.mfg,
                 "exp":data.exp_date,
+                "exp_time":data.exp_time,
+
                 "discount":data.discount,
                 "hsn":data.hsn,
                 "batch":data.batch,
-                "mfg":data.mfg
+                
             }
         }).then(res=>{
             dispatch(createProductSucess(res.data))

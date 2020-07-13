@@ -159,15 +159,18 @@ query x($suggestion:String!){
     id
     name
     qty
-    price
     expiryDate
-    mfg
-    purchaseFrom
+    expiryTime
+    mrp
+    cost
+    price
     typeOfPacking
-    hsn
-    GST
-    batch
     discount
+    image
+    batch
+    mfg
+    remarks
+    data
   }
 }
 `;
@@ -187,27 +190,27 @@ query x($suggestion:String!){
 
 export const getAllPatient = gql`
 {
-  allPatient{
-   id
-   name
-   age
-   sex
- } 
+  allCustomer{
+    id
+    name
+  	email
+    mobile
+    address
+  }
 }
 `;
 
 export const createProductQuery = gql`
-mutation x($medicine:String!,$qty:Int!,$mrp:Int!$purchase:String!,$typeofpack:String!,$gst:String!,$exp:String!,$mfg:String!,$discount:Float!,$hsn:String!,$batch:String!)
+mutation x($name:String!,$qty:Int!,$typeofpack:String!,$mrp:Float!,$list:Float!,$cost:Float!, $exp:String!,$exp_time:Int!,$mfg:String!,$discount:Float!,$hsn:String!,$batch:String!)
 {
-  createProduct(medicine:$medicine,qty:$qty,mrp:$mrp,purchaseFrom:$purchase,typeofpacking:$typeofpack,gst:$gst,exp:$exp,hsn:$hsn,mfg:$mfg,discount:$discount,batch:$batch)
+  createProduct(name:$name,qty:$qty, mrp:$mrp,typeofpacking:$typeofpack,exp:$exp,hsn:$hsn,mfg:$mfg,discount:$discount,batch:$batch,expTime:$exp_time,listPrice:$list,costPrice:$cost)
   {
     product{
         id
-        name
-        purchaseFrom
-        price
-        qty
-        typeOfPacking
+				name
+      	mrp
+      	price
+      	cost
     }
     isNew
   }

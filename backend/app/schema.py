@@ -39,65 +39,81 @@ class BillingNode(DjangoObjectType):
         filter_fields=()
         interfaces = (relay.Node,)
 
-class PatientNode(DjangoObjectType):
+class CustomerNode(DjangoObjectType):
     class Meta:
-        model = Patient
+        model = Customer
         filter_fields=()
         interfaces = (relay.Node,)
-class MedicineNode(DjangoObjectType):
+class Sales_ProductNode(DjangoObjectType):
     class Meta:
-        model = Medicine
+        model = Sales_Product
         filter_fields=()
         interfaces = (relay.Node,)        
 
 class CreateProduct(graphene.Mutation):
     class Arguments:
-        medicine = graphene.String(required=True)
+        name = graphene.String(required=True)
         qty = graphene.Int(required=True)
-        mrp = graphene.Int(required=True)
-        purchase_from = graphene.String(required=True)
         typeofpacking = graphene.String(required=True)
-        gst = graphene.String(required=True)
-        exp = graphene.String(required=True)
+
+        mrp = graphene.Float(required=True)
+        cost_price = graphene.Float(required=True)
+        list_price = graphene.Float(required=True)
+        # purchase_from = graphene.String(required=True)
+        
+        # gst = graphene.String(required=True)
         mfg = graphene.String(required=True)
+        exp = graphene.String(required=True)
+        exp_time = graphene.Int(required=True)
+
         discount = graphene.Float(required=True)
         hsn = graphene.String(required=True)
         batch = graphene.String(required=True)
 
     product = graphene.Field(ProductNode)
     isNew = graphene.Boolean()
-    def mutate(self,info,medicine,qty,mrp,purchase_from,typeofpacking,gst,exp,discount,mfg,hsn,batch):
-        product = Product.objects.filter(name=medicine)
-        if(product):
-            product = product[0]
-            product.name = medicine
-            product.qty = qty
-            product.price = mrp
-            product.purchase_from = purchase_from
-            product.expiry_date = datetime.datetime.strptime(exp,"%Y-%m-%d") 
-            product.type_of_packing = typeofpacking
-            product.GST = gst
-            product.discount = discount
-            product.mfg = mfg
-            product.hsn = hsn
-            product.batch = batch
-            product.save()
-            return CreateProduct(product = product,isNew = False)
+    def mutate(self,info,name,qty,typeofpacking,mrp,cost_price,list_price,mfg,exp,exp_time,discount,hsn,batch):
+        p = Product.objects.filter(name=name)
+        if(p):
+            p = p[0]
+            p.name = name
+            p.qty = qty
+            p.type_of_packing = typeofpacking
+
+            p.mrp = mrp
+            p.list = list_price
+            p.cost = cost_price
+
+            p.mfg = mfg
+            p.expiry_date = datetime.datetime.strptime(exp,"%Y-%m-%d") 
+            p.expiry_time = exp_time
+
+            p.discount = discount
+            p.hsn = hsn
+            p.batch = batch
+            p.save()
+
+            return CreateProduct(product = p,isNew = False)
             
 
         else:
             product = Product.objects.create(
-                name = medicine,
+                name = name,
                 qty = qty,
-                price = mrp,
-                purchase_from = purchase_from,
-                expiry_date = datetime.datetime.strptime(exp,"%Y-%m-%d") ,
                 type_of_packing = typeofpacking,
-                GST = gst,
-                discount = discount,
+
+                mrp = mrp,
+                price = list_price,
+                cost = cost_price,
+
                 mfg = mfg,
-                hsn = hsn,
-                batch = batch
+                expiry_date = datetime.datetime.strptime(exp,"%Y-%m-%d") ,
+                expiry_time = exp_time,
+
+                discount = discount,
+                # hsn = hsn,
+                batch = batch,
+                user_id=info.context.user.id
             )
             return CreateProduct(product = product,isNew = True)
         
@@ -126,9 +142,9 @@ def generate_receipt(bill,medicines,user):
     pdf.cell(0,23,"{}".format(user.profile.GST_no),0,1,"L") 
     pdf.cell(0,23,"Bill to",0,1,"L") 
     pdf.set_font("Arial","B",13) 
-    pdf.cell(0,20,"{}".format(bill.patient.name),0,1,"L") 
+    pdf.cell(0,20,"{}".format(bill.customer.name),0,1,"L") 
     pdf.set_font("Arial","",12) 
-    pdf.cell(0,20,"{}".format(bill.patient.sex),0,1,"L") 
+    pdf.cell(0,20,"{}".format(bill.customer.mobile),0,1,"L") 
     epw = pdf.w - 2*pdf.l_margin 
     # col_width = epw/4 
     th = pdf.font_size 
@@ -273,15 +289,15 @@ class CreateBill(graphene.Mutation):
         # user_id = from_global_id(user_id)[1]
         name = name.replace(" ({})".format(age),"")
 
-        patient = Patient.objects.filter(name__iexact=name,age=12,sex=gender)
-        if patient:
-            user_id = patient[0]
+        customer = Customer.objects.filter(name__iexact=name,age=12,sex=gender)
+        if customer:
+            user_id = customer[0]
         else:
-            user_id = Patient.objects.create(name=name,age=age,sex=gender)
+            user_id = Customer.objects.create(name=name,age=age,sex=gender)
 
 
         bill = Billing.objects.create( 
-            user_id=1,invoice_number="INV#{}".format(user_id.id),patient_id=user_id.id,payment_mode=payment_mode,billing_date=datetime.datetime.strptime(billing_date,"%Y-%m-%d")
+            user_id=1,invoice_number="INV#{}".format(user_id.id),customer_id=user_id.id,payment_mode=payment_mode,billing_date=datetime.datetime.strptime(billing_date,"%Y-%m-%d")
             )
         bill.invoice_number = "INV#{}-{}".format(bill.id,user_id.id)
 
@@ -294,9 +310,9 @@ class CreateBill(graphene.Mutation):
             cgst += i["price"]*i["qty"] * gst /100
 
 
-            Medicine.objects.create(
-                medicine_id = from_global_id(i["medicine_id"])[1],
-                medicine_name = i["name"],
+            Sales_Product.objects.create(
+                product_id = from_global_id(i["medicine_id"])[1],
+                product_name = i["name"],
                 quantity = int(i["qty"]),
                 price = round(float(i["price"]),2),
                 discount = round(float(i["discount"])),
@@ -320,7 +336,7 @@ class CreateBill(graphene.Mutation):
         # bill.save() 
 
         # GenerateBill(gross,bill.invoice_number,Medicine.objects.filter(billing_id=bill.id),discount,cgst,total,bill,info.context.user)
-        generate_receipt(bill,Medicine.objects.filter(billing_id=bill.id),info.context.user)
+        generate_receipt(bill,Sales_Product.objects.filter(billing_id=bill.id),info.context.user)
         pdfname = "{}.pdf".format(bill.invoice_number)
         # print(pdfname)
         with open(pdfname,'rb') as pdf:
@@ -397,7 +413,7 @@ class Mutation(graphene.ObjectType):
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
 
 class Query(graphene.AbstractType):
-    all_patient = graphene.List(PatientNode)
+    all_customer = graphene.List(CustomerNode)
     all_products = DjangoFilterConnectionField(ProductNode)
     product_by_id = graphene.Field(ProductNode,id=graphene.ID())
     product_suggestion = graphene.List(ProductNode,suggestion=graphene.String())
@@ -418,7 +434,7 @@ class Query(graphene.AbstractType):
         if(Billing.objects.filter(invoice_number__iexact=slug)):
             return Billing.objects.filter(invoice_number__iexact=slug)
         
-        return Billing.objects.filter(patient__name__iexact=slug)
+        return Billing.objects.filter(customer__name__iexact=slug)
         
         
         # else if(Billing.objects.filter(patient__name__iexact="aman"))
@@ -439,5 +455,5 @@ class Query(graphene.AbstractType):
         print(from_global_id(id)[1])
         return Product.objects.get(id=from_global_id(id)[1])
         
-    def resolve_all_patient(self,info,**kwargs):
-        return Patient.objects.all()
+    def resolve_all_customer(self,info,**kwargs):
+        return Customer.objects.all()

@@ -3,14 +3,14 @@ import { faTrashAlt,faEdit, faHospital, faBuilding } from '@fortawesome/free-reg
 import {faHome, faList, faReceipt, faHistory, faUser, faSignOutAlt} from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import Cookie from "js-cookie";
-const SideBar = ({sidebar,route,}) =>{
+const SideBar = ({sidebar,route}) =>{
     const Logout = () =>{
         console.log("logout")
         Cookie.remove("token")
         // const r = Router()
         // r.push("/login") 
         // Router.push("/login")
-        router.push("/login")
+        route.push("/login")
     }
     
     return(

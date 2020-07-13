@@ -2,13 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_save,post_save
 from django.dispatch import receiver
+from django.contrib.postgres.fields import JSONField
 from django.template.defaultfilters import slugify
 
 
 # Create your models here.
 
 class Profile(models.Model):
+    image = models.ImageField(upload_to="profile/",null=True,blank=True)
     user = models.OneToOneField(User,on_delete=models.CASCADE)
+    invoice_prefix = models.CharField(max_length=50,null=True,blank=True)
     firm_name = models.CharField(max_length=100)
     GST_no = models.CharField(max_length=50)
     TIN_no = models.CharField(max_length=40)
@@ -18,35 +21,63 @@ class Profile(models.Model):
     def __str__(self):
         return "{} {}".format(self.firm_name,self.user.username)
 
+class Category(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    def __str__(self):
+        return self.name
+
+class SubCategory(models.Model):
+    name = models.CharField(max_length=100)
+    GST = models.FloatField(null=True,blank=True)
+    hsn = models.CharField(max_length=20,null=True,blank=True)
+    category = models.ForeignKey(Category,on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="images/",blank=True,null=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    def __str__(self):
+        return "{} {}".format(self.name,self.category.name)
+
+
+
 class Product(models.Model):
     name = models.CharField(max_length=100)
     qty = models.IntegerField()
     expiry_date = models.DateField(auto_now_add=True,blank=True)
+    expiry_time = models.IntegerField(null=True,blank=True)
+    mrp = models.FloatField(null=True,blank=True)
+    cost = models.FloatField(null=True,blank=True)
     price = models.FloatField()
     purchase_from = models.CharField(max_length=100)
     GST = models.FloatField(default=0)
     type_of_packing = models.CharField(max_length=30)
     discount = models.FloatField(blank=True,default=0)
-    hsn = models.CharField(max_length=20,null=True,blank=True)
+    image = models.ImageField(upload_to="products/",blank=True,null=True)
+    # hsn = models.CharField(max_length=20,null=True,blank=True)
     batch = models.CharField(max_length=20,null=True,blank=True)
     mfg = models.CharField(max_length=50,null=True,blank=True)
+    remarks = models.TextField(null=True,blank=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    subcategory = models.ForeignKey(SubCategory,on_delete=models.CASCADE,null=True,blank=True)
+    data = JSONField(null=True,blank=True)
     def __str__(self):
         return self.name
 
-class Patient(models.Model):
+class Customer(models.Model):
     name = models.CharField(max_length=50)
-    age = models.IntegerField()
-    sex = models.CharField(max_length=10)
-    mobile = models.CharField(max_length=10)
+    email = models.EmailField(blank=True,null=True)
+    mobile = models.CharField(max_length=10,blank=True,null=True)
+    # sex = models.CharField(max_length=10)
+    gst_number = models.CharField(max_length=20,blank=True,null=True)
     address = models.TextField(null=True,blank=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
     def __str__(self):
-        return "{} ({})".format(self.name,self.age)
+        return "{}".format(self.name)
 
 
 class Billing(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
     invoice_number = models.CharField(max_length=20)
-    patient = models.ForeignKey(Patient,on_delete = models.CASCADE)
+    customer = models.ForeignKey(Customer,on_delete = models.CASCADE)
     # medicine = models. (Medicine,on_delete=models.CASCADE)
     payment_mode = models.CharField(max_length=100)
     billing_date = models.DateField(blank=True)
@@ -56,14 +87,17 @@ class Billing(models.Model):
     sgst = models.FloatField(null=True,blank=True)
     invoice = models.FileField(upload_to="invoices/",blank=True,null=True)
     net_amount = models.FloatField(null=True,blank=True)
-
+    paid_amount = models.FloatField(null=True,blank=True)
+    outstanding = models.FloatField(null=True,blank=True)
+    remarks = models.TextField(null=True,blank=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
     def __str__(self):
         return self.invoice_number
 
 
-class Medicine(models.Model):
-    medicine = models.ForeignKey(Product,on_delete=models.CASCADE,blank=True,null=True)
-    medicine_name = models.CharField(max_length=50)
+class Sales_Product(models.Model):
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,blank=True,null=True)
+    product_name = models.CharField(max_length=50)
     quantity = models.IntegerField()
     price = models.FloatField(blank=True,null=True)
     discount = models.FloatField()
@@ -73,11 +107,11 @@ class Medicine(models.Model):
     total = models.FloatField(blank=True,null=True)
     billing = models.ForeignKey(Billing,on_delete=models.CASCADE,blank=True,null=True)
     def __str__(self):
-        return self.medicine_name
+        return self.product_name
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        p = Product.objects.get(id = self.medicine.id)
+        p = Product.objects.get(id = self.product.id)
         p.qty = p.qty - self.quantity
         p.save()
 

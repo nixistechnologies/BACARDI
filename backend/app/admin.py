@@ -4,8 +4,10 @@ from app.models import *
 
 admin.site.register(Profile)
 admin.site.register(Product)
-admin.site.register(Medicine)
+admin.site.register(Category)
+admin.site.register(SubCategory)
+# admin.site.register(Medicine)
 admin.site.register(Billing)
-admin.site.register(Patient)
+admin.site.register(Customer)
 
 

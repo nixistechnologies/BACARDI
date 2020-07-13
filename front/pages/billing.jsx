@@ -59,8 +59,8 @@ const Billingform =() =>{
     if(loading)
         return <div><BillPageLoading/></div>
     const selectOption=(d)=>{
-        data.allPatient.map((e)=>{
-            if(e.name+" ("+e.age+")" === d.target.value)
+        data.allCustomer.map((e)=>{
+            if(e.name === d.target.value)
                 setValue([{"age":e.age},{"gender":e.sex},{"patientId":e.id}])
         })
     }
@@ -175,32 +175,33 @@ const Billingform =() =>{
             <div>
                 <div className="columns is-mobile" style={{display:'flex'}}>
                     <div className="column">
-                        <label className="label">Patient Name <span className="error_text">{errors.patient?.message}</span></label>
+                        <label className="label">Customer Name <span className="error_text">{errors.customer?.message}</span></label>
                         
 
-                        <input list="patient_name" className="input is-small" ref={register({required:"(Name is required)"})}
+                        <input list="customer_name" className="input is-small" ref={register({required:"(Name is required)"})}
                         //  onChange={()=>setQty(qty)} value={qty} 
-                        type="text" name="patient"  placeholder="Patient Name" onChange={selectOption}/>
+                        type="text" name="customer"  placeholder="Customer Name" onChange={selectOption}/>
                         
-                        <datalist id="patient_name">
-                            {data.allPatient.map((e)=>{
-                                return <option key={e.id} value={e.name +" ("+ e.age+")"} onClick={selectOption}/>
+                        <datalist id="customer_name">
+                            {data.allCustomer.map((e)=>{
+                                return <option key={e.id} value={e.name} onClick={selectOption}/>
                             })}
                         </datalist>
 
                     </div>
                     <div className="column">
-                        <label className="label">Age <span className="error_text">{errors.age?.message}</span></label>
-                        <input className="input is-small" ref={register({required:"(Age is required)"})}
+                        <label className="label">Mobile <span className="error_text">{errors.mobile?.message}</span></label>
+                        <input className="input is-small" ref={register({required:"(Mobile is required)"})}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
-                        type="text" name="age" placeholder="Age"/>
+                        type="text" name="mobile" placeholder="Mobile"/>
                     </div>
-                    <input type="hidden" ref={register} name="patientId"/>
+                    <input type="hidden" ref={register} name="customerId"/>
+
                     <div className="column">
-                        <label className="label">Gender <span className="error_text">{errors.gender?.message}</span></label>
-                        <input className="input is-small" ref={register({required:"(Gender is required)"})}
+                        <label className="label">Address <span className="error_text">{errors.address?.message}</span></label>
+                        <input className="input is-small" ref={register({required:"(Address is required)"})}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
-                        type="text" name="gender" placeholder="Gender"/>
+                        type="text" name="address" placeholder="Address"/>
                     </div>
                 </div>
             </div>
@@ -216,17 +217,24 @@ const Billingform =() =>{
                         //  onChange={()=>setQty(qty)} value={qty} 
                         type="text" name="payment"  placeholder="Payment Mode"/>
                     </div>
-                    <div className="column">
+                    
+                    {/* <div className="column">
                         <label className="label">GST</label>
                         <input className="input is-small" ref={register}
-                        // onChange={()=>setMrp(mrp)} value={mrp} 
                         type="text" name="gst" placeholder="GST"/>
-                    </div>
+                    </div> */}
+
                     <div className="column">
                         <label className="label">Date <span className="error_text">{errors.date?.message}</span></label>
                         <input className="input is-small" ref={register({required:"(Fill date first)"})}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
                         type="date" name="date" placeholder="date" required/>
+                    </div>
+
+                    <div className="column">
+                        <label className="label">Remarks</label>
+                        <input className="input is-small" ref={register}
+                        type="text" name="remarks" placeholder="Remarks"/>
                     </div>
                 </div>
             </div>
@@ -309,6 +317,7 @@ const Billingform =() =>{
                             <th>Price</th>
                             <th>Quantity</th>
                             <th>Discount</th>
+                            <th>Total Amount</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -325,6 +334,7 @@ const Billingform =() =>{
                             <td>{e.price}</td>
                             <td>{e.qty??1}</td>
                             <td>{e.discount??1}</td>
+                            <td>{(e.price * e.qty??1) - ((e.price * e.qty??1)*e.discount/100)  }</td>
                             <td onClick={deletefromtemp.bind(null,i)} style={{cursor:'pointer'}}>
                                 <FontAwesomeIcon icon={faTrashAlt} color="red" />
                             </td>
