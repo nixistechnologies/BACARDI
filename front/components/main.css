@@ -1,0 +1,114 @@
+/* .main{
+    margin-top: 20px;
+} */
+.i_row{
+    margin-bottom: 10px;
+}
+/* div,.navbar{
+    width: 100%;
+} */
+
+
+.topHeading{
+    margin-bottom: 20px;
+}
+
+.topHeading h2{
+    font-weight: bold;
+    font-size: 30px;
+    /* margin-bottom: 20px; */
+    padding: 10px;
+}
+
+/* .createform{
+    padding: 10px;
+} */
+.createform div{
+    width: 100%;
+}
+.i_row div{
+    padding: 0px 10px 0px 10px;
+    width: 100%;
+}
+.main-container{
+    max-width: 1000px;
+    padding: 0 2em 2rem 2rem;
+}
+
+
+
+._list{
+    background: 'white';
+    z-index:1;
+    position: absolute;
+    width: 200px;
+    border:1px solid rgba(0,0,0,0.2)
+}
+
+._list ._list-item{
+    /* padding: 5px; */
+    padding: 5px;
+    font-size: 13px;
+    overflow: auto;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+._list ._list-item:hover{
+    /* background-color: lightgray; */
+    border-right: 3px solid #00d1b2;
+}
+.left{
+    float: left;
+}
+.right{
+    float: right;
+}
+.left-1{
+    width: 40%;
+    align-self: center;
+    font-size: 15px;
+}
+.right-1{
+    width: 60%;
+}
+.out{
+    overflow: auto;
+    display: flex;
+    padding: 5px;
+}
+._list-item .right{
+    font-size: 11px;
+    font-weight: normal;
+}
+
+td,th{
+    font-size:15px;
+}
+.data{
+    margin-top:50px;
+}
+
+.label{
+    color: #363636;
+display: block;
+font-size: 1rem;
+font-weight: 700;
+font-size: 13px;
+align-self: center;
+}
+
+.ctable th{
+    font-size: 13px;
+}
+.container{
+    padding-top: 10px;
+}
+.columns{
+    margin: 0 !important;
+}
+
+@media only screen and (max-width: 600px) {
+    .main-container{
+        padding: 0 10px 10px 10px;
+    }}

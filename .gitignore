@@ -1,0 +1,11 @@
+front/node_modules/
+front/.next/
+front/.vercel
+front/out/
+backend/py3/
+backend/__pycache__/
+backend/app/__pycache__/
+backend/app/migrations/
+backend/bacardi/__pycache__/
+backend/media/
+backend/invoices/

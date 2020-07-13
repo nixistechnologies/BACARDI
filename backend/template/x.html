@@ -1,0 +1,190 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.0/css/bulma.min.css"/>
+<style>
+    span{
+        display: block;
+    }
+    .row{
+        flex-direction: row;
+    }
+    .name{
+        width:20%;
+        font-weight:bold;
+        text-transform: uppercase;
+        text-align: left !important;
+        
+    }
+    .title{
+        font-size:25px;
+        /* padding-bottom:7px */
+        margin-bottom: 4px !important;
+    }
+    .text{
+        /* font-size:12px; */
+        padding-bottom:5px
+    }
+    .td{
+        font-size: 9px;
+        text-transform: uppercase;
+        border-width:0 0 1px;
+        border-top:1px solid #dbdbdb;
+        padding-top:7.5px;
+        padding-bottom:7.5px;
+        padding-left:7.5px;
+        padding-right:7.5px;
+        width: 10%;
+        text-align: left,        
+
+    }
+    .th{
+        font-size: 9px;
+        border-width:0 0 1px;
+        border-bottom:1px solid #dbdbdb;
+        padding-top:5px;
+        padding-bottom:5px;
+        padding-left:7.5px;
+        padding-right:7.5px;
+        width: 10%;
+        text-align: left,        
+
+    }
+    .description {
+        width: 100%;
+        text-align: left;
+        padding:0.5em 0.75em;
+        padding-left: 8,
+    }
+    .qty{
+        padding:0.5em 0.75em;
+        width: 100%;
+        text-align: right;
+        padding-right: 8,
+    }
+    .rate {
+        padding:0.5em 0.75em;
+        width: 100%;
+        text-align: right;
+        padding-right: 8;
+    }
+    .amount {
+        padding:0.5em 0.75em;
+        width: 100%;
+        text-align: right;
+        padding-right: 8;
+    }
+    .leftConent{
+        text-align:left;
+        width:50%;
+        font-size:10px;
+        padding:5px;
+        border-top:1px solid #dbdbdb
+    }
+    .rightContent{
+        text-align:right;
+        padding:5px;
+        width:50%;
+        font-size:11px;
+        border-top:1px solid #dbdbdb
+    }
+    th,td{
+        font-size: 14px;
+        padding: .5em .3em !important;
+        text-align: center !important;
+    }
+    
+</style>
+<div style="padding: 5px;">
+    <div>
+        <div>
+            <div style="overflow: auto;">
+                <div style="float:left;width: 50%;">
+                    <span class="title" >{{user.profile.firm_name}}</span>
+                    <span class="text">{{user.profile.address}}</span>
+                    <span class="text">{{user.profile.contact_number}}</span>
+                    <span class="text">{{user.profile.firm_name}}</span>
+                </div>
+                <div style="float: right;text-align: right;width: 50%;"}}>
+                    <span class="title">Inovice</span>
+                    <span class="text">Inovice Number : {{bill.invoice_number}} &nbsp;</span>
+                    <span class="text"> Date : {{bill.billing_date}}</span>
+                </div>
+            </div>
+            <div style="margin-top:5px"}}>
+                <span>Bill to</span>
+                <span class="text" style="font-weight: bold;font-size: 18px;">{{bill.patient.name}}</span>
+                <span class="text">{{bill.patient.sex}}</span>
+            </div>
+        </div>
+
+
+
+
+
+        <div style="margin-top:5px">
+            <table class="table is-fullwidth">
+                <thead>
+                    <tr>
+                        <th style="width:5%">SN.</th>
+                        <th>Name</th>
+                        <th>Pack</th>
+                        <th>HSN</th>
+                        <th>Exp.</th>
+                        <th>Batch</th>
+                        <th>MFG.</th>
+                        <th >Qty</th>
+                        <th >MRP</th>
+                        <th >Dis%</th>
+                        <th >SGST</th>
+                        <th >CGST</th>
+                        <th >Total</th>                    
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    
+                    {% for i in medicines %}
+                    <tr>
+                        <td  style="width:5%">{{forloop.counter}}</td>
+                        <td class="name">{{i.medicine_name}}</td>
+                        <td > {%if i.medicine.type_of_packing %} {{i.medicine.type_of_packing}} {% else %} - {% endif %}</td>
+                        <td >{%if i.medicine.hsn %} {{i.medicine.hsn}} {% else %} - {% endif %}</td>
+                        <td >{%if i.expiry_date %} {{i.expiry_date|date:"m/y"}} {% else %} - {% endif %} </td>
+                        <td > {%if i.medicine.batch %} {{i.medicine.batch }} {% else %} - {% endif %}</td>
+                        <td > {%if i.medicine.mfg %} {{i.medicine.mfg}} {% else %} - {% endif %} </td>
+                        <td >{{i.quantity}}</td>
+                        <td >{{i.price}}</td>
+                        <td >{{i.discount}}</td>
+                        <td >{{i.CGST}}</td>
+                        <td >{{i.SGST}}</td>
+                        <td >{{i.total}}</td> 
+                    </tr>
+                    {% endfor %}
+
+
+                    <tr>
+                        <td colspan="7" rowspan="6" style="vertical-align: middle;font-size: 22px;">Payment mode : {{bill.payment_mode}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Gross Amount</td>
+                        <td colspan="3">{{bill.gross_amount}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Discount</td>
+                        <td colspan="3">{{bill.discount}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">CGST</td>
+                        <td colspan="3">{{bill.cgst}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">SGST</td>
+                        <td colspan="3">{{bill.sgst}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="font-size: 1.2em;font-weight: 600;">Net Amount</td>
+                        <td colspan="3" style="font-size: 1.2em;font-weight: 600;">{{bill.net_amount}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

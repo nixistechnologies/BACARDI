@@ -1,0 +1,22 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<input type="text" class="a" />
+<input type="text" class="a" />
+<input type="text" class="a" />
+<input type="text" class="a" />
+
+
+<div class="v">click</div>
+
+
+<script type="text/javascript">
+$(document).ready(()=>{
+    $(".v").click((e)=>{
+        $(".a").each((x)=>{
+            console.log($($(".a")[x]).val())
+            console.log($(".a")[x])
+            console.log($(this))
+        })
+    })
+})
+</script>

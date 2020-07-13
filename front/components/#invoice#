@@ -1,0 +1,298 @@
+import { Page, Document, Image, StyleSheet, View,Text,Font } from '@react-pdf/renderer';
+import React, {Fragment} from 'react';
+import DateFormat from 'dateformat'
+// import { s} from '../fonts/'
+// import {Text, View, StyleSheet } from '@react-pdf/renderer';
+
+// Font.register(
+//     {
+//         src:'Roboto-Bold.ttf',
+//         family:"Roboto"
+//     }
+// )
+
+const borderColor = '#90e5fc'
+const styles = StyleSheet.create({
+    
+    row: {
+        flexDirection: 'row',
+        // borderBottomColor: '#bff0fd',
+        // borderBottomWidth: 1,
+        // alignItems: 'center',
+        // fontStyle: 'bold',
+        // fontSize: "13px",
+        // letterSpacing: "1px",
+        // marginBottom: "5px",
+        // textTransform: "uppercase",
+    },
+    name:{
+        width:"35%",
+        fontWeight:'bolder',
+        // fontSize:"13px"
+        
+    },
+    title:{
+        fontSize:"20px",
+        paddingBottom:"7px"
+    },
+    text:{
+        fontSize:"12px",
+        paddingBottom:"5px"
+    },
+    td:{
+        fontSize: "9px",
+        // letterSpacing: "1px",
+        // marginBottom: "5px",
+        textTransform: "uppercase",
+        borderWidth:"0 0 1px",
+        borderTop:"1px solid #dbdbdb",
+        // padding:"10px",
+        paddingTop:'7.5px',
+        paddingBottom:'7.5px',
+        paddingLeft:"7.5px",
+        paddingRight:"7.5px",
+        width: '10%',
+        textAlign: 'left',        
+
+    },
+    th:{
+        fontSize: "9px",
+        // letterSpacing: "1px",
+        borderWidth:"0 0 1px",
+        borderBottom:"1px solid #dbdbdb",
+        paddingTop:'5px',
+        paddingBottom:'5px',
+        paddingLeft:"7.5px",
+        paddingRight:"7.5px",
+        width: '10%',
+        textAlign: 'left',        
+
+    },
+    description: {
+        width: '100%',
+        textAlign: 'left',
+        // borderRightColor: borderColor,
+        // borderRightWidth: 1,
+        padding:"0.5em 0.75em",
+        paddingLeft: 8,
+    },
+    qty: {
+        padding:"0.5em 0.75em",
+        width: '100%',
+        // borderRightColor: borderColor,
+        // borderRightWidth: 1,
+        textAlign: 'right',
+        paddingRight: 8,
+    },
+    rate: {
+        padding:"0.5em 0.75em",
+        width: '100%',
+        // borderRightColor: borderColor,
+        // borderRightWidth: 1,
+        textAlign: 'right',
+        paddingRight: 8,
+    },
+    amount: {
+        padding:"0.5em 0.75em",
+        width: '100%',
+        textAlign: 'right',
+        paddingRight: 8,
+    },
+    leftConent:{
+        textAlign:'left',
+        width:'50%',
+        fontSize:"10px",
+        padding:"5px",
+        borderTop:"1px solid #dbdbdb"
+    },
+    rightConent:{
+        textAlign:'right',
+        padding:"5px",
+        width:'50%',
+        fontSize:"11px",borderTop:"1px solid #dbdbdb"
+    }
+  });
+
+
+const InvoiceTableHead = () =>{
+    const row = (
+        <View style={styles.row}>
+            <Text style={{...styles.th,width:'5%'}}>SN.</Text>
+            <Text style={{...styles.th,...styles.name }}>Name</Text>
+            <Text style={styles.th}>MRP</Text>
+            <Text style={styles.th}>Qty</Text>
+            <Text style={styles.th}>Discount</Text>
+            <Text style={styles.th}>SGST</Text>
+            <Text style={styles.th}>CGST</Text>
+            <Text style={styles.th}>Total</Text>
+        </View>
+    )
+    return (<Fragment>{row}</Fragment> )
+}
+
+const TotalAmount=(items,gst)=>{
+    var total = 0
+    var gross = 0
+    var discount = 0
+    var cgst = 0
+    for(var i=0;i<items.length;i++)
+    {
+        gross += items[i].price * items[i].qty
+        total+=((items[i].price * items[i].qty) - (items[i].price*items[i].qty*items[i].discount/100))
+        discount+=(items[i].price*items[i].qty*items[i].discount/100)
+        cgst+=(items[i].price*items[i].qty*gst/100/2)
+    }
+    return {"total":total.toFixed(2) ,"discount":discount.toFixed(2),"gst":cgst.toFixed(2),"gross":gross.toFixed(2)}
+}
+
+
+const InvoiceTotal = ({items,gst,paymentmode})=>{
+    if(items.length>0)
+        console.log(items.length)
+        var totals = TotalAmount(items,gst)
+        // console.log(totals)
+        return(
+            <Fragment>
+                <View style={styles.row}>
+                    <Text style={{...styles.td,width:'50%',fontSize:'15px',textTransform:'capitalize',borderTop:"1px solid #dbdbdb",}}>
+                        Payment Mode: {paymentmode}
+                    </Text>
+                    <View style={{display:'flex',flexDirection:'column',width:'50%'}}>
+                        <View style={{...styles.row}}>
+                            <Text style={styles.leftConent}>
+                                Gross Amount
+                            </Text>
+                            <Text style={styles.rightConent}> {totals.gross} </Text>
+                        </View>
+
+                        <View style={styles.row}>
+                            <Text style={styles.leftConent}>
+                                Discount
+                            </Text>
+                            <Text style={styles.rightConent}>{totals.discount} </Text>
+                        </View>
+
+                        <View style={styles.row}>
+                            <Text style={styles.leftConent}>
+                                CGST
+                            </Text>
+                            <Text style={styles.rightConent}> {totals.gst} </Text>
+                        </View>
+
+                        <View style={styles.row}>
+                            <Text style={styles.leftConent}>
+                                SGST
+                            </Text>
+                            <Text style={styles.rightConent}>{totals.gst} </Text>
+                        </View>
+
+                        <View style={styles.row}>
+                            <Text style={{...styles.leftConent,fontSize:"13px"}}>
+                                Net Amount
+                            </Text>
+                            <Text style={{...styles.rightConent,fontSize:"13px"}}>{totals.total} INR</Text>
+                        </View>
+                    </View>
+                    
+                    
+                </View>
+                {/* <View style={styles.row}>
+                    <Text>
+                        <Text >
+
+                        </Text>
+                    </Text>
+                </View> */}
+            </Fragment>
+        );
+    
+    // var length=21
+    // if(items.length<22){
+    //     const temp = Array(21-items.length).fill(0)
+    //     const rows = temp.map( (item,i) => 
+    //         <View style={styles.row} key={item.id}>
+    //             <Text style={{...styles.td,width:'5%'}}></Text>
+    //             <Text style={{...styles.td,...styles.name}}></Text>
+    //             <Text style={styles.td}></Text>
+    //             <Text style={styles.td}></Text>
+    //             <Text style={styles.td}></Text>
+    //             <Text style={styles.td}></Text>
+    //             <Text style={styles.td}></Text>
+    //             <Text style={styles.td}></Text>
+    //         </View>
+    //     )
+    //     return (<Fragment>{rows}</Fragment> )
+    // }
+     
+}
+
+const InvoiceTableRow = ({items,gst}) => {
+    const rows = items.map( (item,i) => 
+        
+        <View style={styles.row} key={item.id}>
+            <Text style={{...styles.td,width:'5%'}}>{i+1}</Text>
+            <Text style={{...styles.td,...styles.name}}>{item.name}</Text>
+            <Text style={styles.td}>{item.price}</Text>
+            <Text style={styles.td}>{item.qty}</Text>
+            <Text style={styles.td}>{(item.price*item.qty*item.discount/100).toFixed(2)}</Text>
+            <Text style={styles.td}>{(item.price*item.qty*gst/100/2).toFixed(2)}</Text>
+            <Text style={styles.td}>{(item.price*item.qty*gst/100/2).toFixed(2)}</Text>
+            <Text style={styles.td}>{(item.qty * item.price).toFixed(2) - (item.price*item.qty*item.discount/100).toFixed(2)}</Text>
+        </View>
+        
+
+    )
+    
+    return (<Fragment>{rows}</Fragment> )
+};
+  
+// export default InvoiceTableRow
+
+const Heading = ({name,age,sex,date,invoiceNumber}) =>{
+    return (
+    <View>
+        <View style={{display: "flex",flexDirection:"row"}}>
+            <View style={{width:"100%"}}>
+                <Text style={styles.title}>Rama Medicose</Text>
+                <Text style={styles.text}>T-23 Shanti Nager Delhi</Text>
+                <Text style={styles.text}>9878987678</Text>
+                <Text style={styles.text}>22AAPSO78213Z9</Text>
+            </View>
+            <View style={{width:"100%",float: "right",textAlign: "right"}}>
+                <Text style={styles.title}>Inovice</Text>
+                <Text style={styles.text}>Inovice Number : {invoiceNumber}</Text>
+                <Text style={styles.text}> Date : {date}</Text>
+            </View>
+        </View>
+        <View style={{marginTop:"20px"}}>
+            <Text style={{...styles.title,fontSize:"15px"}}>Bill to</Text>
+            <Text style={styles.text}>{name}</Text>
+            {/* <Text style={styles.text}>{age}</Text> */}
+            <Text style={styles.text}>{sex}</Text>
+        </View>
+    </View>
+    )
+}
+
+
+
+
+
+
+const Invoice = ({table,name,age,gender,invoiceDate,GST,paymentmode,invoiceNumber }) =>{
+    return (   
+        <Document>
+            <Page size="A4" style={{padding:"50px"}}>
+                <View style={{width:"100%"}} >
+                    <Heading name={name} sex={gender} date={invoiceDate} invoiceNumber={invoiceNumber}/>
+                    <View style={{marginTop:"30px"}}>
+                        <InvoiceTableHead name={name}/>
+                        <InvoiceTableRow items={table} gst={GST}/>
+                        <InvoiceTotal items={table} gst={GST} paymentmode = {paymentmode}/>
+                    </View>
+                </View>
+            </Page>
+        </Document>
+        )
+}
+export default Invoice;
