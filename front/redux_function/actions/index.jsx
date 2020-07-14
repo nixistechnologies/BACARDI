@@ -1,7 +1,7 @@
 import client from '../../lib/apolloClient';
 import { gql } from 'apollo-boost';
 import Router from  'next/router'
-import {createUserQuery,getAllProductQuery,createProductQuery,generateBillQuery, currentUserQuery, updateCurrentUserQuery,getTokenQuery} from '../../lib/graphql'
+import {createUserQuery,getAllProductQuery,createProductQuery,generateBillQuery, currentUserQuery, updateCurrentUserQuery,getTokenQuery,getCateogryQuery} from '../../lib/graphql'
 
 
 
@@ -27,6 +27,21 @@ export const createNewUser = (data) =>{
             Router.push("/login")
         }).catch((e)=>{
             dispatch(userError())
+        })
+    }
+}
+
+
+export const getCategory = () =>{
+    return dispatch=>{
+        dispatch(categoryLoading)
+        return client.query({
+            query:getCateogryQuery
+        }).then(e=>{
+            console.log(e.data)
+            dispatch(categoryLoaded(e.data.categories.edges))
+        }).catch(e=>{
+            console.log("errro")
         })
     }
 }
@@ -201,6 +216,15 @@ export const FETCH_PRODUCTS_FAILURE = 'FETCH_PRODUCTS_FAILURE';
 export const createProductSucess = (product) =>({
     type:CREATE_PRODUCTS_SUCCESS,
     payload:product
+})
+
+const categoryLoading=()=>({
+    type:"CATEGORY_LOADING"
+})
+
+const categoryLoaded=(category)=>({
+    type:'CATEGORY_LOADED',
+    payload:category
 })
 
 export const loginLoading = () =>({

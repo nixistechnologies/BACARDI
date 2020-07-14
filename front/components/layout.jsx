@@ -67,7 +67,7 @@ class Layout extends React.Component{
                 <main className="main">
                     
                     
-                    <div class="es_" >
+                    <div className="es_" >
                         
                         {
                             sidebar===true?

@@ -11,12 +11,15 @@
 
 .topHeading{
     margin-bottom: 20px;
+    display: flex;
+    align-items: center;
 }
 
 .topHeading h2{
     font-weight: bold;
     font-size: 30px;
     /* margin-bottom: 20px; */
+    width: 100%;
     padding: 10px;
 }
 
@@ -53,7 +56,13 @@
     font-weight: bold;
     cursor: pointer;
 }
+.child{
+    display: none;
+}
 
+.active .child{
+    display: block;
+}
 ._list ._list-item:hover{
     /* background-color: lightgray; */
     border-right: 3px solid #00d1b2;

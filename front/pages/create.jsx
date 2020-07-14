@@ -1,7 +1,7 @@
 import Layout from '../components/layout'
 
 import { useMutation } from '@apollo/react-hooks';
-import { createProductQuery,productSuggetionQueryC } from '../lib/graphql';
+import { createProductQuery,productSuggetionQueryC,categorySuggestionQuery } from '../lib/graphql';
 import { useState, useEffect } from 'react';
 import { connect } from 'react-redux'
 import {createProduct} from '../redux_function/actions'
@@ -24,8 +24,11 @@ function CreateProduct(){
     // const [gst,setGst] = useState("")
     const [isNew,setIsNew] = useState(true)
     const [list,setList] = useState([])
+    const [category,setCategory] = useState([])
+    const [temp,setTemp] = useState([])
+    const [subcategory, setSubcategory] = useState([])
     const [notify,setNotify] = useState(false)
-    const { register, handleSubmit, watch, errors,reset,setValue } = useForm();
+    const { register, handleSubmit, watch, errors,reset,setValue,getValues } = useForm();
     const product = useSelector(state=>state)
     const dispatch = useDispatch()
     const  onSubmit = async(data) =>{
@@ -74,7 +77,49 @@ function CreateProduct(){
         setList([])
     }
 
+    const subCategoryOption = (e) =>{
+        // console.log(e.name)
+        setValue([
+            {"category":e.name},
+            {"categoryId":e.id}
+        ])
+        setSubcategory(e.subcategorySet.edges)
+        setCategory([])
+        
+    }
 
+
+    const selectSubCategory = async (d) =>{
+        var val = d.target.value
+        // console.log(su)
+        if(val.length)
+            setTemp(subcategory.map(e=>e.node.name.toLocaleLowerCase().startsWith(val.toLocaleLowerCase())?e:undefined ))
+        // else if(val.toLocaleLowerCase() === d)
+        else
+            setTemp([])
+    }
+
+    const getCategoryName = async (d)=>{
+        var val = d.target.value
+        var result = await client.query({
+            query:categorySuggestionQuery,
+            variables:{
+                "suggestion":d.target.value
+            }
+        })
+        if(result.loading == false)
+        {
+            if(val.length==0)
+            {
+                setCategory([])
+                // setIsNew(false)
+            }else{
+                setCategory(result.data.categorySuggestion)
+            }
+            console.log(category)
+        }
+        
+    }
 
     const selectMedicineOption = async (d)=>{
         // const {loading,data} = useQuery(productSuggetionQuery,{variables:{"suggestion":d.target.value}})
@@ -126,11 +171,49 @@ function CreateProduct(){
             <div className="i_row" style={{display:"flex"}}>
                 <div>
                     <label className="label">Category Name</label>
-                    <input type="text" className="input is-small" placeholder="Category Name" name="category"/>
+                    <input type="text" className="input is-small" placeholder="Category Name" name="category"
+                    onChange={getCategoryName} autoComplete="off" ref={register}/>
+                    <input type="hidden" name="categoryId" ref={register}/>
+                    
+                    <div style={{'padding':0,'maxWidth':'350px', position:'absolute',zIndex:'1',background:'white',display:category.length?"block":"none"}} role="combobox" className="_list">
+                        { category.map((e)=>{
+                        return <div className="_list-item" key={e.id} onClick={()=>subCategoryOption(e)}>
+                            <div key={e.id} >
+                                    <span className="left">{e.name}</span>
+                                    {/* <span className="right">&#x20b9; {e.price}</span> */}
+                            </div>
+                        </div>
+                        })}   
+                    </div>
+
                 </div>
                 <div>
                     <label className="label">Sub Category</label>
-                    <input type="text" className="input is-small" placeholder="Sub Category Name" name="subCategory"/>
+                    <input type="text" className="input is-small" placeholder="Sub Category Name" name="subCategory" ref={register}
+                    onChange={selectSubCategory}
+                    />
+                    <input type="hidden" name="subCategoryId" ref={register}/>
+                    
+                    <div style={{'padding':0,'maxWidth':'350px', position:'absolute',zIndex:'1',background:'white',display:temp.length?"block":"none"}} role="combobox" className="_list">
+                        { temp.map((e)=>{
+                        // console.log(e.node.name.startsWith(getValues("subCategory")))
+                        // console.log(getValues("subCategory").length)
+                        // if(e.node.name.startsWith(getValues("subCategory"))==true && getValues("subCategory").length>0)
+                        // {
+                            // console.log(e)
+                            if(e!=undefined)
+                            {return (
+                                <div className="_list-item" key={e.node.id} onClick={()=>{setValue([{"subCategory":e.node.name},{"subCategoryId":e.node.id}]) , setTemp([])}}>
+                                <div key={e.node.id} >
+                                        <span className="left">{e.node.name}</span>
+                                        {/* <span className="right">&#x20b9; {e.price}</span> */}
+                                </div>
+                            </div>
+                            )}
+                        
+                        
+                        })}   
+                    </div>
                 </div>
                 
 

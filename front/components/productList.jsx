@@ -79,8 +79,13 @@ const TableView=({products})=>{
       {/* <h3>Add</h3> */}
       {/* <FontAwesomeIcon icon={faPlusCircle} size="2x"/> */}
       <div>
+        <Link href="/category">
+          <a className="button is-rounded is-small is-bold is-primary" style={{fontWeight:"bold"}}>Add category</a>
+        </Link>
+      </div>
+      <div style={{marginLeft:"10px"}}>
         <Link href="/create">
-          <a className="button is-rounded is-small is-bold is-primary" style={{fontWeight:"bold"}}>Add new</a>
+          <a className="button is-rounded is-small is-bold is-primary" style={{fontWeight:"bold"}}>Add product</a>
         </Link>
       </div>
       

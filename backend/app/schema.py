@@ -27,6 +27,18 @@ class ProductNode(DjangoObjectType):
         filter_fields=()
         interfaces = (relay.Node,)
         
+class CategoryNode(DjangoObjectType):
+    class Meta:
+        model = Category
+        filter_fields = ()
+        interfaces = (relay.Node,)
+
+class SubCategoryNode(DjangoObjectType):
+    class Meta:
+        model = SubCategory
+        filter_fields = ()
+        interfaces = (relay.Node,)
+
 class ProfileNode(DjangoObjectType):
     class Meta:
         model = Profile
@@ -375,6 +387,40 @@ class UpdateUser(graphene.Mutation):
         profile.save()
         return UpdateUser(user = user)
 
+class UpdateCategory(graphene.Mutation):
+    class Arguments:
+        category = graphene.String(required=True)
+        subcategory = graphene.String(required=True)
+        gst = graphene.Float(required=True)
+        hsn = graphene.String(required=True)
+
+    isNew = graphene.Boolean()
+    category = graphene.Field(CategoryNode)
+    sub_category = graphene.Field(SubCategoryNode)
+    def mutate(self,info,category,subcategory,gst,hsn):
+        cat = Category.objects.filter(name__iexact=category)
+        if(cat):
+            cat = cat[0]
+            sub = SubCategory.objects.filter(name__iexact=subcategory)
+            if(sub):
+                sub = sub[0]
+                # print(sub.hsn)
+                sub.hsn = hsn
+                sub.GST = gst
+                sub.save()
+                return UpdateCategory(isNew = False,category = cat,sub_category=sub)
+            else:
+                sub = SubCategory.objects.create(name=subcategory,hsn=hsn,GST=gst,user_id=info.context.user.id,category_id=cat.id)
+                return UpdateCategory(isNew = True,category=cat,sub_category=sub)
+        # else:
+        cat = Category.objects.create(name=category,user_id=info.context.user.id)
+        sub = SubCategory.objects.create(name=subcategory,hsn=hsn,GST=gst,user_id=info.context.user.id,category_id=cat.id)
+        return UpdateCategory(isNew = True,category=cat,sub_category=sub)
+
+            
+
+
+            
 
 class CreateUser(graphene.Mutation):
     # user = graphene.Field(UserNode)
@@ -390,9 +436,6 @@ class CreateUser(graphene.Mutation):
         tin = graphene.String(required=True)
         firm_name = graphene.String(required=True)
         address = graphene.String(required=True)
-        
-
-
 
     user = graphene.Field(UserNode)
     def mutate(self,info,username,password,email,firstname,lastname,gst,tin,firm_name,address,phone):
@@ -410,16 +453,20 @@ class Mutation(graphene.ObjectType):
     generate_bill = CreateBill.Field()
     update_user = UpdateUser.Field()
     # create_user = CreateUser.Field()
+    update_category = UpdateCategory.Field()
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    
 
 class Query(graphene.AbstractType):
     all_customer = graphene.List(CustomerNode)
     all_products = DjangoFilterConnectionField(ProductNode)
     product_by_id = graphene.Field(ProductNode,id=graphene.ID())
     product_suggestion = graphene.List(ProductNode,suggestion=graphene.String())
+    category_suggestion = graphene.List(CategoryNode,suggestion=graphene.String())
     report = DjangoFilterConnectionField(BillingNode,min=graphene.String(),max=graphene.String())
     history = DjangoFilterConnectionField(BillingNode,slug=graphene.String())
     user = graphene.Field(UserNode)
+    categories = DjangoFilterConnectionField(CategoryNode)
 
 
     def resolve_user(self,info):
@@ -439,10 +486,14 @@ class Query(graphene.AbstractType):
         
         # else if(Billing.objects.filter(patient__name__iexact="aman"))
 
+    def resolve_categories(self,info):
+        return Category.objects.filter(user_id = info.context.user.id)
+
     def resolve_report(self,info,min,max):
         return Billing.objects.filter(billing_date__range=[min,max]).order_by('-id')
 
-
+    def resolve_category_suggestion(self,info,suggestion):
+        return Category.objects.filter(name__icontains=suggestion)
     def resolve_product_suggestion(self,info,suggestion):
         # return Product.objects.all()
         return Product.objects.filter(name__icontains=suggestion)

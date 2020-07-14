@@ -152,6 +152,77 @@ mutation x($medicines:[MInput!],$name:String!,$age:String!,$gender:String!, $dat
 }
 `
 
+export const createUpdateCategorySubCategoryQuery = gql`
+  mutation x($category:String!,$subcategory:String!,$hsn:String!,$gst:Float!){
+    updateCategory(category:$category,subcategory:$subcategory,hsn:$hsn,gst:$gst){
+      isNew
+      category{
+        id
+        name
+        subcategorySet{
+          edges{
+            node{
+              id
+              name
+              GST
+              hsn
+              image
+            }
+          }
+        }
+      }
+      subCategory{
+        id
+        name
+        GST
+        hsn
+      }
+      
+    }
+  }
+`
+
+export const getCateogryQuery = gql`
+{
+  categories{
+    edges{
+      node{
+        id
+        name
+        subcategorySet{
+          edges{
+            node{
+              id
+              name
+              GST
+              hsn
+              image
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`
+
+
+export const categorySuggestionQuery = gql`
+query x($suggestion:String!){
+  categorySuggestion(suggestion:$suggestion){
+    name
+    id
+    subcategorySet{
+      edges{
+        node{
+          id
+          name
+        }
+      }
+    }
+  }
+}
+`
 
 export const productSuggetionQueryC = gql`
 query x($suggestion:String!){
