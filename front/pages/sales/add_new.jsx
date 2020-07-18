@@ -1,16 +1,16 @@
-import Layout from "../components/layout"
+import Layout from "../../components/layout"
 import {useForm} from 'react-hook-form'
 import { useQuery } from '@apollo/react-hooks'
-import { getAllPatient,productSuggetionQuery, generateBillQuery } from "../lib/graphql";
+import { getAllPatient,productSuggetionQuery, generateBillQuery } from "../../lib/graphql";
 import { useDispatch, useSelector } from 'react-redux'
 import {useState, useEffect} from 'react'
 import React from 'react'
-import client from "../lib/apolloClient";
+import client from "../../lib/apolloClient";
 import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
 import { faTrashAlt,faEdit } from '@fortawesome/free-regular-svg-icons'
-import { generateBill,clearBill } from "../redux_function/actions";
-import { server } from "../lib/settings";
-import {BillPageLoading} from '../components/skeleton'
+import { generateBill,clearBill } from "../../redux_function/actions";
+import { server } from "../../lib/settings";
+import {BillPageLoading} from '../../components/skeleton'
 const ref = React.createRef();
 
 
@@ -156,7 +156,7 @@ const Billingform =() =>{
     return (
         <div>
             <div className="topHeading">
-                <h2>Billing</h2>
+                <h2>Sales</h2>
             </div>
             <style jsx>{`
                 .error_text{

@@ -56,13 +56,17 @@
     font-weight: bold;
     cursor: pointer;
 }
-.child{
+.menu-list .child_{
     display: none;
 }
 
-.active .child{
+.active .child_{
     display: block;
 }
+
+/* .active .child{
+    display: block;
+} */
 ._list ._list-item:hover{
     /* background-color: lightgray; */
     border-right: 3px solid #00d1b2;
@@ -117,7 +121,26 @@ align-self: center;
     margin: 0 !important;
 }
 
+._heading{
+    font-weight: 500;
+    color: black;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.w30{
+    width:30%
+}
+.w10{
+    width:10%
+}
+.w5{
+    width:5%;
+}
+
+
 @media only screen and (max-width: 600px) {
     .main-container{
         padding: 0 10px 10px 10px;
     }}
+

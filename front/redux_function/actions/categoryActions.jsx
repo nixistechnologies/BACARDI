@@ -1,5 +1,27 @@
 import client from '../../lib/apolloClient';
-import {createUpdateCategorySubCategoryQuery} from '../../lib/graphql'
+import {createUpdateCategorySubCategoryQuery,renameCategory} from '../../lib/graphql'
+
+
+export const updateCategory=(id,name,is_update)=>{
+    return dispatch=>{
+        dispatch(updateLoading())
+        return client.mutate({
+            mutation:renameCategory,
+            variables:{
+                "id":id,
+                "name":name,
+                "isUpdate":is_update
+            }
+        }).then(e=>{
+            dispatch(updateCategorySuccess(e.data))
+        }).catch(e=>{
+            console.log(e)
+        })
+    }
+}
+const updateCategorySuccess=(data)=>({
+    type:"CATEGORY_UPDATE_SUCCESS"
+})
 
 export const createUpdateCategory=(data)=>{
     return dispatch=>{

@@ -3,8 +3,10 @@ var inital = {'loading':true,items:[],"internal_loading":false,"update":false}
 export const categoryReducer = (state=inital,action)=>{
     
     switch(action.type){
+        case 'CATEGORY_UPDATE_SUCCESS':
+            return {...state}
         case 'CATEGORY_ADD_LOADING':
-            console.log("loading")
+            // console.log("loading")
             return {...state,internal_loading:true}
         
         case 'CATEGORY_SUBCATEGORY_UPDATED':

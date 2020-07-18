@@ -28,10 +28,16 @@ class ProductNode(DjangoObjectType):
         interfaces = (relay.Node,)
         
 class CategoryNode(DjangoObjectType):
+    subCategory = graphene.Int()
+    product = graphene.Int()
     class Meta:
         model = Category
         filter_fields = ()
         interfaces = (relay.Node,)
+    def resolve_subCategory(self,info):
+        return len(SubCategory.objects.filter(category_id=self.id))
+    def resolve_product(self,info):
+        return len(Product.objects.filter(subcategory_id__in=[i.id for i in SubCategory.objects.filter(category_id=self.id)]))
 
 class SubCategoryNode(DjangoObjectType):
     class Meta:
@@ -420,7 +426,26 @@ class UpdateCategory(graphene.Mutation):
             
 
 
-            
+class RenameCategory(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+        name = graphene.String(required=False)
+        is_update = graphene.Boolean(required=True)
+
+    success = graphene.Boolean()
+    category = graphene.Field(CategoryNode)
+
+    def mutate(self,info,id,is_update,name=None):
+        if(is_update is True):
+            c = Category.objects.get(id=from_global_id(id)[1])
+            c.name = name
+            c.save()
+            return RenameCategory(success=True,category=c)
+        else:
+            Category.objects.get(id=from_global_id(id)[1]).delete()
+            return RenameCategory(success=True)
+
+
 
 class CreateUser(graphene.Mutation):
     # user = graphene.Field(UserNode)
@@ -454,6 +479,7 @@ class Mutation(graphene.ObjectType):
     update_user = UpdateUser.Field()
     # create_user = CreateUser.Field()
     update_category = UpdateCategory.Field()
+    rename_category = RenameCategory.Field()
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
     
 
@@ -465,9 +491,15 @@ class Query(graphene.AbstractType):
     category_suggestion = graphene.List(CategoryNode,suggestion=graphene.String())
     report = DjangoFilterConnectionField(BillingNode,min=graphene.String(),max=graphene.String())
     history = DjangoFilterConnectionField(BillingNode,slug=graphene.String())
+    subcategoy = DjangoFilterConnectionField(SubCategoryNode,id = graphene.ID())
     user = graphene.Field(UserNode)
+
     categories = DjangoFilterConnectionField(CategoryNode)
 
+
+    def resolve_subcategoy(self,info,id):
+        return SubCategory.objects.filter(category_id=from_global_id(id)[1])
+    
 
     def resolve_user(self,info):
         # print("..user..")

@@ -206,6 +206,51 @@ export const getCateogryQuery = gql`
 }
 `
 
+export const subCategoryById = gql`
+query x($id:ID!)
+{
+  subcategoy(id:$id)
+  {
+    edges{
+      node{
+        id
+        name
+        hsn
+        GST
+      }
+    }
+  }
+}
+`
+
+export const renameCategory = gql`
+mutation x($id:ID!,$isUpdate:Boolean!,$name:String!){
+  renameCategory(id:$id,isUpdate:$isUpdate,name:$name){
+    success
+  	category{
+      subCategory
+      product
+      id
+      name
+    }
+  }
+}
+`
+
+export const allCategory=gql`
+{
+  categories{
+    edges{
+      node{
+        subCategory
+        product
+        id
+        name
+      }
+    }
+  }
+}
+`
 
 export const categorySuggestionQuery = gql`
 query x($suggestion:String!){

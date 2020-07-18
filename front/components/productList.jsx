@@ -52,19 +52,6 @@ const TableView=({products})=>{
         color:black;
         text-transform: uppercase;
       }
-
-      .w30{
-        width:30%
-      }
-      .w10{
-        width:10%
-      }
-      .th{
-
-      }
-      .w5{
-        width:5%;
-      }
       .cont{
         color:grey;
       }
