@@ -102,7 +102,7 @@ const Records = ({rdata}) => {
                     {rdata.map((e)=>{
                         return(<tr key={e.node.id}>
                             <td className="_heading w30">
-                                <Link href={`category/[subcategory]?name=${e.node.name}`} as={`category/${e.node.id}`}>
+                                <Link href={`category/[subcategory]?name=${e.node.name}`} as={`category/${e.node.id}?name=${e.node.name}`}>
                                     <a>
                                         {e.node.name}
                                     </a>

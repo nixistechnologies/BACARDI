@@ -40,10 +40,13 @@ class CategoryNode(DjangoObjectType):
         return len(Product.objects.filter(subcategory_id__in=[i.id for i in SubCategory.objects.filter(category_id=self.id)]))
 
 class SubCategoryNode(DjangoObjectType):
+    product = graphene.Int()
     class Meta:
         model = SubCategory
         filter_fields = ()
         interfaces = (relay.Node,)
+    def resolve_product(self,info):
+        return len(Product.objects.filter(subcategory_id=self.id))
 
 class ProfileNode(DjangoObjectType):
     class Meta:
@@ -423,7 +426,36 @@ class UpdateCategory(graphene.Mutation):
         sub = SubCategory.objects.create(name=subcategory,hsn=hsn,GST=gst,user_id=info.context.user.id,category_id=cat.id)
         return UpdateCategory(isNew = True,category=cat,sub_category=sub)
 
-            
+class DeleteSubCategory(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+    success=graphene.Boolean()
+    def mutate(self,info,id):
+        SubCategory.objects.get(id=from_global_id(id)[1]).delete()
+        return DeleteSubCategory(success=True)
+
+class UpdateSubCategory(graphene.Mutation):
+    class Arguments:
+        id = graphene.String(required=False)
+        category = graphene.String(required=False)
+        is_update = graphene.Boolean(required=True) 
+        hsn = graphene.String(required=True)
+        gst = graphene.Int(required=True)
+        name = graphene.String(required=True)
+    success = graphene.Boolean()
+    sub_category = graphene.Field(SubCategoryNode)
+
+    def mutate(self,info,is_update,hsn,gst,name,id=None,category=None):
+        if(is_update is False):
+            sub = SubCategory.objects.create(name=name,GST=gst,hsn=hsn,user_id=info.context.user.id,category_id=from_global_id(category)[1])
+            return UpdateSubCategory(sub_category=sub,success=True)
+        else:
+            sub = SubCategory.objects.get(id=from_global_id(id)[1])
+            sub.name = name
+            sub.GST = gst
+            sub.hsn = hsn
+            sub.save()
+            return UpdateSubCategory(sub_category=sub,success=True)
 
 
 class RenameCategory(graphene.Mutation):
@@ -481,6 +513,8 @@ class Mutation(graphene.ObjectType):
     update_category = UpdateCategory.Field()
     rename_category = RenameCategory.Field()
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    update_subcategory = UpdateSubCategory.Field()
+    delete_subcategory = DeleteSubCategory.Field()
     
 
 class Query(graphene.AbstractType):

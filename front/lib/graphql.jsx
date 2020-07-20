@@ -206,6 +206,32 @@ export const getCateogryQuery = gql`
 }
 `
 
+export const deleteSubCategoryQuery = gql`
+  mutation x($id:ID!){
+    deleteSubcategory(id:$id)
+    {
+      success
+    }
+  }
+`
+
+export const createSubCategoryQuery = gql`
+  mutation x($id:String!,$category:String!,$name:String!,$hsn:String!,$gst:Int!,$isUpdate:Boolean!){
+    updateSubcategory(id:$id,category:$category,name:$name,hsn:$hsn,gst:$gst,isUpdate:$isUpdate)
+    {
+      success
+      subCategory{
+        __typename
+        name
+        id
+        product
+        hsn
+        GST
+      }
+    }
+  }
+`
+
 export const subCategoryById = gql`
 query x($id:ID!)
 {
@@ -213,6 +239,7 @@ query x($id:ID!)
   {
     edges{
       node{
+        product
         id
         name
         hsn
