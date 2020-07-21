@@ -40,10 +40,7 @@ const Modal = ({active,setActive})=>{
                     
                 }
             }
-
-        
-        })
-        
+        })   
     }
     
     return(
@@ -177,13 +174,13 @@ const Records = ({rdata}) => {
                     <tbody>
                     {rdata.map((e)=>{
                         return(<tr key={e.node.id}>
-                            <td className="_heading w30">
-                                <Link href={`category/[subcategory]?name=${e.node.name}`} as={`category/${e.node.id}?name=${e.node.name}`}>
+                            <Link href={`category/[subcategory]?name=${e.node.name}`} as={`category/${e.node.id}?name=${e.node.name}`}>
+                                <td className="_heading w30">
                                     <a>
                                         {e.node.name}
                                     </a>
-                                </Link>
-                            </td>
+                                </td>
+                            </Link>
                             <td>
                                 {e.node.subCategory}
                             </td>

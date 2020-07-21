@@ -1,14 +1,16 @@
-import Layout from '../components/layout'
+import Layout from '../../components/layout'
 
-import { useMutation } from '@apollo/react-hooks';
-import { createProductQuery,productSuggetionQueryC,categorySuggestionQuery } from '../lib/graphql';
+import { useMutation, useQuery, useLazyQuery } from '@apollo/react-hooks';
+import { createProductQuery,productSuggetionQueryC,categorySuggestionQuery,allCategory,subCategoryById,getAllProductQuery } from '../../lib/graphql';
 import { useState, useEffect } from 'react';
 import { connect } from 'react-redux'
-import {createProduct} from '../redux_function/actions'
+import {createProduct} from '../../redux_function/actions'
 import {useForm} from 'react-hook-form'
-import client from '../lib/apolloClient';
+import client from '../../lib/apolloClient';
 import { gql } from 'apollo-boost';
 import { useStore,useDispatch, useSelector } from 'react-redux'
+import { FullPageLoading } from '../../components/skeleton';
+import SnackbarProvider,{ useSnackbar } from 'react-simple-snackbar'
 
 
 
@@ -22,6 +24,10 @@ function CreateProduct(){
     // const [purchase,setPurchase] = useState("")
     // const [typeofpack,setTypeofpack] = useState("")
     // const [gst,setGst] = useState("")
+    const [openSnackbar, closeSnackbar] = useSnackbar({position:"top-center",style:{zIndex:"999", marginTop:"50px"}})
+    const {data,loading:mainLoading} = useQuery(allCategory)
+    const [getSub,{data:subData,loading:subLoading}] = useLazyQuery(subCategoryById)
+    const [createNewProduct,{data:newData,loading:createLoading}] = useMutation(createProductQuery)
     const [isNew,setIsNew] = useState(true)
     const [list,setList] = useState([])
     const [category,setCategory] = useState([])
@@ -30,18 +36,74 @@ function CreateProduct(){
     const [notify,setNotify] = useState(false)
     const { register, handleSubmit, watch, errors,reset,setValue,getValues } = useForm();
     const product = useSelector(state=>state)
-    const dispatch = useDispatch()
-    const  onSubmit = async(data) =>{
-        dispatch(createProduct(data))
-    }
+    // const dispatch = useDispatch()
+    
     const clearData=() =>{
         // console.log(onSubmit)
         setValue([
             {"gst":""},{"mrp":""},{"medicine":""},{"qty":""},{"purchase":""},{"typeofpack":""},{"exp_date":"dd/mm/yyyy"},
-            {"mfg":"","discount":"","hsn":"","batch":""}
+            {"mfg":"","discount":"","hsn":"","batch":""},{"category":""},{"subCategory":""},{"product":""},{"cost":""},{"listprice":""},
+            {"exp_time":""},{"discount":""},{"hsn":""},{"batch":""}
         ])
         return false
     }
+    
+    
+    const  onSubmit = async(data) =>{
+        
+        console.log(data)
+        // dispatch(createProduct(data))
+        createNewProduct(
+            {
+                variables:{
+                "categoryId":data.category,
+                "subCategoryId":data.subCategory,
+                "name": data.product,
+                "qty": data.qty,
+                "typeofpack": data.typeofpack,
+
+                "mrp": data.mrp,
+                "list":data.listprice,
+                "cost":data.cost,
+
+                "mfg":data.mfg,
+                "exp":data.exp_date,
+                "exp_time":data.exp_time,
+
+                "discount":data.discount,
+                "hsn":data.hsn,
+                "batch":data.batch,                 
+            },
+            optimisticResponse:true,
+            update:(cache,{data})=>{
+                if(data!=true){
+                    console.log(data)
+                    try{
+                        const existCache = cache.readQuery({query:getAllProductQuery})
+                        console.log(existCache)
+                        existCache.allProducts.edges.push({"node":data.createProduct.product,"__typename":"ProductNodeEdge"})
+                        cache.writeQuery({
+                            query:getAllProductQuery,
+                            data:existCache
+                        })
+                        
+                    }catch(e){
+                        console.log("no need to update")
+                    }
+                    openSnackbar("Product has been created successfully")
+                    clearData()
+                
+                    
+                    
+                }
+            }
+        
+        })
+
+
+
+    }
+    
 
     useEffect(()=>{
         setNotify(product.products.created)
@@ -140,13 +202,22 @@ function CreateProduct(){
         }
 
     }
+    const select_Sub_Category = (e) =>{
+        // console.log(e.target.value)
+        getSub({variables:{"id":e.target.value}})
+
+    }
 
 
 
-
+    // console.log(data)
+    // console.log(subData)
 
     return(
         <Layout>
+            {mainLoading==true?
+                <FullPageLoading />:
+            <>
             <style jsx>{`
                 .is-small{
                     font-size:0.85rem;
@@ -171,49 +242,36 @@ function CreateProduct(){
             <div className="i_row" style={{display:"flex"}}>
                 <div>
                     <label className="label">Category Name</label>
-                    <input type="text" className="input is-small" placeholder="Category Name" name="category"
-                    onChange={getCategoryName} autoComplete="off" ref={register}/>
-                    <input type="hidden" name="categoryId" ref={register}/>
                     
-                    <div style={{'padding':0,'maxWidth':'350px', position:'absolute',zIndex:'1',background:'white',display:category.length?"block":"none"}} role="combobox" className="_list">
-                        { category.map((e)=>{
-                        return <div className="_list-item" key={e.id} onClick={()=>subCategoryOption(e)}>
-                            <div key={e.id} >
-                                    <span className="left">{e.name}</span>
-                                    {/* <span className="right">&#x20b9; {e.price}</span> */}
-                            </div>
-                        </div>
-                        })}   
-                    </div>
+                    {/* <input type="text" className="input is-small" placeholder="Category Name" name="category"
+                    onChange={getCategoryName} autoComplete="off" ref={register}/> */}
+                    <article className="select is-small" style={{width:"100%"}}>
+                        <select className="_input is-small" style={{width:"100%"}} ref={register} name="category" onChange={(e)=>select_Sub_Category(e)}>
+                            <option>-----</option>
+                            {data.categories.edges.map(e=>{
+                                return <option key={e.node.id} disabled={e.node.subCategory>0?false:true} value={e.node.id}>{e.node.name}  {e.node.subCategory}</option>
+                            })}
+                        </select>
+                    </article>                    
+                    <input type="hidden" name="categoryId" ref={register}/>
 
                 </div>
                 <div>
                     <label className="label">Sub Category</label>
-                    <input type="text" className="input is-small" placeholder="Sub Category Name" name="subCategory" ref={register}
+                    <article className={`select is-small ${subLoading===true?"is-loading":""}`} style={{width:"100%"}}>
+                        <select className="_input is-small" style={{width:"100%"}} ref={register} name="subCategory">
+                        <option>-----</option>
+                            {
+                                subData!=undefined?
+                                (subData.subcategoy.edges.map(e=><option key={e.node.id} value={e.node.id}>{e.node.name}</option>)):null
+                            
+                            }
+                        </select>
+                    </article>
+                    {/* <input type="text" className="input is-small" placeholder="Sub Category Name" name="subCategory" ref={register}
                     onChange={selectSubCategory}
-                    />
-                    <input type="hidden" name="subCategoryId" ref={register}/>
+                    /> */}
                     
-                    <div style={{'padding':0,'maxWidth':'350px', position:'absolute',zIndex:'1',background:'white',display:temp.length?"block":"none"}} role="combobox" className="_list">
-                        { temp.map((e)=>{
-                        // console.log(e.node.name.startsWith(getValues("subCategory")))
-                        // console.log(getValues("subCategory").length)
-                        // if(e.node.name.startsWith(getValues("subCategory"))==true && getValues("subCategory").length>0)
-                        // {
-                            // console.log(e)
-                            if(e!=undefined)
-                            {return (
-                                <div className="_list-item" key={e.node.id} onClick={()=>{setValue([{"subCategory":e.node.name},{"subCategoryId":e.node.id}]) , setTemp([])}}>
-                                <div key={e.node.id} >
-                                        <span className="left">{e.node.name}</span>
-                                        {/* <span className="right">&#x20b9; {e.price}</span> */}
-                                </div>
-                            </div>
-                            )}
-                        
-                        
-                        })}   
-                    </div>
                 </div>
                 
 
@@ -345,17 +403,29 @@ function CreateProduct(){
             <div className="i_row">
                 <div>
                     <button type="submit" 
-                        className= {product.products.create_loading==true?"button is-primary is-small is-loading":"button is-primary is-small"} 
+                        className={`button is-primary is-small ${createLoading==true?"is-loading":""}`}
+                        // className= {createLoading==true?"button is-primary is-small is-loading":"button is-primary is-small"} 
                         >
-                        {isNew?"CREATE":"UPDATE"}
+                            Create
+                        {/* {isNew?"CREATE":"UPDATE"} */}
                     </button>
                 </div>
             </div>
 
             </form>
         </div>
+        </>
+        }
     </Layout>
     )
 }
 
-export default connect()(CreateProduct);
+const X=()=>{
+    return(
+        <SnackbarProvider>
+            <CreateProduct />
+        </SnackbarProvider>
+    )
+}
+
+export default connect()(X);

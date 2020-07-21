@@ -8,6 +8,9 @@ import { useStore,useDispatch, useSelector } from 'react-redux'
 import { useEffect,useState } from 'react';
 import {addProduct} from '../redux_function/actions'
 import {FullPageLoading} from './skeleton'
+import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
+import {faPen, faPlus} from '@fortawesome/free-solid-svg-icons'
+import { faTrashAlt } from '@fortawesome/free-regular-svg-icons'
 // import flus from 'font'
 // import  from '@fortawesome/fontawesome-free'
 import { connect } from "react-redux";
@@ -71,7 +74,7 @@ const TableView=({products})=>{
         </Link>
       </div>
       <div style={{marginLeft:"10px"}}>
-        <Link href="/create">
+        <Link href="products/create">
           <a className="button is-rounded is-small is-bold is-primary" style={{fontWeight:"bold"}}>Add product</a>
         </Link>
       </div>
@@ -82,9 +85,10 @@ const TableView=({products})=>{
        <thead>
        <tr>
          <th className="w30">Name</th>
+         <th className="w10">Brand</th>
          <th className="w10">Qty</th>
          <th className="w10">Price</th>
-         <th className="w10">Purchase from</th>
+         <th className="w5"></th>
          <th className="w5"></th>
          </tr>
        </thead>
@@ -109,16 +113,21 @@ const TableView=({products})=>{
                     
                   </td>
                   <td className="cont">
+                    {prd.node.mfg}
+                  </td>
+                  <td className="cont">
                     {prd.node.qty}
                   </td>
                   <td className="cont">
                     {prd.node.price}
                   </td>
+
                   <td className="cont">
-                    {prd.node.purchaseFrom}
+                    <FontAwesomeIcon icon={faPen} color="#00d1b2" />
+                    {/* <button className="button is-rounded is-small is-success is-light">Update</button> */}
                   </td>
-                  <td className="cont">
-                  <button className="button is-rounded is-small is-success is-light">Update</button>
+                  <td>
+                    <FontAwesomeIcon icon={faTrashAlt} color="red"/>
                   </td>
                   {/* <p className="title is-4">{e.node.name}</p>
                   <p className="subtitle is-4">{e.node.id}</p> */}

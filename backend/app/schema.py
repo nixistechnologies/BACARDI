@@ -91,9 +91,12 @@ class CreateProduct(graphene.Mutation):
         hsn = graphene.String(required=True)
         batch = graphene.String(required=True)
 
+        category_id = graphene.ID(required=True)
+        sub_category_id = graphene.ID(required=True)
+
     product = graphene.Field(ProductNode)
     isNew = graphene.Boolean()
-    def mutate(self,info,name,qty,typeofpacking,mrp,cost_price,list_price,mfg,exp,exp_time,discount,hsn,batch):
+    def mutate(self,info,name,qty,typeofpacking,mrp,cost_price,list_price,mfg,exp,exp_time,discount,hsn,batch,sub_category_id,category_id):
         p = Product.objects.filter(name=name)
         if(p):
             p = p[0]
@@ -134,7 +137,8 @@ class CreateProduct(graphene.Mutation):
                 discount = discount,
                 # hsn = hsn,
                 batch = batch,
-                user_id=info.context.user.id
+                user_id=info.context.user.id,
+                subcategory_id = from_global_id(sub_category_id)[1]
             )
             return CreateProduct(product = product,isNew = True)
         

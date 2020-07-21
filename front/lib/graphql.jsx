@@ -11,6 +11,7 @@ export const getAllProductQuery = gql`
           price
           qty
           typeOfPacking
+          mfg
         }
       }
     }
@@ -359,16 +360,18 @@ export const getAllPatient = gql`
 `;
 
 export const createProductQuery = gql`
-mutation x($name:String!,$qty:Int!,$typeofpack:String!,$mrp:Float!,$list:Float!,$cost:Float!, $exp:String!,$exp_time:Int!,$mfg:String!,$discount:Float!,$hsn:String!,$batch:String!)
+mutation x($categoryId:ID!,$subCategoryId:ID!, $name:String!,$qty:Int!,$typeofpack:String!,$mrp:Float!,$list:Float!,$cost:Float!, $exp:String!,$exp_time:Int!,$mfg:String!,$discount:Float!,$hsn:String!,$batch:String!)
 {
-  createProduct(name:$name,qty:$qty, mrp:$mrp,typeofpacking:$typeofpack,exp:$exp,hsn:$hsn,mfg:$mfg,discount:$discount,batch:$batch,expTime:$exp_time,listPrice:$list,costPrice:$cost)
+  createProduct(categoryId:$categoryId,subCategoryId:$subCategoryId, name:$name,qty:$qty, mrp:$mrp,typeofpacking:$typeofpack,exp:$exp,hsn:$hsn,mfg:$mfg,discount:$discount,batch:$batch,expTime:$exp_time,listPrice:$list,costPrice:$cost)
   {
     product{
-        id
-				name
-      	mrp
-      	price
-      	cost
+      id
+      name
+      purchaseFrom
+      price
+      qty
+      typeOfPacking
+      mfg
     }
     isNew
   }
@@ -385,6 +388,7 @@ query x($id:ID!){
       expiryDate
       purchaseFrom
       GST
+      mfg
     }
   }
 `;
