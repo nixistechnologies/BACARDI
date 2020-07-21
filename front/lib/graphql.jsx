@@ -250,6 +250,21 @@ query x($id:ID!)
 }
 `
 
+export const createCategoryQuery=gql`
+mutation x($name:String!)
+{
+  createCategory(name:$name)
+  {
+    category{
+      id
+      name
+      product
+      subCategory
+    }
+  }
+}
+`
+
 export const renameCategory = gql`
 mutation x($id:ID!,$isUpdate:Boolean!,$name:String!){
   renameCategory(id:$id,isUpdate:$isUpdate,name:$name){

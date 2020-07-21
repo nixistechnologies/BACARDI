@@ -11,7 +11,65 @@ import {useState} from 'react'
 import { useDispatch,useSelector}from 'react-redux'
 // import { useEffect } from 'react'
 import SnackbarProvider,{ useSnackbar } from 'react-simple-snackbar'
-import {renameCategory} from '../../../lib/graphql'
+import {renameCategory,createCategoryQuery} from '../../../lib/graphql'
+
+
+const Modal = ({active,setActive})=>{
+    
+    const [name,setName] = useState("")
+    const [createCategory,{data,loading}] = useMutation(createCategoryQuery)
+    const sendToServer=(e)=>{
+        e.preventDefault()
+        createCategory({
+            variables:{name:name},
+            optimisticResponse:true,
+            update:(cache,{data})=>{
+                if(data!=true){
+                    console.log(data)
+                    const existingCache = cache.readQuery({query:allCategory})
+                    existingCache.categories.edges.push({"node":data.createCategory.category,"__typename":"CategoryNodeEdge"})
+                    console.log(existingCache)
+                    
+                    cache.writeQuery({
+                        query:allCategory,
+                        data:existingCache
+                    })
+
+                    setActive("")
+
+                    
+                }
+            }
+
+        
+        })
+        
+    }
+    
+    return(
+        <div className={`modal ${active}`} >
+            <div className="modal-background" onClick={()=>setActive("")}></div>
+                <div className="modal-content">
+                    <div className="box">
+                        <h1 className="model-title">Create new category</h1>
+                        <form onSubmit={(e)=>sendToServer(e)}>
+                            <div className="columns">
+                                <div className="column">
+                                    <input type="text" value={name} onChange={(e)=>setName(e.target.value)} className="input is-primary is-small" />
+                                </div>
+                                <div className="column is-2">
+                                    <button type="submit" className={`button is-primary is-small ${loading==true?"is-loading":"not"}`}>Create</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    {/* <!-- Any other Bulma elements you want --> */}
+                </div>
+            <button className="modal-close is-large" aria-label="close" onClick={()=>setActive("")}></button>
+        </div>
+    )
+}
+
 
 
 const Records = ({rdata}) => {
@@ -45,12 +103,26 @@ const Records = ({rdata}) => {
             update:(cache,{data})=>{
                 if(data!=true){
                     const existingCache = cache.readQuery({query:allCategory})
-                    console.log(existingCache)
+                    // console.log(data)
+                    // console.log(existingCache)
+                    
                     // console.log(data)
                     // console.log(data.renameCategory.category)
                     if(isUpdate==true){
                         // const cc = {"node":data.renameCategory.category}
                         // const newCache = existingCache.categories.edges.map(e=>(e.node.id==id?cc:e))
+                        
+                    for(var i=0;i<existingCache.categories.edges.length;i++)
+                    {
+                        if(existingCache.categories.edges[i].node.id === id)
+                        {
+                            existingCache.categories.edges[i].node.name = data.renameCategory.category.name
+                            // existingCache.categories.edges[i].node.product = data.renameCategory.
+                            // existingCache.categories.edges[i].node.hsn = data.renameCategory.
+                            // existingCache.categories.edges[i].node.GST = data.renameCategory.
+                        }
+                    }
+                        
                         setActive("")
                     }
                     else{
@@ -59,11 +131,15 @@ const Records = ({rdata}) => {
                         // console.log(existingCache)
                         const newCache = existingCache.categories.edges.filter(t=>(t.node.id!=id))
                         const c ={"categories":{"edges":newCache,"__typename":"CategoryNodeConnection"}}
-                        console.log(c)
+                        // console.log(c)
+                        // console.log(existingCache)
+                        // existingCache.categories.edges = existingCache.categories.edges.filter(t=>(t.node.id!=id))
+                        // console.log(existingCache)
                         cache.writeQuery({
                             query:allCategory,
                             data:c
                         })
+                        // existingCache.categories.edges = existingCache.categories.edges.filter(t=>(t.node.id!=id))
                         setdelActive("")
                     }
 
@@ -95,7 +171,7 @@ const Records = ({rdata}) => {
                         <th className="w10">Products</th>
                         <th className="w5"></th>
                         <th className="w5"></th>
-                        <th className="w5"></th>
+                        {/* <th className="w5"></th> */}
                     </tr>
                     </thead>
                     <tbody>
@@ -121,12 +197,9 @@ const Records = ({rdata}) => {
                             <td onClick={()=>{setdelActive("is-active"),setName(e.node.name),setId(e.node.id)}}>
                                 <FontAwesomeIcon icon={faTrashAlt} color="red"/>
                             </td>
-                            <td className="hover">
-                                
-                                
+                            {/* <td className="hover">
                                 <button className="button is-small is-rounded is-primary is-light"><FontAwesomeIcon icon={faPlus} /> <span style={{marginLeft:"3px"}}>Add</span></button>
-                            
-                            </td>
+                            </td> */}
 
                         </tr>)
                     })}
@@ -147,20 +220,8 @@ const Records = ({rdata}) => {
                                 </div>
 
                             </div>
-                            {/* <form onSubmit={(e)=>sendToServer(e,false)}>
-                                <div className="columns">
-                                    <div className="column">
-                                        <input type="text" value={name} onChange={(e)=>setName(e.target.value)} className="input is-primary is-small" />
-                                    </div>
-                                    <div className="column is-2">
-                                        <button type="submit" className={`button is-primary is-small ${loading==true?"is-loading":"not"}`}>Update</button>
-                                    </div>
-                                </div>
-                            </form> */}
                         </div>
-                        {/* <!-- Any other Bulma elements you want --> */}
-                    </div>
-                
+                    </div>                
                 <button className="modal-close is-large" aria-label="close"></button>
             </div>
 
@@ -196,6 +257,7 @@ const Records = ({rdata}) => {
 
 const Category=()=>{
     const {data,loading,error} = useQuery(allCategory)
+    const [active,setActive] = useState("")
     // const dispatch = useDispatch();
     // useEffect(()=>{
     //     dispatch(addProduct("X"))
@@ -210,9 +272,9 @@ const Category=()=>{
                     <h2>Categories</h2>
                 </div>
                 <div>
-                    <Link href="/category">
-                        <a className="button is-rounded is-small is-bold is-primary" style={{fontWeight:"bold"}}>Add category</a>
-                    </Link>
+                    {/* <Link href="/category"> */}
+                        <a onClick={()=>setActive("is-active")} className="button is-rounded is-small is-bold is-primary" style={{fontWeight:"bold"}}>Add category</a>
+                    {/* </Link> */}
                 </div>            
             </div>
             {
@@ -220,6 +282,7 @@ const Category=()=>{
                 ?<FullPageLoading/>
                 :<Records rdata={data.categories.edges} />
             }
+            <Modal active={active} setActive={setActive} />
             </>
 
     </Layout>

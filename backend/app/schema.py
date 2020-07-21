@@ -477,7 +477,14 @@ class RenameCategory(graphene.Mutation):
             Category.objects.get(id=from_global_id(id)[1]).delete()
             return RenameCategory(success=True)
 
-
+class CreateCategory(graphene.Mutation):
+    class Arguments:
+        name = graphene.String(required=True)
+    category = graphene.Field(CategoryNode)
+    def mutate(self,info,name):
+        print(info.context.user.id)
+        category = Category.objects.create(name=name,user_id = info.context.user.id)
+        return CreateCategory(category = category)
 
 class CreateUser(graphene.Mutation):
     # user = graphene.Field(UserNode)
@@ -515,6 +522,7 @@ class Mutation(graphene.ObjectType):
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
     update_subcategory = UpdateSubCategory.Field()
     delete_subcategory = DeleteSubCategory.Field()
+    create_category = CreateCategory.Field()
     
 
 class Query(graphene.AbstractType):

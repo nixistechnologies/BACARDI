@@ -14,7 +14,7 @@ import { useEffect } from 'react'
 
 const Model=({active,info=null,setActive,setInfo=undefined,isUpdate,categoryId})=>{
     // console.log(isUpdate)
-    console.log(categoryId)
+    // console.log(categoryId)
     // if(isUpdate===false)
     // {
     //     setActive({})
@@ -29,19 +29,24 @@ const Model=({active,info=null,setActive,setInfo=undefined,isUpdate,categoryId})
 
     const onSubmit=(d)=>{
         // console.log(data)
-        console.log(isUpdate)
+        // console.log(isUpdate)
         updateSubCategory({
             variables:{id:info.id?info.id:"",name:d.name,hsn:d.hsn,gst:d.gst,category:categoryId!=null?categoryId:"",isUpdate:isUpdate==true?true:false},
             optimisticResponse:true,
             update:(cache,{data})=>{
                 if(data!=true){
-                    console.log(data)
+                    // console.log(data)
                     const subCategoryCache = cache.readQuery({query:subCategoryById,variables:{"id":categoryId}})
                     
                     console.log(subCategoryCache)
-                    console.log(info.id)
+                    // console.log(info.id)
                     if(isUpdate==false){
-                        subCategoryCache.subcategoy.edges.push({"node":data.updateSubcategory.subCategory})
+                        subCategoryCache.subcategoy.edges.push({"node":data.updateSubcategory.subCategory,"__typename":"SubCategoryNodeEdge"})
+                        cache.writeQuery({
+                            query:subCategoryById,
+                            variables:{"id":categoryId},
+                            data:subCategoryCache
+                        })
                     }
                     
                     else{
@@ -150,23 +155,27 @@ const Records=({rdata,id})=>{
 
     const sendToServer=()=>{
 
-        // console.log("deleted")
+        console.log("deleted")
         // setdelActive("")
         deleteCategory(
             {variables:{id:info.id},
             optimisticResponse:true,
             update:(cache,{data})=>{
-                const subCategoryCache = cache.readQuery({query:subCategoryById,variables:{"id":id}})
-                const nCache = subCategoryCache.subcategoy.edges.filter((e)=>e.node.id!=info.id)
-                console.log(nCache)
-                const c ={"subcategoy":{"edges":nCache,"__typename":"SubCategoryNodeConnection"}}
-                console.log(c)
-                cache.writeQuery({
-                    query:subCategoryById,
-                    variables:{"id":id},
-                    data:c
-                })
-                setdelActive("")
+                if(data!=loading)
+                {
+                    const subCategoryCache = cache.readQuery({query:subCategoryById,variables:{"id":id}})
+                    console.log(subCategoryCache)
+                    const nCache = subCategoryCache.subcategoy.edges.filter((e)=>e.node.id!=info.id)
+                    // console.log(nCache)
+                    const c ={"subcategoy":{"edges":nCache,"__typename":"SubCategoryNodeConnection"}}
+                    console.log(c)
+                    cache.writeQuery({
+                        query:subCategoryById,
+                        variables:{"id":id},
+                        data:c
+                    })
+                    setdelActive("")
+                }
             }
         
         })
@@ -185,7 +194,7 @@ const Records=({rdata,id})=>{
                     <th className="w10">GST</th>
                     <th className="w5"></th>
                     <th className="w5"></th>
-                    <th className="w5"></th>
+                    {/* <th className="w5"></th> */}
                 </tr>
                 </thead>
                 <tbody>
@@ -227,10 +236,9 @@ const Records=({rdata,id})=>{
                         >
                             <FontAwesomeIcon icon={faTrashAlt} color="red"/>
                         </td>
-                        <td className="hover">
+                        {/* <td className="hover">
                             <button className="button is-small is-rounded is-primary is-light"><FontAwesomeIcon icon={faPlus} /> <span style={{marginLeft:"3px"}}>Add</span></button>
-                        
-                        </td>
+                        </td> */}
 
                     </tr>)
                 })}
@@ -285,7 +293,7 @@ const SubCategory=()=>{
     // console.log(query.subcategory)
     const [active,setActive] = useState("")
 
-    console.log(router)
+    // console.log(router)
     // console.log(data)
     return(
         <Layout title="Sub Category">
