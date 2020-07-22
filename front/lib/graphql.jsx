@@ -360,9 +360,9 @@ export const getAllPatient = gql`
 `;
 
 export const createProductQuery = gql`
-mutation x($categoryId:ID!,$subCategoryId:ID!, $name:String!,$qty:Int!,$typeofpack:String!,$mrp:Float!,$list:Float!,$cost:Float!, $exp:String!,$exp_time:Int!,$mfg:String!,$discount:Float!,$hsn:String!,$batch:String!)
+mutation x($id:String!,$isNew:Boolean!, $categoryId:ID!,$subCategoryId:ID!, $name:String!,$qty:Int!,$typeofpack:String!,$mrp:Float!,$list:Float!,$cost:Float!, $exp:String!,$exp_time:Int!,$mfg:String!,$discount:Float!,$hsn:String!,$batch:String!)
 {
-  createProduct(categoryId:$categoryId,subCategoryId:$subCategoryId, name:$name,qty:$qty, mrp:$mrp,typeofpacking:$typeofpack,exp:$exp,hsn:$hsn,mfg:$mfg,discount:$discount,batch:$batch,expTime:$exp_time,listPrice:$list,costPrice:$cost)
+  createProduct(pid:$id,isNew:$isNew,categoryId:$categoryId,subCategoryId:$subCategoryId, name:$name,qty:$qty, mrp:$mrp,typeofpacking:$typeofpack,exp:$exp,hsn:$hsn,mfg:$mfg,discount:$discount,batch:$batch,expTime:$exp_time,listPrice:$list,costPrice:$cost)
   {
     product{
       id
@@ -378,19 +378,42 @@ mutation x($categoryId:ID!,$subCategoryId:ID!, $name:String!,$qty:Int!,$typeofpa
 }
 `;
 
+
+export const deleteProductQuery = gql`
+mutation X($id:String!){
+  deleteProduct(id:$id){
+    success
+  }
+}
+`
+
 export const getProductByIdQuery = gql`
 query x($id:ID!){
-    productById(id:$id)
-    {
+  productById(id:$id)
+  {
+    id
+    name
+    price
+    mrp
+    cost
+    qty
+    typeOfPacking
+    expiryDate
+    expiryTime
+    GST
+    mfg
+    discount
+    batch
+    subcategory {
       id
       name
-      price
-      expiryDate
-      purchaseFrom
-      GST
-      mfg
+      category{
+        id
+        name
+      }
     }
   }
+}
 `;
 
 // export getAllProductQuery;

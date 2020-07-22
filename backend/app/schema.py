@@ -73,6 +73,9 @@ class Sales_ProductNode(DjangoObjectType):
 
 class CreateProduct(graphene.Mutation):
     class Arguments:
+        is_new = graphene.Boolean(required=True)
+        pid = graphene.String(required=True)
+
         name = graphene.String(required=True)
         qty = graphene.Int(required=True)
         typeofpacking = graphene.String(required=True)
@@ -96,16 +99,16 @@ class CreateProduct(graphene.Mutation):
 
     product = graphene.Field(ProductNode)
     isNew = graphene.Boolean()
-    def mutate(self,info,name,qty,typeofpacking,mrp,cost_price,list_price,mfg,exp,exp_time,discount,hsn,batch,sub_category_id,category_id):
-        p = Product.objects.filter(name=name)
-        if(p):
-            p = p[0]
+    def mutate(self,info,pid,is_new,name,qty,typeofpacking,mrp,cost_price,list_price,mfg,exp,exp_time,discount,hsn,batch,sub_category_id,category_id):
+        # p = Product.objects.filter(name=name)
+        if(is_new is False):
+            p = Product.objects.get(id=from_global_id(pid)[1])
             p.name = name
             p.qty = qty
             p.type_of_packing = typeofpacking
 
             p.mrp = mrp
-            p.list = list_price
+            p.price = list_price
             p.cost = cost_price
 
             p.mfg = mfg
@@ -115,6 +118,7 @@ class CreateProduct(graphene.Mutation):
             p.discount = discount
             p.hsn = hsn
             p.batch = batch
+            p.subcategory_id = from_global_id(sub_category_id)[1]
             p.save()
 
             return CreateProduct(product = p,isNew = False)
@@ -490,6 +494,14 @@ class CreateCategory(graphene.Mutation):
         category = Category.objects.create(name=name,user_id = info.context.user.id)
         return CreateCategory(category = category)
 
+class DeleteProduct(graphene.Mutation):
+    class Arguments:
+        id = graphene.String(required=True)
+    success = graphene.Boolean()
+    def mutate(self,info,id):
+        Product.objects.get(id=from_global_id(id)[1]).delete()
+        return DeleteProduct(success = True)
+
 class CreateUser(graphene.Mutation):
     # user = graphene.Field(UserNode)
     class Arguments:
@@ -518,6 +530,7 @@ import graphql_jwt
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
     create_product = CreateProduct.Field()
+    delete_product = DeleteProduct.Field()
     generate_bill = CreateBill.Field()
     update_user = UpdateUser.Field()
     # create_user = CreateUser.Field()

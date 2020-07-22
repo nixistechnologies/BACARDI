@@ -6,7 +6,7 @@ import Login from '../pages/login';
 class Index extends React.Component{
   render(){
     return (
-      <Layout>
+      <Layout title={"All products | BACARDI"}>
         <GetProduct></GetProduct>
       </Layout>  
     )
