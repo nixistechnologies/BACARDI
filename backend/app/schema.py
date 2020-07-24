@@ -485,6 +485,32 @@ class RenameCategory(graphene.Mutation):
             Category.objects.get(id=from_global_id(id)[1]).delete()
             return RenameCategory(success=True)
 
+class CreateCustomer(graphene.Mutation):
+    class Arguments:
+        id = graphene.String(required=True)
+        name = graphene.String(required=True)
+        mobile = graphene.String(required=True)
+        gst = graphene.String(required=True)
+        address = graphene.String(required=True)
+        email = graphene.String(required=True)
+        is_new = graphene.Boolean(required=True)
+    customer = graphene.Field(CustomerNode)
+    def mutate(self,info,id,name,mobile,gst,address,email,is_new):
+        if(is_new is True):
+            customer = Customer.objects.create(name=name,mobile=mobile,gst_number=gst,address=address,email=email,user_id = info.context.user.id)
+            # return CreateCustomer(customer = customer)
+        else:
+            customer = Customer.objects.get(id = from_global_id(id)[1])
+            customer.name = name
+            customer.mobile = mobile
+            customer.gst_number = gst
+            customer.email = email
+            customer.address = address
+            customer.save()
+        return CreateCustomer(customer = customer)
+
+
+
 class CreateCategory(graphene.Mutation):
     class Arguments:
         name = graphene.String(required=True)
@@ -540,10 +566,11 @@ class Mutation(graphene.ObjectType):
     update_subcategory = UpdateSubCategory.Field()
     delete_subcategory = DeleteSubCategory.Field()
     create_category = CreateCategory.Field()
+    create_customer = CreateCustomer.Field()
     
 
 class Query(graphene.AbstractType):
-    all_customer = graphene.List(CustomerNode)
+    customers = DjangoFilterConnectionField(CustomerNode)
     all_products = DjangoFilterConnectionField(ProductNode)
     product_by_id = graphene.Field(ProductNode,id=graphene.ID())
     product_suggestion = graphene.List(ProductNode,suggestion=graphene.String())
@@ -555,6 +582,9 @@ class Query(graphene.AbstractType):
 
     categories = DjangoFilterConnectionField(CategoryNode)
 
+
+    def resolve_customers(self,info):
+        return Customer.objects.filter(user_id=info.context.user.id)
 
     def resolve_subcategoy(self,info,id):
         return SubCategory.objects.filter(category_id=from_global_id(id)[1])

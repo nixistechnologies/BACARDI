@@ -1,5 +1,39 @@
 import gql from 'graphql-tag';
 
+export const getAllCustomersQuery = gql`
+query{
+  customers{
+    edges{
+      node{
+        id
+        name
+        address
+        email
+        mobile
+        gstNumber
+      }
+    }
+  }
+}
+`
+
+export const createOrUpdateCustomerQuery = gql`
+mutation x($name:String!,$id:String!, $mobile:String!$gst:String!,$address:String!,$email:String!,$isNew:Boolean!){
+  createCustomer(id:$id,name:$name,mobile:$mobile,gst:$gst,address:$address,email:$email,isNew:$isNew)
+  {
+    customer{
+      id
+      name
+      mobile
+      gstNumber
+      address
+      email
+    }
+  }
+}
+`
+
+
 export const getAllProductQuery = gql`
 {
     allProducts{

@@ -61,7 +61,11 @@ const SideBar = ({sidebar,route}) =>{
                             </Link>
                         </div>
                         </li>
-                    <li><a>Customers</a></li>
+                    <li>
+                        <Link href="/customers">
+                            <a className={route.startsWith("/customers") ?"active":"not"}>Customers</a>
+                        </Link>
+                    </li>
                 </ul>
                 <p className="menu-label">
                     Team
