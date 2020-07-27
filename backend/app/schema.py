@@ -148,16 +148,16 @@ class CreateProduct(graphene.Mutation):
         
 
 class MInput(graphene.InputObjectType):
-    medicine_id = graphene.String(required=True)
+    product_id = graphene.String(required=True)
     name = graphene.String(required=True)
     qty = graphene.Int()
     price = graphene.Float()
-    # GST = graphene.Float()
+    gst = graphene.Float()
     discount = graphene.Float()
     expiry = graphene.String()
 
 
-def generate_receipt(bill,medicines,user): 
+def generate_receipt(bill,products,user): 
     pdf = FPDF(orientation='P', unit='pt', format='A4') 
     pdf.add_page() 
     pdf.set_font("Arial", "B", 17) 
@@ -203,22 +203,22 @@ def generate_receipt(bill,medicines,user):
     pdf.cell(40, 2*th, "Total",1,0,"C")
     pdf.ln(2*th)
 
-    for index,i in enumerate(medicines,start=1):
+    for index,i in enumerate(products,start=1):
 
 
         
         pdf.set_font("Arial", "", 8)
         pdf.cell(20, 2*th, str(index),1,0,"C")
         pdf.set_font("Arial", "B", 8)
-        pdf.cell(100, 2*th, str(i.medicine_name.upper()),1,0,"C")
+        pdf.cell(100, 2*th, str(i.product_name.upper()),1,0,"C")
         pdf.set_font("Arial", "", 8)
-        if(i.medicine.type_of_packing):
-            pdf.cell(40, 2*th, str(i.medicine.type_of_packing),1,0,"C")
+        if(i.product.type_of_packing):
+            pdf.cell(40, 2*th, str(i.product.type_of_packing),1,0,"C")
         else:
             pdf.cell(40, 2*th, str(" - "),1,0,"C")
         
-        if(i.medicine.hsn):
-            pdf.cell(45, 2*th, str(i.medicine.hsn),1,0,"C")
+        if(i.product.subcategory.hsn):
+            pdf.cell(45, 2*th, str(i.product.subcategory.hsn),1,0,"C")
         else:
             pdf.cell(45, 2*th, str(" - "),1,0,"C")
         if(i.expiry_date):
@@ -226,13 +226,13 @@ def generate_receipt(bill,medicines,user):
         else:
             pdf.cell(40, 2*th, str(" - "),1,0,"C")
 
-        if(i.medicine.batch):
-            pdf.cell(40, 2*th, str(i.medicine.batch),1,0,"C")
+        if(i.product.batch):
+            pdf.cell(40, 2*th, str(i.product.batch),1,0,"C")
         else:
             pdf.cell(40, 2*th, str(" - "),1,0,"C")
 
-        if(i.medicine.mfg):
-            pdf.cell(40, 2*th, str(i.medicine.mfg),1,0,"C")
+        if(i.product.mfg):
+            pdf.cell(40, 2*th, str(i.product.mfg),1,0,"C")
         else:
             pdf.cell(40, 2*th, str(" - "),1,0,"C")
 
@@ -305,49 +305,54 @@ def GenerateBill(gross,invoice_number,medicines,discount,cgst,total,bill,user):
 
 class CreateBill(graphene.Mutation):
     class Arguments:
-        name = graphene.String(required = True)
-        age = graphene.String(required = True)
-        gender = graphene.String(required = True)
-        payment_mode = graphene.String(required=True)
-        billing_date = graphene.String(required=True)
-        gst = graphene.Float(required=True)
-        medicines = graphene.List(MInput)
+        # name = graphene.String(required = True)
+        # age = graphene.String(required = True)
+        # gender = graphene.String(required = True)
+        customerId = graphene.ID(required = True)
+        remarks = graphene.String(required = True)
+        # productId = graphene.ID(required = True)
+        payment_mode = graphene.String(required = True)
+        billing_date = graphene.String(required = True)
+        # gst = graphene.Float(required = True)
+        products = graphene.List(MInput)
     bill = graphene.Field(BillingNode)
-    def mutate(self,info,payment_mode,billing_date,gst,medicines,name,age,gender):
-        # print(medicines[0])
+    def mutate(self,info,payment_mode,billing_date,products,customerId,remarks):
+        # print(products[0])
         # user_id = from_global_id(user_id)[1]
-        name = name.replace(" ({})".format(age),"")
+        # name = name.replace(" ({})".format(age),"")
 
-        customer = Customer.objects.filter(name__iexact=name,age=12,sex=gender)
-        if customer:
-            user_id = customer[0]
-        else:
-            user_id = Customer.objects.create(name=name,age=age,sex=gender)
+        # customer = Customer.objects.filter(name__iexact=name,age=12,sex=gender)
+        # if customer:
+        #     user_id = customer[0]
+        # else:
+        #     user_id = Customer.objects.create(name=name,age=age,sex=gender)
+
+        user_id = from_global_id(customerId)[1]
 
 
         bill = Billing.objects.create( 
-            user_id=1,invoice_number="INV#{}".format(user_id.id),customer_id=user_id.id,payment_mode=payment_mode,billing_date=datetime.datetime.strptime(billing_date,"%Y-%m-%d")
+            user_id=1,invoice_number="INV#{}".format(user_id),customer_id=user_id,payment_mode=payment_mode,billing_date=datetime.datetime.strptime(billing_date,"%Y-%m-%d")
             )
-        bill.invoice_number = "INV#{}-{}".format(bill.id,user_id.id)
+        bill.invoice_number = "INV#{}-{}".format(bill.id,user_id)
 
         gross = total = discount = cgst =  0.0
 
-        for i in medicines:
+        for i in products:
             gross += i["price"] * i["qty"]
             total += (i["price"] * i["qty"]) - (i["price"]*i["qty"] * i["discount"]/100)
             discount += i["price"]*i["qty"] * i["discount"]/100
-            cgst += i["price"]*i["qty"] * gst /100
+            cgst += i["price"]*i["qty"] * i["gst"] /100
 
-
+            print(i)
             Sales_Product.objects.create(
-                product_id = from_global_id(i["medicine_id"])[1],
+                product_id = from_global_id(i["product_id"])[1],
                 product_name = i["name"],
                 quantity = int(i["qty"]),
                 price = round(float(i["price"]),2),
                 discount = round(float(i["discount"])),
                 expiry_date = datetime.datetime.strptime(i["expiry"],"%Y-%m-%d"),
-                CGST = round(float(i["price"]) * int(i["qty"]) * float(gst)/100/2,2),
-                SGST = round(float(i["price"]) * int(i["qty"]) * float(gst)/100/2,2),
+                CGST = round(float(i["price"]) * int(i["qty"]) * float(i["gst"])/100/2,2),
+                SGST = round(float(i["price"]) * int(i["qty"]) * float(i["gst"])/100/2,2),
                 total = round(int(i["qty"]) * float(i["price"]) - (i["price"]*i["qty"]*i["discount"]/100),2),
                 billing_id = bill.id,
             )
@@ -579,10 +584,13 @@ class Query(graphene.AbstractType):
     history = DjangoFilterConnectionField(BillingNode,slug=graphene.String())
     subcategoy = DjangoFilterConnectionField(SubCategoryNode,id = graphene.ID())
     user = graphene.Field(UserNode)
+    customer_suggestion = graphene.List(CustomerNode,suggestion = graphene.String())
 
     categories = DjangoFilterConnectionField(CategoryNode)
 
 
+    def resolve_customer_suggestion(self,info,suggestion):
+        return Customer.objects.filter(name__istartswith=suggestion)
     def resolve_customers(self,info):
         return Customer.objects.filter(user_id=info.context.user.id)
 

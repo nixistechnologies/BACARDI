@@ -17,6 +17,19 @@ query{
 }
 `
 
+export const customerSuggestion = gql`
+query x($suggestion:String!){
+  customerSuggestion(suggestion:$suggestion)
+  {
+    id
+    name
+    address
+    mobile
+    email
+  }
+}
+`
+
 export const createOrUpdateCustomerQuery = gql`
 mutation x($name:String!,$id:String!, $mobile:String!$gst:String!,$address:String!,$email:String!,$isNew:Boolean!){
   createCustomer(id:$id,name:$name,mobile:$mobile,gst:$gst,address:$address,email:$email,isNew:$isNew)
@@ -137,10 +150,11 @@ query x($slug:String!){
         netAmount
         paymentMode
         billingDate
-        patient{
+        outstanding
+        paidAmount
+        customer{
+          id
           name
-          age
-          sex
         }
       }
     }
@@ -163,10 +177,11 @@ query x($min:String!,$max:String!){
         netAmount
         paymentMode
         billingDate
-        patient{
+        outstanding
+        paidAmount
+        customer{
+          id
           name
-          age
-          sex
         }
       }
     }
@@ -176,8 +191,8 @@ query x($min:String!,$max:String!){
 
 
 export const generateBillQuery = gql`
-mutation x($medicines:[MInput!],$name:String!,$age:String!,$gender:String!, $date:String!,$gst:Float!,$payment:String!){
-  generateBill(billingDate:$date,gst:$gst,medicines:$medicines,paymentMode:$payment,name:$name,age:$age,gender:$gender)
+mutation x($products:[MInput!],$remarks:String!,$customerId:ID!,$date:String!,$payment:String!){
+  generateBill(billingDate:$date,products:$products,paymentMode:$payment,customerId:$customerId,remarks:$remarks)
   {
     bill{
       invoice
@@ -377,6 +392,7 @@ query x($suggestion:String!){
     price
     discount
     expiryDate
+    GST
   }
 }
 `;

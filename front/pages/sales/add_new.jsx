@@ -1,7 +1,7 @@
 import Layout from "../../components/layout"
 import {useForm} from 'react-hook-form'
-import { useQuery } from '@apollo/react-hooks'
-import { getAllPatient,productSuggetionQuery, generateBillQuery } from "../../lib/graphql";
+import { useQuery,useLazyQuery, useMutation } from '@apollo/react-hooks'
+import { getAllPatient,productSuggetionQuery, customerSuggestion, getAllCustomersQuery,generateBillQuery } from "../../lib/graphql";
 import { useDispatch, useSelector } from 'react-redux'
 import {useState, useEffect} from 'react'
 import React from 'react'
@@ -11,6 +11,10 @@ import { faTrashAlt,faEdit } from '@fortawesome/free-regular-svg-icons'
 import { generateBill,clearBill } from "../../redux_function/actions";
 import { server } from "../../lib/settings";
 import {BillPageLoading} from '../../components/skeleton'
+// import SelectSearch from 'react-select-search';
+// import { useSelect } from 'react-select-search';
+import $ from 'jquery'
+
 const ref = React.createRef();
 
 
@@ -50,24 +54,105 @@ const Billingform =() =>{
     const [mlist,setMlist] = useState([])
     const [list,setList] = useState([])
     const [active,setActive] = useState("modal")
-    const [text,setText] = useState("")
+    const [cname,setCname] = useState("")
+    const [pname,setPname] = useState("")
+    const [cSuggestion,{data:customerTemp,loading:customerloading}] = useLazyQuery(customerSuggestion)
+    const [pSuggestion,{data:productTemp,loading:productloading}] = useLazyQuery(productSuggetionQuery)
+    const [genBill,{data:billData,loading:billLoading}]  = useMutation(generateBillQuery)
+    
+    const [dropdown1,setDropdown1] = useState("")
+    const [dropdown2,setDropdown2] = useState("")
+
+
     const { register, handleSubmit,setValue,getValues,errors } = useForm();
-    const {loading,error,data} = useQuery(getAllPatient)
+    const {loading,error,data} = useQuery(getAllCustomersQuery)
     const product = useSelector(state => state.products);
     const billstore = useSelector(state => state.bills);
     const dispatch = useDispatch()
+    
+    useEffect(()=>{
+        // console.log("ds")
+        
+        // if($("#customer_dropdown").click()){
+        //     console.log("clickedd")
+        // }
+
+        $("#customer_dropdown").click(()=>{
+            console.log("XX")
+        })
+        
+        // $(document).on("click",(e)=>{
+        //     // if($("customer_dropdown").click(()=>{
+        //         console.log(e)
+        //     // })
+
+
+        //     // console.log("clickeddd")
+            
+        // })
+        
+    })
+    
     if(loading)
         return <div><BillPageLoading/></div>
-    const selectOption=(d)=>{
-        data.allCustomer.map((e)=>{
-            if(e.name === d.target.value)
-                setValue([{"age":e.age},{"gender":e.sex},{"patientId":e.id}])
-        })
+    const selectOption=(e)=>{
+        // const f = data.customers.edges.filter(t=>(t.node.id===e.target.value))[0]
+        // if(f!=undefined)
+        //     setValue([{"mobile":f.node.mobile},{"address":f.node.address},{"customerId":f.node.id}])
+        // if(e.target.value==="0")
+        // {
+        //     setValue([{"mobile":""},{"address":""},{"customerId":""}])   
+        // }
+        setDropdown1("")
+        setCname(e.name)
+        setValue([{"mobile":e.mobile},{"address":e.address},{"customerId":e.id},{"name":e.name}])
+
+        
+    }
+    const selectProduct=(e)=>{
+        setPname(e.name)
+        setQlabel(` (${e.qty})`)
+        // setValue([
+        //     {"id":id},
+        //     {"medicine":medicine},
+        //     {"price":price},
+        //     {"expiry":expiry},
+        //     {"discount":discount}
+        // ])
+        setDropdown2("")
+        setValue([{"price":e.price},{"expiry":e.expiryDate},{"discount":e.discount},{"id":e.id},{"pgst":e.GST}])
     }
 
-    const BillToServer=(name,age,gender,date,gst,payment,mlist)=>{
+    const showCustomer=(e)=>{
+        if(e.target.value.length>0)
+        {
+            cSuggestion({variables:{suggestion:e.target.value}})
+        }
+    }
+
+    const showProduct =(e)=>{
+        if(e.target.value.length>0)
+        {
+            pSuggestion({variables:{suggestion:e.target.value}})
+        }
+    }
+
+    const BillToServer=(customerId,date,payment,remarks,mlist)=>{
         // console.log(errors)
-        dispatch(generateBill(name,age,gender,date,gst,payment,mlist))
+        console.log(customerId)
+        console.log(date)
+        console.log(payment)
+        console.log(remarks)
+        console.log(mlist)
+        genBill({variables:{
+            "customerId":customerId,
+            "remarks":remarks,
+            "date":date,
+            "payment":payment,
+            "products":mlist
+        }})
+
+        // dispatch(generateBill(name,age,gender,date,gst,payment,mlist))
     }
 
     const fillMedicineInfo = (id,medicine,qty,price,expiry,discount)=>{
@@ -76,7 +161,6 @@ const Billingform =() =>{
         setValue([
             {"id":id},
             {"medicine":medicine},
-            // {"qty":qty},
             {"price":price},
             {"expiry":expiry},
             {"discount":discount}
@@ -87,20 +171,23 @@ const Billingform =() =>{
     const AddRows=()=>{
         setMlist(mlist.concat(
             [{
-                "medicineId":getValues("id"),
-                "name":getValues("medicine"),
+                "productId":getValues("id"),
+                "name":pname,
                 "qty":getValues("qty").length? getValues("qty"):1,
                 "price":getValues("price"),
                 "expiry":getValues("expiry"),
+                "gst":getValues("pgst"),
                 "discount":getValues("discount").length?getValues("discount"):0
             }]
         ))
+        setPname("")
         setValue([
-            {"medicine":""},
+            // {"medicine":""},
             {"qty":""},
             {"price":""},
             {"expiry":""},
             {"discount":""},
+            {"pgst":""}
         ])
     }
 
@@ -139,9 +226,12 @@ const Billingform =() =>{
     const reset =()=>{
         setMlist([])
         dispatch(clearBill())
+        setCname("")
+        setPname("")
         setValue([
-            {"patient":""},
-            {"age":""},
+            {"mobile":""},
+            {"address":""},
+            {"remarks":""},
             {"gender":""},
             {"payment":""},
             {"gst":""},
@@ -153,8 +243,12 @@ const Billingform =() =>{
     // console.log(mlist)
     console.log(billstore)
 
+    
+
     return (
-        <div>
+        <div 
+        // onClick={()=>{dropdown1==="is-active"?setDropdown1(""):null}}
+        >
             <div className="topHeading">
                 <h2>Sales</h2>
             </div>
@@ -165,6 +259,14 @@ const Billingform =() =>{
                 }
                 .is-small{
                     font-size:0.85rem;
+                }
+                .search_dropdown{
+                    outline: 0;
+                    border: 0;
+                    box-shadow: none;
+                }
+                .dropdown-menu{
+                    min-width:18rem;
                 }
             `} </style>
             {/* <form> */}
@@ -178,22 +280,85 @@ const Billingform =() =>{
                         <label className="label">Customer Name <span className="error_text">{errors.customer?.message}</span></label>
                         
 
-                        <input list="customer_name" className="input is-small" ref={register({required:"(Name is required)"})}
-                        //  onChange={()=>setQty(qty)} value={qty} 
-                        type="text" name="customer"  placeholder="Customer Name" onChange={selectOption}/>
-                        
-                        <datalist id="customer_name">
-                            {data.allCustomer.map((e)=>{
+                        {/* <input className="input is-small" ref={register({required:"(Name is required)"})} type="text" name="customer"  placeholder="Customer Name"/> */}
+                        {/* <article className="select is-small" style={{width:'100%'}}>
+                            <select className="" style={{width:'100%'}}
+                            onChange={(e)=>selectOption(e)}
+                            >
+                                <option value="0">------</option>
+                                {data.customers.edges.map(e=>{
+                                    return <option key={e.node.id} value={e.node.id}>{e.node.name}</option>
+                                })}
+
+                            </select>                            
+                        </article> */}
+
+
+
+
+                        <div className={`dropdown ${dropdown1}`} id="customer_dropdown" style={{width:"100%"}} >
+                        <div style={{width:"100%"}} className="dropdown-trigger" onClick={()=>{dropdown1==="is-active"?setDropdown1(""):setDropdown1("is-active")}}>
+                            <button style={{width:"100%"}} className="button is-small" aria-haspopup="true" aria-controls="dropdown-menu3">
+                                <span ref={register} name="name">{cname.length===0?"Select Customer Name":cname}</span>
+
+
+                            <span className="icon is-small">
+                                <i className="fas fa-angle-down" aria-hidden="true"></i>
+                            </span>
+                            </button>
+                        </div>
+                        <div className="dropdown-menu" id="dropdown-menu3" role="menu">
+                            <div className="dropdown-content">
+                            <a className="dropdown-item" style={{padding:"0"}}>
+                                <div className={`control ${customerloading===true?"is-loading":""}`}>
+                                    <input type="text" className="input is-small search_dropdown is-loading" onChange={(e)=>showCustomer(e)} placeholder="Customer name.." />
+                                </div>
+                                
+                            </a>
+                            <hr className="dropdown-divider" />
+                            {
+                                customerTemp!=undefined?
+                                customerTemp.customerSuggestion.map(e=>{
+                                return <a className="dropdown-item" onClick={()=>selectOption(e)} key={e.id}> {e.name}</a>
+                                }):""
+                            }
+                            </div>
+                        </div>
+                        </div>
+
+                        {/* <div className="dropdown is-hoverable">
+                        <div className="dropdown-trigger">
+                            <button className="button" aria-haspopup="true" aria-controls="dropdown-menu4">
+                            <span>Hover me</span>
+                            <span className="icon is-small">
+                                <i className="fas fa-angle-down" aria-hidden="true"></i>
+                            </span>
+                            </button>
+                        </div>
+                        <div className="dropdown-menu" id="dropdown-menu4" role="menu">
+                            <div className="dropdown-content">
+                            <div className="dropdown-item">
+                                <p>You can insert <strong>any type of content</strong> within the dropdown menu.</p>
+                            </div>
+                            </div>
+                        </div>
+                        </div> */}
+
+
+
+
+                        {/* <datalist id="customer_name">
+                            {data.customers.edges.map((e)=>{
                                 return <option key={e.id} value={e.name} onClick={selectOption}/>
                             })}
-                        </datalist>
+                        </datalist> */}
 
                     </div>
                     <div className="column">
                         <label className="label">Mobile <span className="error_text">{errors.mobile?.message}</span></label>
                         <input className="input is-small" ref={register({required:"(Mobile is required)"})}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
-                        type="text" name="mobile" placeholder="Mobile"/>
+                        type="text" name="mobile" placeholder="Mobile" disabled/>
                     </div>
                     <input type="hidden" ref={register} name="customerId"/>
 
@@ -201,7 +366,8 @@ const Billingform =() =>{
                         <label className="label">Address <span className="error_text">{errors.address?.message}</span></label>
                         <input className="input is-small" ref={register({required:"(Address is required)"})}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
-                        type="text" name="address" placeholder="Address"/>
+
+                        type="text" name="address" placeholder="Address" disabled/>
                     </div>
                 </div>
             </div>
@@ -248,23 +414,54 @@ const Billingform =() =>{
                 <form onSubmit={handleSubmit(AddRows)}>
                 <div className="columns">
                     <div className="column">
-                        <label className="label">Medicine<span className="error_text">{errors.medicine?.message}</span></label>
+                        <label className="label">Product<span className="error_text">{errors.medicine?.message}</span></label>
                         {/* {errors.medicine?.message} */}
-                        <input className="input is-small" list="medicine_name" ref={register({required:"(required)"})} autoComplete="off"
-                        //  onChange={()=>setQty(qty)} value={qty} 
-                        type="text" name="medicine"  placeholder="Medicine" onChange={selectMedicineOption} />
+                        {/* <input className="input is-small" list="medicine_name" ref={register({required:"(required)"})} autoComplete="off"
+                        type="text" name="medicine"  placeholder="Medicine" onChange={selectMedicineOption} /> */}
+
+                        <div className={`dropdown ${dropdown2}`} id="customer_dropdown" style={{width:"100%"}} >
+                        <div style={{width:"100%"}} className="dropdown-trigger" onClick={()=>{dropdown2==="is-active"?setDropdown2(""):setDropdown2("is-active")}}>
+                            <button type="button" style={{width:"100%"}} className="button is-small" aria-haspopup="true" aria-controls="dropdown-menu3">
+                                <span ref={register} name="name">{pname.length===0?"Product name":pname}</span>
+
+
+                            <span className="icon is-small">
+                                <i className="fas fa-angle-down" aria-hidden="true"></i>
+                            </span>
+                            </button>
+                        </div>
+                        <div className="dropdown-menu" id="dropdown-menu3" role="menu">
+                            <div className="dropdown-content">
+                            <a className="dropdown-item" style={{padding:"0"}}>
+                                <div className={`control ${productloading===true?"is-loading":""}`}>
+                                    <input type="text" className="input is-small search_dropdown is-loading" onChange={(e)=>showProduct(e)} placeholder="Product name.." />
+                                </div>
+                                
+                            </a>
+                            <hr className="dropdown-divider" />
+                            {
+                                productTemp!=undefined?
+                                productTemp.productSuggestion.map(e=>{
+                                return <a className="dropdown-item" onClick={()=>selectProduct(e)} key={e.id}> {e.name}</a>
+                                }):""
+                            }
+                            </div>
+                        </div>
+                        </div>
+
+
                         
 
-                        <div style={{position:'absolute',zIndex:'1',background:'white',display:list.length?"block":"none"}} className="_list">
+                        {/* <div style={{position:'absolute',zIndex:'1',background:'white',display:list.length?"block":"none"}} className="_list">
                             { list.map((e)=>{
-                            return <div className="_list-item" key={e.id} onClick={()=>fillMedicineInfo(e.id,e.name,e.qty,e.price,e.expiryDate,e.discount)}>
+                            return <div className="_list-item" key={e.id} onClick={()=>fillMedicineInfo(e.id,e.name,e.qty,e.price,e.expiryDate,e.discount,e.GST)}>
                                 <div key={e.id} >
                                         <span className="left">{e.name}</span>
                                         <span className="right">&#x20b9; {e.price}</span>
                                 </div>
                             </div>
                             })}   
-                        </div>
+                        </div> */}
 
                     </div>
                     <div className="column">
@@ -272,25 +469,26 @@ const Billingform =() =>{
                         <input type="hidden" name="id" ref={register}/>
                         <input className="input is-small" ref={register}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
-                        type="text" name="qty" placeholder="Quantity"/>
+                        type="text" name="qty" placeholder="Quantity" required/>
                     </div>
+                    <input type="hidden" name="pgst" ref={register} />
                     <div className="column">
                         <label className="label">Price</label>
                         <input className="input is-small" ref={register}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
-                        type="text" name="price" placeholder="Price"/>
+                        type="text" name="price" placeholder="Price" required/>
                     </div>
                     <div className="column">
                         <label className="label">Expiry Date</label>
                         <input className="input is-small" ref={register}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
-                        type="date" name="expiry" placeholder="Expiry Date"/>
+                        type="date" name="expiry" placeholder="Expiry Date" required/>
                     </div>
                     <div className="column">
                         <label className="label">Discount</label>
                         <input className="input is-small" ref={register}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
-                        type="text" name="discount" placeholder="Discount"/>
+                        type="text" name="discount" placeholder="Discount" required />
                     </div>
                     <div className="column is-1">
                     {/* <label className="label">Add</label> */}
@@ -344,28 +542,25 @@ const Billingform =() =>{
                 </tbody>
                 </table>
 
-                {billstore.invoice==null?
+                {billData==undefined?
                 <>
                 
 
-                <a onClick={()=>
-                        BillToServer( getValues("patient"),getValues("age"),getValues("gender"), getValues("date"),getValues("gst"),getValues("payment"),mlist)
-                    }
+                <a onClick={()=> 
+                    BillToServer( getValues("customerId"),getValues("date"),getValues("payment"),getValues("remarks"),mlist)
+                }
                 target={billstore.invoice==null?'_self':'_blank'}>
 
 
-                <button type="button" className="button is-primary is-small" data-target="bill" aria-haspopup="true">
+                <button type="button" className={`button is-primary is-small ${billLoading==true?"is-loading":""}`} data-target="bill" aria-haspopup="true">
                         {billstore.invoice==null?"Generate":"Download bill"}
                 </button>
                 </a>
-                {/* <div style={{marginLeft:'10px'}}> */}
-                    {/* <a style={{marginLeft:'30px'}} className="button is-small" onClick={()=>reset()}>Reset</a> */}
-                {/* </div> */}
                 
                 </>
                 :
                     <>
-                    <a href={`${server}/media/${billstore.link}`} target="_blank" className="button is-primary is-small" >Bill</a>
+                    <a href={`${server}/media/${billData.generateBill.bill.invoice}`} target="_blank" className="button is-primary is-small" >Bill</a>
                     <a style={{marginLeft:'30px'}} className="button is-small" onClick={()=>reset()}>Reset</a>
                     </>
                 }

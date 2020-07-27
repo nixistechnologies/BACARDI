@@ -134,6 +134,10 @@ align-self: center;
 .w20{
     width: 20%;
 }
+.is-small{
+    font-size:0.85rem !important;
+    /* font-weight: bold; */
+}
 .w10{
     width:10%
 }

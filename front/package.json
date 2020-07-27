@@ -40,6 +40,7 @@
     "react-loading-overlay": "^1.0.1",
     "react-loading-skeleton": "^2.1.1",
     "react-redux": "^7.2.0",
+    "react-select-search": "^2.0.4",
     "react-simple-snackbar": "^1.1.10",
     "react-to-pdf": "0.0.11",
     "recompose": "^0.30.0",
