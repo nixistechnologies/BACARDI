@@ -73,6 +73,41 @@ class Customer(models.Model):
     def __str__(self):
         return "{}".format(self.name)
 
+class State(models.Model):
+    name = models.CharField(max_length=50,blank=True,null=True)
+    def __str__(self):
+        return self.name
+    
+class City(models.Model):
+    name = models.CharField(max_length=50,blank=True,null=True)
+    state = models.ForeignKey(State,on_delete=models.CASCADE)
+    def __str__(self):
+        return self.name
+
+
+class Vendor(models.Model):
+    name = models.CharField(max_length=50,blank=True,null=True)
+    company = models.CharField(max_length=50,blank=True,null=True)
+    gst = models.CharField(max_length=20,blank=True,null=True)
+    email = models.EmailField(blank=True,null=True)
+    mobile = models.CharField(max_length=10,blank=True,null=True)
+    address = models.TextField(blank=True,null=True)
+    state = models.ForeignKey(State,on_delete=models.CASCADE)
+    # city = models.CharField(max_length=20,blank=True,null=True)
+    city = models.ForeignKey(City,on_delete=models.CASCADE,blank=True,null=True)
+    zip_code = models.CharField(max_length=10,blank=True,null=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
+
+    
+    def __str__(self):
+        return self.name
+    
+
+
+
+    # city = models.ForeignKey(City,on_delete=models.CASCADE)
+    # state = models.
+    # city = models.
 
 class Billing(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)

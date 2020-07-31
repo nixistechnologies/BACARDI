@@ -9,12 +9,22 @@ import {faPen, faPlus} from '@fortawesome/free-solid-svg-icons'
 import {useForm} from 'react-hook-form'
 import { faTrashAlt,faEdit } from '@fortawesome/free-regular-svg-icons'
 import { useState } from 'react'
+import { useEffect } from 'react'
 // import {useMutation} from '@apollo/react-hooks'
 
 const Modal = ({active,setActive,isNew, info=null})=>{
-    // const [name,setName] = useState("")
     const [createCustomer,{data,loading}] = useMutation(createOrUpdateCustomerQuery)
     const {register,setValue,handleSubmit,reset} = useForm()
+    console.log(info)
+    
+    useEffect(()=>{
+        if(info!=null)
+        {
+            reset({name:info.name,address:info.address,email:info.email,id:info.id,gst:info.gst,mobile:info.mobile})
+        }
+        
+    },[info])
+
 
     const sendToServer=(e)=>{
         // e.preventDefault()
@@ -25,7 +35,7 @@ const Modal = ({active,setActive,isNew, info=null})=>{
                 id: e.id,
                 mobile: e.mobile,
                 gst: e.gst,
-                email: e.gst,
+                email: e.email,
                 address: e.address,
                 isNew: isNew
 
@@ -62,6 +72,7 @@ const Modal = ({active,setActive,isNew, info=null})=>{
                     {
                         reset({"name":"","gst":"","mobile":"","address":"","email":""})
                     }
+                    // reset({"name":"","gst":"","mobile":"","address":"","email":""})
                     
                     
                     setActive("")
@@ -117,6 +128,7 @@ const Modal = ({active,setActive,isNew, info=null})=>{
                                     <input type="text"  
                                     placeholder="Enter Name"
                                     defaultValue={!isNew?info.name:""}
+                                    // value={info.name}
                                     // onChange={(e)=>setName(e.target.value)} 
                                     name="name"
                                     ref={register}
@@ -126,7 +138,7 @@ const Modal = ({active,setActive,isNew, info=null})=>{
                                     <button type="submit" className={`button is-small ${loading==true?"is-loading":"not"}`}>Create</button>
                                 </div> */}
                             </div>
-                            <input type="hidden" value={!isNew?info.id:""} name="id" ref={register} />
+                            <input type="hidden" defaultValue={!isNew?info.id:""} name="id" ref={register} />
                             <div className="columns">
                                 <div className="column">
                                 <label className="label">Address</label>

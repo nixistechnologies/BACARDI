@@ -9,5 +9,8 @@ admin.site.register(SubCategory)
 # admin.site.register(Medicine)
 admin.site.register(Billing)
 admin.site.register(Customer)
+admin.site.register(Vendor)
+admin.site.register(City)
+admin.site.register(State)
 
 

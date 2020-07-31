@@ -161,6 +161,87 @@ query x($slug:String!){
   }
 }`
 
+export const cityByStateQuery = gql`
+query x($id:ID!)
+{
+  city(stateId:$id)
+  {
+    edges{
+      node{
+        id
+        name
+      }
+    }
+  }
+}
+`
+
+export const stateQuery = gql`
+query {
+  states{
+    edges{
+      node{
+        id
+        name
+      }
+    }
+  }
+}
+`
+
+
+export const createVendorQuery = gql`
+mutation x($isNew:Boolean!, $name:String!,$email:String!,$mobile:String!,$company:String!,$address:String!,$city:String!,$state:String!,$zip:String!,$gst:String!,$id:String!){
+  createVendor(name:$name,email:$email,mobile:$mobile,company:$company,address:$address,city:$city,state:$state,zipcode:$zip,gst:$gst,id:$id,isNew:$isNew){
+    vendor{
+      id
+      name
+      email
+      mobile
+      company
+      address
+      city{
+        id
+        name
+      }
+      state{
+        id
+        name
+      }
+      zipCode
+      gst
+    }
+  }
+}
+
+`
+
+export const allVendorQuery = gql`
+query {
+  vendors{
+    edges{
+      node{
+        id
+        name
+        company
+        gst
+        email
+        mobile
+        address
+        state{
+          id
+          name
+        }
+        city{
+          id
+          name
+        }
+        zipCode
+      }
+    }
+  }
+}
+`
 
 export const reportByDateRangeQuery = gql`
 query x($min:String!,$max:String!){

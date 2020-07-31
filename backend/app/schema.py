@@ -71,6 +71,24 @@ class Sales_ProductNode(DjangoObjectType):
         filter_fields=()
         interfaces = (relay.Node,)        
 
+class VendorNode(DjangoObjectType):
+    class Meta:
+        model = Vendor
+        filter_fields = ()
+        interfaces = (relay.Node,)
+
+class StateNode(DjangoObjectType):
+    class Meta:
+        model = State
+        filter_fields = ()
+        interfaces = (relay.Node,)
+class CityNode(DjangoObjectType):
+    class Meta:
+        model = City
+        filter_fields = ()
+        interfaces = (relay.Node,)
+
+
 class CreateProduct(graphene.Mutation):
     class Arguments:
         is_new = graphene.Boolean(required=True)
@@ -489,6 +507,39 @@ class RenameCategory(graphene.Mutation):
         else:
             Category.objects.get(id=from_global_id(id)[1]).delete()
             return RenameCategory(success=True)
+class CreateVendor(graphene.Mutation):
+    class Arguments:
+        id = graphene.String(required=True)
+        name = graphene.String(required=True)
+        mobile = graphene.String(required=True)
+        gst = graphene.String(required=True)
+        address = graphene.String(required=True)
+        city = graphene.String(required=True)
+        state = graphene.String(required=True)
+        zipcode = graphene.String(required=True)
+        company = graphene.String(required=True)
+        email = graphene.String(required=True)
+        is_new = graphene.Boolean(required=True)
+
+    vendor = graphene.Field(VendorNode)
+    def mutate(self,info,id,name,mobile,gst,address,city,state,zipcode,company,email,is_new):
+        if(is_new is True):
+            vendor = Vendor.objects.create(name=name,mobile=mobile,email=email, gst=gst,address=address ,state_id=from_global_id(state)[1],city_id=from_global_id(city)[1],zip_code=zipcode,company=company,user_id=info.context.user.id)
+        else:
+            vendor = Vendor.objects.get(id = from_global_id(id)[1])
+            vendor.name = name
+            vendor.mobile = mobile
+            vendor.email = email
+            vendor.gst = gst
+            vendor.address = address
+            vendor.state_id = from_global_id(state)[1]
+            vendor.city_id = from_global_id(city)[1]
+            vendor.zip_code = zipcode
+            vendor.company = company
+            vendor.save()
+        return CreateVendor(vendor = vendor)
+
+
 
 class CreateCustomer(graphene.Mutation):
     class Arguments:
@@ -572,6 +623,7 @@ class Mutation(graphene.ObjectType):
     delete_subcategory = DeleteSubCategory.Field()
     create_category = CreateCategory.Field()
     create_customer = CreateCustomer.Field()
+    create_vendor  = CreateVendor.Field()
     
 
 class Query(graphene.AbstractType):
@@ -587,7 +639,16 @@ class Query(graphene.AbstractType):
     customer_suggestion = graphene.List(CustomerNode,suggestion = graphene.String())
 
     categories = DjangoFilterConnectionField(CategoryNode)
+    vendors = DjangoFilterConnectionField(VendorNode)
+    states = DjangoFilterConnectionField(StateNode)
+    city = DjangoFilterConnectionField(CityNode,stateId = graphene.ID())
 
+
+    def resolve_city(self,info,stateId):
+        return City.objects.filter(state_id=from_global_id(stateId)[1])
+
+    def resolve_vendors(self,info):
+        return Vendor.objects.filter(user_id = info.context.user.id)
 
     def resolve_customer_suggestion(self,info,suggestion):
         return Customer.objects.filter(name__istartswith=suggestion)
