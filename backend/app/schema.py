@@ -13,6 +13,8 @@ from django.template import Context
 import pdfkit
 import os
 from fpdf import FPDF
+import django_filters
+from django_filters import FilterSet
 
 class UserNode(DjangoObjectType):
     class Meta:
@@ -54,10 +56,27 @@ class ProfileNode(DjangoObjectType):
         filter_fields=()
         interfaces = (relay.Node,)
 
+class BillingFilter(FilterSet):
+    # customer__name = django_filters.CharFilter(lookup_expr=["iexact"])
+    customer__iexact = django_filters.CharFilter(field_name="customer__name",lookup_expr="in")
+
+    # INV#8-6
+    class Meta:
+        model = Billing
+        fields = ["customer__name","invoice_number"]
+    @property
+    def qs(self):
+        return super(BillingFilter,self).qs.filter(user_id = self.request.user.id)
+
 class BillingNode(DjangoObjectType):
     class Meta:
         model = Billing
-        filter_fields=()
+        # filter_fields = ["customer__name",]
+        filterset_class = BillingFilter
+        # filter_fields={
+        #     "customer__name":["exact","iexact"],   
+        # }
+
         interfaces = (relay.Node,)
 
 class CustomerNode(DjangoObjectType):
@@ -71,10 +90,21 @@ class Sales_ProductNode(DjangoObjectType):
         filter_fields=()
         interfaces = (relay.Node,)        
 
+class VendorFilter(FilterSet):
+    name_contains = django_filters.CharFilter(field_name="name",lookup_expr="icontains")
+    class Meta:
+        model = Vendor
+        fields = ["name"]
+    @property
+    def qs(self):
+        return super(VendorFilter,self).qs.filter(user_id = self.request.user.id)
+
+
 class VendorNode(DjangoObjectType):
     class Meta:
         model = Vendor
-        filter_fields = ()
+        # filter_fields = ()
+        filterset_class = VendorFilter
         interfaces = (relay.Node,)
 
 class StateNode(DjangoObjectType):
@@ -647,7 +677,7 @@ class Query(graphene.AbstractType):
     def resolve_city(self,info,stateId):
         return City.objects.filter(state_id=from_global_id(stateId)[1])
 
-    def resolve_vendors(self,info):
+    def resolve_vendors(self,info,**kwargs):
         return Vendor.objects.filter(user_id = info.context.user.id)
 
     def resolve_customer_suggestion(self,info,suggestion):
@@ -667,7 +697,12 @@ class Query(graphene.AbstractType):
 
     # def resol
 
-    def resolve_history(self,info,slug):
+    # def resolve_history(self,info,*args):
+    #     return Billing.objects.all()
+    def resolve_history(self,info,slug,**kwargs):
+        if(not len(slug)):
+            return Billing.objects.all()
+
         if(Billing.objects.filter(invoice_number__iexact=slug)):
             return Billing.objects.filter(invoice_number__iexact=slug)
         

@@ -124,8 +124,12 @@ const SideBar = ({sidebar,route}) =>{
                             <FontAwesomeIcon icon={faAngleRight}/>
                         </span>
                         </a>
-                        <ul className="child_">
-                            <li><a>Add new</a></li>
+                        <ul className="child_" style={{display:route.startsWith("/purchase")?"inherit":"none"}}>
+                            <li>
+                                <Link href="/purchase/new">
+                                    <a className={route.startsWith("/purchase/new")?"active":"not"}>Add new</a>
+                                </Link>
+                            </li>
                             <li><a>All Sales</a></li>
                         </ul>
                     </li>

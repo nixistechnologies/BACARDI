@@ -89,10 +89,12 @@ const Modal = ({active,setActive,isNew, info=null})=>{
                         query:allVendorQuery,
                         data:existingCache
                     })
-                    // if(isNew===true)
-                    // {
-                    //     reset({"name":"","gst":"","mobile":"","address":"","email":""})
-                    // }
+                    if(isNew===true)
+                    {
+                        setCity({name:"City",id:""})
+                        setState({name:"State",id:""})
+                        reset({"name":"","zipCode":"","company":"","gst":"","mobile":"","address":"","email":""})
+                    }
                     
                     
                     setActive("")
@@ -116,33 +118,6 @@ const Modal = ({active,setActive,isNew, info=null})=>{
             .modal-content, .modal-card {
                 margin: 0 auto;
                 // width: 540px;
-            }
-            .my-d{
-                display:none;
-                position:absolute;
-                width:100%;
-                z-index:10;
-                background:white;
-                box-shadow:0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
-                // height:135px;
-            }
-            .d-item{
-                padding:5px;
-            }
-            .dd-active{
-                display:block
-            }
-            .dn{
-                display:none
-            }
-            .dd-list{
-                position:absolute;
-                width:100%;
-                background:white;
-                max-height:100px;
-                overflow:scroll;
-                z-index:100;
-                box-shadow:0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
             }
 
         `}

@@ -39,6 +39,33 @@
 }
 
 
+.my-d{
+    display:none;
+    position:absolute;
+    width:100%;
+    z-index:10;
+    background:white;
+    box-shadow:0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
+}
+.d-item{
+    padding:5px;
+}
+.dd-active{
+    display:block
+}
+.dn{
+    display:none
+}
+.dd-list{
+    position:absolute;
+    width:100%;
+    background:white;
+    max-height:100px;
+    overflow:scroll;
+    z-index:100;
+    box-shadow:0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
+}
+
 
 ._list{
     background: 'white';

@@ -99,7 +99,7 @@ const Result = ({loading,data})=>{
             <table className="table is-fullwidth is-hoverable">
                 <thead>
                     <tr>
-                        <th>SN.</th>
+                        {/* <th>SN.</th> */}
                         <th>Invoice Number</th>
                         <th>Date</th>
                         <th>Name</th>
@@ -112,7 +112,7 @@ const Result = ({loading,data})=>{
                 <tbody>
                     {data.map((item,i)=>{
                         return (<tr key={item.node.id}>
-                            <td>{i+1}</td>
+                            {/* <td>{i+1}</td> */}
                             <td>
                                 <a href={`${server}/media/${item.node.invoice}`} target="_blank">
                                     {item.node.invoiceNumber}
@@ -153,7 +153,7 @@ const History = () =>{
     const [min,setMin] = useState("")
     const [max,setMax] = useState("")
     const [getReport, {loading:nloading,nerror,data:ndata}] = useLazyQuery(reportByDateRangeQuery,{variables:{"min":min,"max":max}})
-
+    const {data:pageData,loading:pageLoading} = useQuery(historyBySlugQuery,{variables:{"slug":""}})
     const [getHistory, {loading,error,data}] = useLazyQuery(historyBySlugQuery)    
     // console.log(ndata)
     return (
@@ -204,7 +204,8 @@ const History = () =>{
                         </div>
                     </div>
                     </form>
-                    <Result loading={loading} data={data!=undefined?data.history.edges:undefined}/>
+                    {/* <Result loading={loading} data={data!=undefined?data.history.edges:undefined}/> */}
+                    <Result loading={pageLoading} data={data!=undefined?data.history.edges:pageData!=undefined?pageData.history.edges:undefined}/>
                     </div>
 
                 :

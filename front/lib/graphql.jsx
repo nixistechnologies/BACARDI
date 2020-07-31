@@ -135,9 +135,26 @@ mutation x($username:String!$password:String!,$firstName:String!,$lastName:Strin
 }
 `
 
+
+export const vendorSuggestionQuery = gql`
+query x($name:String!){
+  vendors(nameContains:$name)
+  {
+    edges{
+      node{
+        id
+        name
+        gst
+        email
+      }
+    }
+  }
+}
+`
+
 export const historyBySlugQuery = gql`
 query x($slug:String!){
-  history(slug:$slug){
+  history(slug:$slug,first:20){
     edges{
       node{
 				discount

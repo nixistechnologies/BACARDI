@@ -1,21 +1,27 @@
 import Layout from './layout'
 import { useMutation, useQuery, useLazyQuery } from '@apollo/react-hooks';
-import { createProductQuery,allCategory,subCategoryById,getAllProductQuery,getProductByIdQuery } from '../lib/graphql';
+import { createProductQuery,allCategory,subCategoryById,getAllProductQuery,getProductByIdQuery,vendorSuggestionQuery } from '../lib/graphql';
 import { useState, useEffect } from 'react';
 import {useForm} from 'react-hook-form'
 import { TableLoading } from './skeleton';
 import SnackbarProvider,{ useSnackbar } from 'react-simple-snackbar'
-import gql from 'graphql-tag';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUpload,faAngleDown } from '@fortawesome/free-solid-svg-icons';
 
 
-function X({productId=null,name=null}){
+function X({productId=null,name=null,purchase=null}){
     const [openSnackbar, closeSnackbar] = useSnackbar({position:"top-center",style:{zIndex:"999", marginTop:"50px"}})
     const {data:single,loading:sLoading} = useQuery(getProductByIdQuery,{variables:{id:productId}})
     const {data,loading:mainLoading} = useQuery(allCategory)
     const [getSub,{data:subData,loading:subLoading}] = useLazyQuery(subCategoryById)
+    const [getVendor,{data:vendorData,loading:VendorLoading}] = useLazyQuery(vendorSuggestionQuery)
     const [createNewProduct,{data:newData,loading:createLoading}] = useMutation(createProductQuery)
     const [notify,setNotify] = useState(false)
     const { register, handleSubmit, watch, errors,reset,setValue,getValues } = useForm();
+
+    const [vendorFilter,setVendorFilter] = useState("")
+    const [vendorDD,setVendorDD] = useState("")
+    const [vendor,setVendor] = useState({name:"Select Vendor",id:"",email:"",gst:""})
     
     const clearData=() =>{
         setValue([
@@ -128,18 +134,8 @@ function X({productId=null,name=null}){
     // console.log(subData)
     // console.log(name)
     console.log(single)
-    
-    // if(single!=undefined)
-    // {
-    //     const p = single.productById
-    //     setValue([
-    //         {"gst":p.GST},{"mrp":p.mrp},{"product":p.name},{"qty":p.qty},{"typeofpack":p.typeOfPacking},{"exp_date":p.expiryDate},
-    //         {"mfg":p.mfg},{"cost":p.cost},{"listprice":p.price},
-    //         {"exp_time":p.expiryTime},{"discount":p.discount},
-    //     ])
-        
-    // }
-    // console.log(productId)
+    console.log(purchase)
+
     return(
         <Layout title={productId===null?"Create new Product":`Update ${name}`}>
             
@@ -148,6 +144,7 @@ function X({productId=null,name=null}){
                 .is-small{
                     font-size:0.85rem;
                 }
+                .dd-list
             `}
             </style>
             <div style={{display:notify?'block':'none'}}  onClick={()=>setNotify(false)}>
@@ -158,7 +155,9 @@ function X({productId=null,name=null}){
             </div>
         <div style={{maxWidth:"1000px",}} className="createform">
             <div className="topHeading">
-                <h2>{name==null?"Create New":
+                <h2>{
+                purchase!=null?"Purchase":
+                name==null?"Create New":
                     name
                     // <div>
                     //     <input type="text" style={{width:"auto"}} className="input is-medium" defaultValue={name} />
@@ -177,7 +176,115 @@ function X({productId=null,name=null}){
                 onSubmit={handleSubmit(onSubmit)}
             >
 
+            <div style={{display:purchase==null?"none":"block"}}>
+            <div style={{marginBottom:"30px"}}>
+                <h2 style={{fontSize:"20px",marginBottom:"15px",fontWeight:'300'}}> Vendor Detail</h2>
+                {/* <hr /> */}
+                <div className="i_row" style={{display:"flex"}}>
+                    
+                    
+                    
+                    <div>
+                        <label className="label">Vendor Name</label>
+                        {/* <input className="input is-small" ref={register}
+                        type="text" name="vendor_name" placeholder="Vendor NAme" required/> */}
+
+
+                        <div style={{position:'relative',padding:"0"}} >
+                            <div type="text" className="input is-small" 
+                            onClick={()=>{setVendorDD(vendorDD==="dd-active"?"":"dd-active")}}
+                            >
+                                {/* <input type="text" className="input is-small"/> */}
+                                <div style={{width:'100%',padding:"0"}}>
+                                    <span>{vendor.name}</span>
+                                    <span style={{float:'right'}}>
+                                        <FontAwesomeIcon icon={faAngleDown} />
+                                    </span>
+                                </div>
+                            </div>
+                            <div style={{padding:"0"}}>
+                                <div className={`control my-d dropdown-content ${vendorDD}`} style={{padding:"0"}}>
+                                    <input type="text" className={`input is-small ${VendorLoading===true?"is-loading":""}`} value={vendorFilter} onChange={(e)=>{ setVendorFilter(e.target.value), getVendor({variables:{"name":e.target.value}})}} placeholder="Search Vendor.." style={{border:0,outline:0,boxShadow:'none'}}/>
+                                    <div className="dd-list" style={{padding:"0",maxHeight:"170px"}}>
+                                        {
+                                        vendorData!=null?
+                                        vendorData.vendors.edges.map(e=>{
+                                            // return ( e.node.name.toLocaleLowerCase().startsWith(statefilter)?
+                                            return <div style={{padding:"0"}} className="d-item_" onClick={()=>{setVendor({name:e.node.name,id:e.node.id,email:e.node.email,gst:e.node.gst}), setValue([{"vendor_email":e.node.email},{"vendor_GST":e.node.gst}]), setVendorDD(vendorDD==="dd-active"?"":"dd-active") }} key={e.node.id} value={e.node.id}> <a className="dropdown-item">{e.node.name}</a></div>
+                                            // :null
+                                                }
+                                            ):null
+                                        }
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+
+
+
+
+                    <div>
+                        <label className="label">Vendor Email</label>
+                        <input className="input is-small is-disabled" ref={register}
+                        type="text" name="vendor_email"  placeholder="Vendor Email" required disabled/>
+                    </div>
+                    <div>
+                        <label className="label">GST</label>
+                        <input className="input is-small" ref={register}
+                        type="text" name="vendor_GST"  placeholder="Vendor GST" required disabled/>
+                    </div>
+                </div>
+            </div>
+
+            <div style={{marginBottom:"30px"}}>
+                <h2 style={{fontSize:"20px",marginBottom:"15px",fontWeight:'300'}}> Invoice Detail</h2>
+                {/* <hr /> */}
+                <div className="i_row" style={{display:"flex"}}>
+                    <div>
+                        <label className="label">Invoice Date</label>
+                        <input className="input is-small" ref={register}
+                        type="date" name="invoice_date" placeholder="Invoice date" required/>
+                    </div>
+                    <div>
+                        <label className="label">Invoice Number</label>
+                        <input className="input is-small" ref={register}
+                        type="text" name="invoice_number"  placeholder="Invoice Number" required/>
+                    </div>
+                    <div>
+                        <label className="label">Upload</label>
+
+                        <div className="file is-small">
+                            <label className="file-label">
+                                <input className="file-input is-small" type="file" name="resume" />
+                                <span className="file-cta">
+                                <span className="file-icon">
+                                <FontAwesomeIcon icon={faUpload} />
+                                </span>
+                                <span className="file-label">
+                                    Choose a file…
+                                </span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            </div>
+
+            <div>
+            
+            <h2 style={{fontSize:"20px",marginBottom:"15px",fontWeight:'300'}}> Product Detail</h2>
+            
             <div className="i_row" style={{display:"flex"}}>
+
                 <div>
                     <label className="label">Category Name</label>
                     
@@ -375,6 +482,7 @@ function X({productId=null,name=null}){
                     </button>
                 </div>
             </div>
+            </div>
             
             </form>
             </>
@@ -386,10 +494,10 @@ function X({productId=null,name=null}){
     )
 }
 
-const CreateProduct = ({name=null,productId=null})=>{
+const CreateProduct = ({name=null,productId=null,purchase=null})=>{
     return(
         <SnackbarProvider>
-            <X name={name} productId={productId}/>
+            <X name={name} productId={productId} purchase={purchase}/>
         </SnackbarProvider>
     )
 }
