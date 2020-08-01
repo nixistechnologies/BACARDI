@@ -131,6 +131,9 @@ class PurchaseProduct(models.Model):
         super().save(*args, **kwargs)
         p = Product.objects.get(id = self.product.id)
         p.qty = p.qty + self.qty
+        p.mrp = self.mrp
+        p.price = self.list_price
+        p.cost = self.cost
         p.save()
 
 
