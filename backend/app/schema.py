@@ -269,7 +269,7 @@ class AddPurchase(graphene.Mutation):
         products = graphene.List(PurchaseInput)
     purchase = graphene.Field(PurchaseNode)
     def mutate(self,info,vendor_id,invoice_date,invoice_number,products):
-        purchase = Purchase.objects.create(vendor_id = from_global_id(vendor_id)[1],invoice_date = datetime.datetime.strptime(invoice_date,"%Y-%m-%d"),invoice_number = invoice_number)
+        purchase = Purchase.objects.create(vendor_id = from_global_id(vendor_id)[1],invoice_date = datetime.datetime.strptime(invoice_date,"%Y-%m-%d"),invoice_number = invoice_number,user_id=info.context.user.id)
         for i in products:
             PurchaseProduct.objects.create(
                 product_id = from_global_id(i.product_id)[1],
