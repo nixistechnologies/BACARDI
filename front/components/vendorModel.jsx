@@ -59,6 +59,7 @@ const Modal = ({active,setActive,isNew, info=null})=>{
             update:(cache,{data})=>{
                 if(data!=true)
                 {
+                    try{
                     const existingCache = cache.readQuery({query:allVendorQuery})
                     if(isNew === true){
                         console.log(data)
@@ -89,14 +90,16 @@ const Modal = ({active,setActive,isNew, info=null})=>{
                         query:allVendorQuery,
                         data:existingCache
                     })
+                    }
+                    catch(e){
+                        console.log("no need to update")
+                    }
                     if(isNew===true)
                     {
                         setCity({name:"City",id:""})
                         setState({name:"State",id:""})
                         reset({"name":"","zipCode":"","company":"","gst":"","mobile":"","address":"","email":""})
                     }
-                    
-                    
                     setActive("")
                 }
             }

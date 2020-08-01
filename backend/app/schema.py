@@ -23,10 +23,56 @@ class UserNode(DjangoObjectType):
         interfaces = (graphene.Node,)
         # interfaces = (relay.Node,)
 
+class PurchaseProductNode(DjangoObjectType):
+    class Meta:
+        model = PurchaseProduct
+        filter_fields=()
+        interfaces = (relay.Node,)
+
+
+class PurchaseFilter(FilterSet):
+    vendor__iexact = django_filters.CharFilter(field_name="vendor__name",lookup_expr="iexact")
+    date_gte = django_filters.DateFilter(field_name="date",lookup_expr="gte")
+    date_lte = django_filters.DateFilter(field_name="date",lookup_expr="lte")
+    class Meta:
+        model = Purchase
+        fields = ["vendor__name","date_gte","date_lte"]
+        
+        filter_fields={
+            # "vendor__name":["iexact"],
+            "date":["lte","gte"],
+        }
+    @property
+    def qs(self):
+        return super(PurchaseFilter,self).qs.filter(user_id = self.request.user.id) 
+
+class PurchaseNode(DjangoObjectType):
+    class Meta:
+        model = Purchase
+        # filter_fields=()
+        
+
+        filterset_class = PurchaseFilter
+        interfaces = (relay.Node,)
+    products = graphene.Int()
+    def resolve_products(self,info):
+        return len(PurchaseProduct.objects.filter(purchase_id = self.id))
+
+class ProductFilter(FilterSet):
+    name_startswith = django_filters.CharFilter(field_name="name", lookup_expr="icontains")
+    class Meta:
+        model = Product
+        fields = ["name",]
+    @property
+    def qs(self):
+        return super(ProductFilter,self).qs.filter(user_id = self.request.user.id)
+
+
 class ProductNode(DjangoObjectType):
     class Meta:
         model = Product
-        filter_fields=()
+        filterset_class = ProductFilter
+        # filter_fields=()
         interfaces = (relay.Node,)
         
 class CategoryNode(DjangoObjectType):
@@ -203,6 +249,42 @@ class MInput(graphene.InputObjectType):
     gst = graphene.Float()
     discount = graphene.Float()
     expiry = graphene.String()
+
+
+class PurchaseInput(graphene.InputObjectType):
+    product_id = graphene.String(required=True)
+    name = graphene.String(required=True)
+    qty = graphene.Int()
+    mrp = graphene.Float()
+    price = graphene.Float()
+    cost = graphene.Float()
+    discount = graphene.Float()
+
+
+class AddPurchase(graphene.Mutation):
+    class Arguments:
+        vendor_id = graphene.ID(required=True)
+        invoice_date = graphene.String(required=True)
+        invoice_number = graphene.String(required=True)
+        products = graphene.List(PurchaseInput)
+    purchase = graphene.Field(PurchaseNode)
+    def mutate(self,info,vendor_id,invoice_date,invoice_number,products):
+        purchase = Purchase.objects.create(vendor_id = from_global_id(vendor_id)[1],invoice_date = datetime.datetime.strptime(invoice_date,"%Y-%m-%d"),invoice_number = invoice_number)
+        for i in products:
+            PurchaseProduct.objects.create(
+                product_id = from_global_id(i.product_id)[1],
+                qty = i.qty,
+                mrp = i.mrp,
+                list_price = i.price,
+                cost = i.cost,
+                discount = i.discount,
+                purchase_id = purchase.id
+            )
+            # pr = Product.objects.get(id = from_global_id(i.product_id)[1])
+            # pr.qty = pr.qty + i.qty
+            # pr.save()
+        return AddPurchase(purchase=purchase)
+
 
 
 def generate_receipt(bill,products,user): 
@@ -654,6 +736,7 @@ class Mutation(graphene.ObjectType):
     create_category = CreateCategory.Field()
     create_customer = CreateCustomer.Field()
     create_vendor  = CreateVendor.Field()
+    add_purchase = AddPurchase.Field()
     
 
 class Query(graphene.AbstractType):
@@ -672,6 +755,7 @@ class Query(graphene.AbstractType):
     vendors = DjangoFilterConnectionField(VendorNode)
     states = DjangoFilterConnectionField(StateNode)
     city = DjangoFilterConnectionField(CityNode,stateId = graphene.ID())
+    purchases = DjangoFilterConnectionField(PurchaseNode,slug=graphene.String())
 
 
     def resolve_city(self,info,stateId):
@@ -708,6 +792,15 @@ class Query(graphene.AbstractType):
         
         return Billing.objects.filter(customer__name__iexact=slug)
         
+    def resolve_purchases(self,info,slug,**kwargs):
+        if(not len(slug)):
+            return Purchase.objects.all()
+
+        if(Purchase.objects.filter(invoice_number__iexact=slug)):
+            return Purchase.objects.filter(invoice_number__iexact=slug)
+        
+        return Purchase.objects.filter(vendor__name__iexact=slug)
+
         
         # else if(Billing.objects.filter(patient__name__iexact="aman"))
 

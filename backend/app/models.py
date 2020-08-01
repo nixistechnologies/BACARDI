@@ -101,7 +101,37 @@ class Vendor(models.Model):
     
     def __str__(self):
         return self.name
+
     
+
+class Purchase(models.Model):
+    vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE)
+    invoice_date = models.DateField()
+    date = models.DateField(auto_now_add=True,blank=True)
+    invoice_number = models.CharField(max_length=50)
+    invoice_file = models.FileField(upload_to="purchase_invoice/",blank=True,null=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
+    
+    def __str__(self):
+        return self.vendor.name
+    
+
+class PurchaseProduct(models.Model):
+    product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    qty = models.IntegerField(null=True,blank=True)
+    mrp = models.FloatField(null=True,blank=True)
+    list_price = models.FloatField(null=True,blank=True)
+    cost = models.FloatField(null=True,blank=True)
+    discount = models.IntegerField(null=True,blank=True)
+    purchase = models.ForeignKey(Purchase,on_delete=models.CASCADE)
+    def __str__(self):
+        return self.product.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        p = Product.objects.get(id = self.product.id)
+        p.qty = p.qty + self.qty
+        p.save()
 
 
 

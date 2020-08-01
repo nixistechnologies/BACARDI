@@ -130,7 +130,12 @@ const SideBar = ({sidebar,route}) =>{
                                     <a className={route.startsWith("/purchase/new")?"active":"not"}>Add new</a>
                                 </Link>
                             </li>
-                            <li><a>All Sales</a></li>
+                            <li>
+                                <Link href="/purchase/history">
+                                    <a className={route.startsWith("/purchase/history")?"active":"not"}>All purchase</a>
+                                </Link>
+                                
+                            </li>
                         </ul>
                     </li>
                 </ul>

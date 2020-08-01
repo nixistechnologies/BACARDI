@@ -26,9 +26,9 @@
 /* .createform{
     padding: 10px;
 } */
-.createform div{
+/* .createform div{
     width: 100%;
-}
+} */
 .i_row div{
     padding: 0px 10px 0px 10px;
     width: 100%;
@@ -47,6 +47,15 @@
     background:white;
     box-shadow:0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
 }
+#nprogress .bar {
+    background: #00d1b2 !important;
+  }
+  
+  #nprogress .spinner-icon {
+    border-top-color: #00d1b2 !important;
+    border-left-color: #00d1b2 !important;
+  }
+
 .d-item{
     padding:5px;
 }

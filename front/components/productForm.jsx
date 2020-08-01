@@ -4,24 +4,22 @@ import { createProductQuery,allCategory,subCategoryById,getAllProductQuery,getPr
 import { useState, useEffect } from 'react';
 import {useForm} from 'react-hook-form'
 import { TableLoading } from './skeleton';
-import SnackbarProvider,{ useSnackbar } from 'react-simple-snackbar'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUpload,faAngleDown } from '@fortawesome/free-solid-svg-icons';
+import { useSnackbar } from 'react-simple-snackbar'
+// import VendorModel from '../components/vendorModel'
 
 
-function X({productId=null,name=null,purchase=null}){
+function X({productId=null,name=null,purchase=null,setActive=null }){
     const [openSnackbar, closeSnackbar] = useSnackbar({position:"top-center",style:{zIndex:"999", marginTop:"50px"}})
     const {data:single,loading:sLoading} = useQuery(getProductByIdQuery,{variables:{id:productId}})
     const {data,loading:mainLoading} = useQuery(allCategory)
     const [getSub,{data:subData,loading:subLoading}] = useLazyQuery(subCategoryById)
-    const [getVendor,{data:vendorData,loading:VendorLoading}] = useLazyQuery(vendorSuggestionQuery)
     const [createNewProduct,{data:newData,loading:createLoading}] = useMutation(createProductQuery)
     const [notify,setNotify] = useState(false)
     const { register, handleSubmit, watch, errors,reset,setValue,getValues } = useForm();
+    
 
-    const [vendorFilter,setVendorFilter] = useState("")
-    const [vendorDD,setVendorDD] = useState("")
-    const [vendor,setVendor] = useState({name:"Select Vendor",id:"",email:"",gst:""})
+    // const [active,setActive] = useState("")
+    
     
     const clearData=() =>{
         setValue([
@@ -90,6 +88,7 @@ function X({productId=null,name=null,purchase=null}){
                     }catch(e){
                         console.log("no need to update")
                     }
+
                     if(productId===null)
                     {
                         openSnackbar("Product has been created successfully")
@@ -101,6 +100,7 @@ function X({productId=null,name=null,purchase=null}){
                     if(productId===null){
                         clearData()
                     }
+                    setActive("")
                     
                 }
             }
@@ -109,14 +109,14 @@ function X({productId=null,name=null,purchase=null}){
     }
 
     const select_Sub_Category = (e) =>{
-        console.log(e)
+        // console.log(e)
         getSub({variables:{"id":e.target.value}})
 
     }
     useEffect(()=>{
         if(single!=undefined)
         {
-            console.log("getsubcategory")
+            // console.log("getsubcategory")
             // const p = single.productById
             // setValue([
             //     {"gst":p.GST},{"mrp":p.mrp},{"product":p.name},{"qty":p.qty},{"typeofpack":p.typeOfPacking},{"exp_date":p.expiryDate},
@@ -133,11 +133,12 @@ function X({productId=null,name=null,purchase=null}){
 
     // console.log(subData)
     // console.log(name)
-    console.log(single)
-    console.log(purchase)
+    // console.log(single)
+    // console.log(purchase)
 
+    // console.log(setActive)
     return(
-        <Layout title={productId===null?"Create new Product":`Update ${name}`}>
+        <>
             
             
             <style jsx>{`
@@ -147,6 +148,7 @@ function X({productId=null,name=null,purchase=null}){
                 .dd-list
             `}
             </style>
+            {/* <VendorModel isNew={true} active={active} setActive={setActive} /> */}
             <div style={{display:notify?'block':'none'}}  onClick={()=>setNotify(false)}>
                 <div className="notification is-primary">
                 <button className="delete"  onClick={()=>setNotify(false)}></button>
@@ -154,19 +156,23 @@ function X({productId=null,name=null,purchase=null}){
                 </div>
             </div>
         <div style={{maxWidth:"1000px",}} className="createform">
+            
+            {purchase===null?
             <div className="topHeading">
                 <h2>{
-                purchase!=null?"Purchase":
                 name==null?"Create New":
                     name
-                    // <div>
-                    //     <input type="text" style={{width:"auto"}} className="input is-medium" defaultValue={name} />
-                    // </div>
-                    
-                // name
                 
                 }</h2>
-            </div>
+                {/* {
+                    purchase!=null?
+                    <button type="buttom" className="button is-primary is-small is-rounded" onClick={()=>setActive("is-active")}> Add Vendor</button>
+                    :""
+                } */}
+                <div>
+                    
+                </div>
+            </div>:""}
 
 
             {mainLoading==true || sLoading==true?
@@ -175,113 +181,9 @@ function X({productId=null,name=null,purchase=null}){
             <form 
                 onSubmit={handleSubmit(onSubmit)}
             >
-
-            <div style={{display:purchase==null?"none":"block"}}>
-            <div style={{marginBottom:"30px"}}>
-                <h2 style={{fontSize:"20px",marginBottom:"15px",fontWeight:'300'}}> Vendor Detail</h2>
-                {/* <hr /> */}
-                <div className="i_row" style={{display:"flex"}}>
-                    
-                    
-                    
-                    <div>
-                        <label className="label">Vendor Name</label>
-                        {/* <input className="input is-small" ref={register}
-                        type="text" name="vendor_name" placeholder="Vendor NAme" required/> */}
-
-
-                        <div style={{position:'relative',padding:"0"}} >
-                            <div type="text" className="input is-small" 
-                            onClick={()=>{setVendorDD(vendorDD==="dd-active"?"":"dd-active")}}
-                            >
-                                {/* <input type="text" className="input is-small"/> */}
-                                <div style={{width:'100%',padding:"0"}}>
-                                    <span>{vendor.name}</span>
-                                    <span style={{float:'right'}}>
-                                        <FontAwesomeIcon icon={faAngleDown} />
-                                    </span>
-                                </div>
-                            </div>
-                            <div style={{padding:"0"}}>
-                                <div className={`control my-d dropdown-content ${vendorDD}`} style={{padding:"0"}}>
-                                    <input type="text" className={`input is-small ${VendorLoading===true?"is-loading":""}`} value={vendorFilter} onChange={(e)=>{ setVendorFilter(e.target.value), getVendor({variables:{"name":e.target.value}})}} placeholder="Search Vendor.." style={{border:0,outline:0,boxShadow:'none'}}/>
-                                    <div className="dd-list" style={{padding:"0",maxHeight:"170px"}}>
-                                        {
-                                        vendorData!=null?
-                                        vendorData.vendors.edges.map(e=>{
-                                            // return ( e.node.name.toLocaleLowerCase().startsWith(statefilter)?
-                                            return <div style={{padding:"0"}} className="d-item_" onClick={()=>{setVendor({name:e.node.name,id:e.node.id,email:e.node.email,gst:e.node.gst}), setValue([{"vendor_email":e.node.email},{"vendor_GST":e.node.gst}]), setVendorDD(vendorDD==="dd-active"?"":"dd-active") }} key={e.node.id} value={e.node.id}> <a className="dropdown-item">{e.node.name}</a></div>
-                                            // :null
-                                                }
-                                            ):null
-                                        }
-                                    </div>
-                                    
-                                </div>
-                            </div>
-                        </div>
-
-
-
-
-                    </div>
-
-
-
-
-                    <div>
-                        <label className="label">Vendor Email</label>
-                        <input className="input is-small is-disabled" ref={register}
-                        type="text" name="vendor_email"  placeholder="Vendor Email" required disabled/>
-                    </div>
-                    <div>
-                        <label className="label">GST</label>
-                        <input className="input is-small" ref={register}
-                        type="text" name="vendor_GST"  placeholder="Vendor GST" required disabled/>
-                    </div>
-                </div>
-            </div>
-
-            <div style={{marginBottom:"30px"}}>
-                <h2 style={{fontSize:"20px",marginBottom:"15px",fontWeight:'300'}}> Invoice Detail</h2>
-                {/* <hr /> */}
-                <div className="i_row" style={{display:"flex"}}>
-                    <div>
-                        <label className="label">Invoice Date</label>
-                        <input className="input is-small" ref={register}
-                        type="date" name="invoice_date" placeholder="Invoice date" required/>
-                    </div>
-                    <div>
-                        <label className="label">Invoice Number</label>
-                        <input className="input is-small" ref={register}
-                        type="text" name="invoice_number"  placeholder="Invoice Number" required/>
-                    </div>
-                    <div>
-                        <label className="label">Upload</label>
-
-                        <div className="file is-small">
-                            <label className="file-label">
-                                <input className="file-input is-small" type="file" name="resume" />
-                                <span className="file-cta">
-                                <span className="file-icon">
-                                <FontAwesomeIcon icon={faUpload} />
-                                </span>
-                                <span className="file-label">
-                                    Choose a file…
-                                </span>
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            </div>
-
             <div>
             
-            <h2 style={{fontSize:"20px",marginBottom:"15px",fontWeight:'300'}}> Product Detail</h2>
+            {/* <h2 style={{fontSize:"20px",marginBottom:"15px",fontWeight:'300'}}> Product Detail</h2> */}
             
             <div className="i_row" style={{display:"flex"}}>
 
@@ -487,18 +389,18 @@ function X({productId=null,name=null,purchase=null}){
             </form>
             </>
             }
-        </div>
-        
-        
-    </Layout>
+        </div> 
+    </>
     )
 }
 
-const CreateProduct = ({name=null,productId=null,purchase=null})=>{
+const CreateProduct = ({name=null,productId=null,purchase=null, setActive=null})=>{
     return(
-        <SnackbarProvider>
-            <X name={name} productId={productId} purchase={purchase}/>
-        </SnackbarProvider>
+        // <SnackbarProvider>
+            // <Layout title={productId===null?"Create new Product":`Update ${name}`}>
+                <X name={name} productId={productId} purchase={purchase} setActive={setActive}/>
+            // </Layout>
+        // </SnackbarProvider>
     )
 }
 

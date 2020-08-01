@@ -152,6 +152,94 @@ query x($name:String!){
 }
 `
 
+export const addPurchaseQuery = gql`
+  mutation($products:[PurchaseInput],$date:String!,$invoiceNumber:String!,$vendorId:ID!){
+    addPurchase(products:$products,invoiceDate:$date,invoiceNumber:$invoiceNumber,vendorId:$vendorId)
+    {
+      purchase{
+        id
+        invoiceNumber
+        invoiceDate
+        date
+        vendor{
+          name
+          company
+        }
+      }
+    }
+  }
+`
+
+
+// {
+//   "products": [{
+//     "productId": "UHJvZHVjdE5vZGU6MTU=","price": 2000,"mrp": 3000,"cost": 2800,"qty": 10,"discount": 4 
+//   },{"productId": "UHJvZHVjdE5vZGU6NA==","price": 66,"mrp": 90,"cost": 60,"qty": 5,"discount": 1 
+//   }],
+//   "date": "2020-08-01",
+//   "invoiceNumber": "LSKC#121",
+//   "vendorId": "VmVuZG9yTm9kZToxNg=="
+// }
+
+
+export const purchaseHistoryDateQuery = gql`
+query x($dateGte:Date!,$dateLte:Date!){
+  purchases(slug:"",dateGte:$dateGte,dateLte:$dateLte)
+  {
+    edges{
+      node{
+        products
+        id
+        date
+        invoiceDate
+        invoiceNumber
+        vendor{
+          name
+          company
+        }
+      }
+    }
+  }
+}`
+
+export const purchaseHistoryQuery = gql`
+query x($slug:String!){
+  purchases(slug:$slug)
+  {
+    edges{
+      node{
+        products
+        id
+        date
+        invoiceDate
+        invoiceNumber
+        vendor{
+          name
+          company
+        }
+      }
+    }
+  }
+}
+`
+
+export const productStartsWithQuery = gql`
+query ($name:String!){
+  allProducts(nameStartswith:$name){
+    edges{
+      node{
+        id
+        name
+        mrp
+        price
+        cost
+        qty
+      }
+    }
+  }
+}
+`
+
 export const historyBySlugQuery = gql`
 query x($slug:String!){
   history(slug:$slug,first:20){

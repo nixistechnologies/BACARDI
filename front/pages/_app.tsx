@@ -8,13 +8,20 @@ import React from 'react';
 import App, {AppInitialProps, AppContext} from 'next/app';
 import {store} from '../redux_function/stores';
 import {MakeStore, createWrapper, Context, HYDRATE} from 'next-redux-wrapper';
+import Router from 'next/router'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css';
 // import reducer from '../redux_function/reducers'
 // import {createStore, AnyAction} from 'redux';
 
 // import {wrapper} from '../components/store';
 // import {State} from '../components/reducer';
 
+NProgress.configure({showSpinner:false,'color':"#00d1b2",height:5})
 
+Router.events.on('routeChangeStart', () => NProgress.start()); 
+Router.events.on('routeChangeComplete', () => NProgress.done()); 
+Router.events.on('routeChangeError', () => NProgress.done());
 
 
 class MyApp extends App<AppInitialProps> {

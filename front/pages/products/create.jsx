@@ -1,4 +1,4 @@
-// import Layout from '../../components/layout'
+import Layout from '../../components/layout'
 
 // import { useMutation, useQuery, useLazyQuery } from '@apollo/react-hooks';
 // import { createProductQuery,productSuggetionQueryC,categorySuggestionQuery,allCategory,subCategoryById,getAllProductQuery } from '../../lib/graphql';
@@ -20,9 +20,11 @@ import SnackbarProvider,{ useSnackbar } from 'react-simple-snackbar'
 
 const X=()=>{
     return(
-        <SnackbarProvider>
-            <CreateProduct/>
-        </SnackbarProvider>
+        <Layout>
+            <SnackbarProvider>
+                <CreateProduct/>
+            </SnackbarProvider>
+        </Layout>
     )
 }
 
