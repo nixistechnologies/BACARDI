@@ -10,6 +10,9 @@ import {useForm} from 'react-hook-form'
 import ProductForm from '../../components/productForm'
 import SnackbarProvider,{useSnackbar} from 'react-simple-snackbar'
 import VendorModel from '../../components/vendorModel'
+import { server } from '../../lib/settings'
+import Cookie from 'js-cookie'
+// import {Buffer} from 'buffer'
 
 const Modal =({active,setActive}) =>{
     return <>
@@ -76,8 +79,6 @@ const NewPurchase = () =>{
                 "mrp":data.mrp,
                 "price":data.list,
                 "cost":data.cost,
-                // "gst":getValues("pgst"),
-                // "discount":getValues("discount").length?getValues("discount"):0
             }]
         ))
         setProduct({name:"Select Product"})
@@ -92,22 +93,41 @@ const NewPurchase = () =>{
     }
 
     const sendToserver = () =>{
+        const formData = new FormData()
+        formData.append("invoice_file",getValues("invoice")[0])
+
         addPurchase({
+            context:{},
             variables:{
                 "date":getValues("invoice_date"),
                 "invoiceNumber":getValues("invoice_number"),
+                "file":formData.get("invoice_file"),
                 "vendorId":vendor.id,
                 "products":mlist
             },
             optimisticResponse:true,
             update:(cache,{data})=>{
-                setMlist([])
-                setVendor({name:""})
-                reset({
-                    "name":"","productId":"","qty":"","discount":"","mrp":"","list":"","cost":"","vendor_email":"","vendor_GST":"","invoice_date":"","invoice_number":""
-                })
+                if(data!=true)
+                {
+                    const token = Cookie.get("token")
+                    fetch(`${server}/api/purchase/${data.addPurchase.purchase.originalId}/`,{
+                        method:'PUT',
+                        body:formData,
+                    }).then(e=>{
+                        console.log(e)
+                    }).catch(e=>{
+                        console.log(e)
+                    })
+                
+                    setMlist([])
+                    setVendor({name:""})
+                    reset({
+                        "name":"","productId":"","qty":"","discount":"","mrp":"","list":"","cost":"","vendor_email":"","vendor_GST":"","invoice_date":"","invoice_number":""
+                    })
+    
+                    openSnackbar("Purchase has been added successfully")
+                }
 
-                openSnackbar("Purchase has been added successfully")
             }
         })
     }
@@ -204,7 +224,7 @@ const NewPurchase = () =>{
 
                         <div className="file is-small">
                             <label className="file-label">
-                                <input className="file-input is-small" type="file" name="resume" />
+                                <input className="file-input is-small" type="file" name="invoice" ref={register} />
                                 <span className="file-cta">
                                 <span className="file-icon">
                                 <FontAwesomeIcon icon={faUpload} />
@@ -220,7 +240,7 @@ const NewPurchase = () =>{
             </div>
 
 
-            <form style={{marginBottom:"30px"}} onSubmit={handleSubmit(AddRow)} >
+            <form style={{marginBottom:"30px"}} onSubmit={handleSubmit(AddRow)} encType={`multipart/form-data`}>
                 <div style={{marginBottom:"15px",display:'flex',alignItems:'center'}}>
                     <h2 style={{fontSize:"20px",fontWeight:'300'}}> Product Detail</h2>
                     <a className="tag is-link is-light" style={{marginLeft:"20px"}} onClick={()=>setActive("is-active")}>Add Product</a>

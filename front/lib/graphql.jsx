@@ -153,10 +153,12 @@ query x($name:String!){
 `
 
 export const addPurchaseQuery = gql`
-  mutation($products:[PurchaseInput],$date:String!,$invoiceNumber:String!,$vendorId:ID!){
-    addPurchase(products:$products,invoiceDate:$date,invoiceNumber:$invoiceNumber,vendorId:$vendorId)
+  mutation($products:[PurchaseInput],$date:String!,$invoiceNumber:String!,$vendorId:ID!,$file:Upload!){
+    addPurchase(products:$products,invoiceDate:$date,invoiceNumber:$invoiceNumber,vendorId:$vendorId,invoice:$file)
     {
       purchase{
+        originalId
+        products
         id
         invoiceNumber
         invoiceDate

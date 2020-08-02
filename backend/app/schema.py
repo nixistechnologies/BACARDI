@@ -15,6 +15,7 @@ import os
 from fpdf import FPDF
 import django_filters
 from django_filters import FilterSet
+from graphene_file_upload.scalars import Upload
 
 class UserNode(DjangoObjectType):
     class Meta:
@@ -55,8 +56,11 @@ class PurchaseNode(DjangoObjectType):
         filterset_class = PurchaseFilter
         interfaces = (relay.Node,)
     products = graphene.Int()
+    originalId = graphene.Int()
     def resolve_products(self,info):
         return len(PurchaseProduct.objects.filter(purchase_id = self.id))
+    def resolve_originalId(self,info):
+        return self.id
 
 class ProductFilter(FilterSet):
     name_startswith = django_filters.CharFilter(field_name="name", lookup_expr="icontains")
@@ -267,9 +271,16 @@ class AddPurchase(graphene.Mutation):
         invoice_date = graphene.String(required=True)
         invoice_number = graphene.String(required=True)
         products = graphene.List(PurchaseInput)
+        invoice = Upload(required=True)
     purchase = graphene.Field(PurchaseNode)
-    def mutate(self,info,vendor_id,invoice_date,invoice_number,products):
+    def mutate(self,info,vendor_id,invoice_date,invoice_number,products,invoice,**kwargs):
         purchase = Purchase.objects.create(vendor_id = from_global_id(vendor_id)[1],invoice_date = datetime.datetime.strptime(invoice_date,"%Y-%m-%d"),invoice_number = invoice_number,user_id=info.context.user.id)
+        
+        # print(info.context.FILES)
+        # print(invoice)
+        # print(kwargs)
+
+        # purchase = Purchase.objects.get(id=7)
         for i in products:
             PurchaseProduct.objects.create(
                 product_id = from_global_id(i.product_id)[1],
@@ -280,10 +291,8 @@ class AddPurchase(graphene.Mutation):
                 discount = i.discount,
                 purchase_id = purchase.id
             )
-            # pr = Product.objects.get(id = from_global_id(i.product_id)[1])
-            # pr.qty = pr.qty + i.qty
-            # pr.save()
-        return AddPurchase(purchase=purchase)
+        # purchase = Purchase.objects.get(id=7)
+        return AddPurchase(purchase = purchase)
 
 
 

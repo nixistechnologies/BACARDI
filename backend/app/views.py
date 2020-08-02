@@ -2,9 +2,25 @@ from django.shortcuts import render,HttpResponse
 from django.template.loader import get_template 
 from django.template import Context
 import pdfkit
+from rest_framework import status,viewsets
+from app.serializer import *
+
 
 
 # Create your views here.
+
+class PurchaseSer(viewsets.ModelViewSet):
+    queryset = Purchase.objects.all()
+    serializer_class = PurchaseSerializer
+    def perform_create(self,serializer):
+        serializer.save(user_id=self.request.user.id)
+    def perform_update(self,serializer):
+        print(self.request.user)
+        print(self.request.data["invoice_file"])
+        # print()
+        serializer.save(invoice_file = self.request.data["invoice_file"])
+
+
 
 def example(request):
     return render(request,"e.html")
