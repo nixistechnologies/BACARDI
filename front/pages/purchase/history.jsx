@@ -1,72 +1,116 @@
 import Layout from '../../components/layout'
 import {useState} from 'react'
 import { useQuery,useLazyQuery,useMutation } from '@apollo/react-hooks'
-import {historyBySlugQuery,purchaseHistoryQuery,purchaseHistoryDateQuery,createCategoryQuery} from '../../lib/graphql'
+import {historyBySlugQuery,purchaseHistoryQuery,purchaseHistoryDateQuery,createCategoryQuery,purchaseProductQuery} from '../../lib/graphql'
 import {privateRoute} from '../../lib/private_route'
 import { server } from '../../lib/settings'
 import {TableLoading} from '../../components/skeleton'
 import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
-import {faPen, faPlus} from '@fortawesome/free-solid-svg-icons'
+import {faPen, faPlus, faFileInvoice} from '@fortawesome/free-solid-svg-icons'
 import {useForm} from 'react-hook-form'
 
 
 
-const Modal = ({active,setActive,paid,outstanding})=>{
+const Modal = ({active,setActive,loading,item,info})=>{
     
     // const [name,setName] = useState("")
     const { register, handleSubmit,setValue,getValues,errors } = useForm();
-    const [createCategory,{data,loading}] = useMutation(createCategoryQuery)
-
+    // const [createCategory,{data,loading}] = useMutation(createCategoryQuery)
+    // const {data,loading} = useQuery(purchaseProductQuery,{variables:{purchaseId:purchaseId}})
+    const isEmpty = (obj) =>{
+        for(let i in obj){
+            return false
+        }
+        return true
+    }
     const sendToServer=(e)=>{
         console.log(e)
-        // e.preventDefault()
-        // createCategory({
-        //     variables:{name:name},
-        //     optimisticResponse:true,
-        //     update:(cache,{data})=>{
-        //         if(data!=true){
-        //             console.log(data)
-        //             const existingCache = cache.readQuery({query:allCategory})
-        //             existingCache.categories.edges.push({"node":data.createCategory.category,"__typename":"CategoryNodeEdge"})
-        //             console.log(existingCache)
-                    
-        //             cache.writeQuery({
-        //                 query:allCategory,
-        //                 data:existingCache
-        //             })
-
-        //             setActive("")
-
-                    
-        //         }
-        //     }
-        // })   
     }
-    
+    console.log(isEmpty(info))
+    console.log(info)
     return(
         <div className={`modal ${active}`} >
             <div className="modal-background" onClick={()=>setActive("")}></div>
                 <div className="modal-content">
                     <div className="box">
-                        <h1 className="title model-title">Update Outstanding balance</h1>
-                        <form onSubmit={handleSubmit(sendToServer)}>
-                            <div className="columns">
-                                <div className="column">
-                                    <label className="label">Paid</label>
-                                    <input type="text" defaultValue={paid} ref={register} className="input is-small" />
+                        {
+                            loading===true || loading===undefined ||item===undefined ?<TableLoading /> :
+                            <>
+                            {/* <h1 className="title model-title">Purchase Products</h1> */}
+                            {/* {
+                                info
+                            } */}
+                            {
+                                isEmpty(info)==false?
+                                    <div style={{overflow:'auto',marginBottom:"20px"}}>
+                                    <div style={{float:'left'}}>
+                                        <span style={{fontSize:"20px",fontWeight:"bold"}}>{info.vendor.name}</span><br/>
+                                        <span style={{color:"grey"}}>{info.vendor.company}</span>
+                                    </div>
+                                    <div style={{float:'right'}}>
+                                        <span>
+                                            {/* {info.date} */}
+                                            {new Date(info.date).toDateString()}
+                                        </span>
+                                        
+                                    </div>
+
+                                    </div>
+                                :""
+                            }
+                            <table className="table is-fullwidth is-hoverable">
+                                <thead>
+                                    <tr>
+                                        {/* <th>SN.</th> */}
+                                        <th>Name</th>
+                                        <th>Brand</th>
+                                        <th>Qty</th>
+                                        <th>MRP</th>
+                                        <th>List Price</th>
+                                        <th>Cost Price</th>
+                                        <th>Discount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {item.map((i)=>{
+                                        return (
+                                            <tr key={i.node.id}>
+                                            <td>{i.node.product.name}</td>
+                                            <td>{i.node.product.mfg}</td>
+                                            <td>{i.node.qty}</td>
+                                            <td>{i.node.mrp}</td>
+                                            <td>{i.node.listPrice}</td>
+                                            <td>{i.node.cost}</td>
+                                            <td>{i.node.discount}</td>
+                                            {/* <td>{i.node.outstanding}</td> */}
+                                            {/* <td onClick={()=>{setActive("is-active"),setPaid(i.node.paidAmount),setOutstanding(item.node.outstanding)}}>
+                                                <FontAwesomeIcon icon={faPen} color="#00c4a7" /> 
+                                            </td> */}
+                                        </tr>)
+                                    })}
+                                </tbody>
+                            </table>
+                            
+                            {/* <form onSubmit={handleSubmit(sendToServer)}>
+                                <div className="columns">
+                                    <div className="column">
+                                        <label className="label">Paid</label>
+                                        <input type="text" defaultValue={paid} ref={register} className="input is-small" />
+                                    </div>
+                                    
+                                    <div className="column">
+                                        <label className="label">Outstanding</label>
+                                        <input type="text" defaultValue={outstanding} ref={register} className="input is-small" />
+                                    </div>
                                 </div>
-                                
-                                <div className="column">
-                                    <label className="label">Outstanding</label>
-                                    <input type="text" defaultValue={outstanding} ref={register} className="input is-small" />
+                                <div className="columns">
+                                    <div className="column">
+                                        <button type="submit" className={`button is-primary is-small ${loading==true?"is-loading":"not"}`}>Update</button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="columns">
-                                <div className="column">
-                                    <button type="submit" className={`button is-primary is-small ${loading==true?"is-loading":"not"}`}>Update</button>
-                                </div>
-                            </div>
-                        </form>
+                            </form> */}
+                            </>
+                        }
                     </div>
                     {/* <!-- Any other Bulma elements you want --> */}
                 </div>
@@ -82,6 +126,8 @@ const Result = ({loading,data})=>{
     const [active,setActive] = useState("")
     const [paid,setPaid] = useState("")
     const [outstanding,setOutstanding] = useState("")
+    const [getPurchaseProduct,{data:pdata,loading:ploading}] = useLazyQuery(purchaseProductQuery)
+    const [info,setInfo] = useState({})
     return(
         <div className="data">
             <style jsx>{`
@@ -106,7 +152,7 @@ const Result = ({loading,data})=>{
                         <th>Invoice No.</th>
                         <th>Invoice Date</th>
                         <th>Products</th>
-                        <th></th>
+                        <th>Invoice</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -125,11 +171,14 @@ const Result = ({loading,data})=>{
                             <td>{item.node.invoiceNumber}</td>
                             <td>{item.node.invoiceDate}</td>
                             
-                            <td>{item.node.products}</td>
+                            <td style={{cursor:'pointer'}} onClick={()=>{getPurchaseProduct({variables:{purchaseId:item.node.id}}), setInfo(item.node), setActive("is-active") } }>{item.node.products}</td>
 
                             {/* <td>{item.node.outstanding}</td> */}
-                            <td onClick={()=>{setActive("is-active"),setPaid(item.node.paidAmount),setOutstanding(item.node.outstanding)}}>
-                                <FontAwesomeIcon icon={faPen} color="#00c4a7" /> 
+                            <td>
+                               <a target="_blank" href={`${server}/media/${item.node.invoiceFile}`}>
+                                   <FontAwesomeIcon icon={faFileInvoice} style={{fontSize:"20px"}} color="grey" /> 
+                               </a>
+                                
                             </td>
                         </tr>)
                     })}
@@ -139,7 +188,7 @@ const Result = ({loading,data})=>{
             :<div></div>
             }
 
-            <Modal active={active} setActive={setActive} paid={paid} outstanding={outstanding} />
+            <Modal active={active} setActive={setActive} loading={ploading} item={pdata!=undefined?pdata.purchaseProduct.edges:undefined} info={info}  />
 
             </div>
     )

@@ -152,6 +152,29 @@ query x($name:String!){
 }
 `
 
+export const purchaseProductQuery = gql`
+query x($purchaseId:ID!){
+  purchaseProduct(purchaseId:$purchaseId)
+  {
+    edges{
+      node{
+        id
+        product{
+          id
+          name
+          mfg
+        }
+        listPrice
+        mrp
+        discount
+        qty
+        cost
+      }
+    }
+  }
+}
+`
+
 export const addPurchaseQuery = gql`
   mutation($products:[PurchaseInput],$date:String!,$invoiceNumber:String!,$vendorId:ID!,$file:Upload!){
     addPurchase(products:$products,invoiceDate:$date,invoiceNumber:$invoiceNumber,vendorId:$vendorId,invoice:$file)
@@ -195,6 +218,7 @@ query x($dateGte:Date!,$dateLte:Date!){
         date
         invoiceDate
         invoiceNumber
+        invoiceFile
         vendor{
           name
           company
@@ -215,6 +239,7 @@ query x($slug:String!){
         date
         invoiceDate
         invoiceNumber
+        invoiceFile
         vendor{
           name
           company

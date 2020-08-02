@@ -23,11 +23,18 @@ class UserNode(DjangoObjectType):
         filter_fields=()
         interfaces = (graphene.Node,)
         # interfaces = (relay.Node,)
+# class PurchaseProductFilter(FilterSet):
+#     purchase_id = django_filters.NumberFilter(field_name="purchase__id",lookup_expr="exact")
+#     class Meta:
+#         model = PurchaseProduct
+#         fields = ["purchase__id"]
+
 
 class PurchaseProductNode(DjangoObjectType):
     class Meta:
         model = PurchaseProduct
         filter_fields=()
+        # filterset_class = PurchaseProductFilter
         interfaces = (relay.Node,)
 
 
@@ -765,6 +772,12 @@ class Query(graphene.AbstractType):
     states = DjangoFilterConnectionField(StateNode)
     city = DjangoFilterConnectionField(CityNode,stateId = graphene.ID())
     purchases = DjangoFilterConnectionField(PurchaseNode,slug=graphene.String())
+    purchaseProduct = DjangoFilterConnectionField(PurchaseProductNode,purchaseId=graphene.ID())
+
+
+
+    def resolve_purchaseProduct(self,info,purchaseId,**kwargs):
+        return PurchaseProduct.objects.filter(purchase__id = from_global_id(purchaseId)[1])
 
 
     def resolve_city(self,info,stateId):

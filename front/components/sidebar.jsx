@@ -4,14 +4,19 @@ import {faAngleRight} from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import Cookie from "js-cookie";
 import $ from 'jquery'
+import {useRouter} from 'next/router'
 const SideBar = ({sidebar,route}) =>{
     const Logout = () =>{
         console.log("logout")
         Cookie.remove("token")
         // const r = Router()
-        // r.push("/login") 
+        // console.log(r)
+        // console.log(router)
+        // r.push("/login")
+        router.push("/login") 
         // Router.push("/login")
-        route.push("/login")
+        // console.log(route)
+        // route.push("/login")
     }
     const Toggle=(e)=>{
         // console.log(e.target.classList.value)
@@ -33,7 +38,10 @@ const SideBar = ({sidebar,route}) =>{
         // $(e.target.nextSibling).toggle()
         // console.log($(e))
     }
-    
+    // const r = new Router()
+    // console.log(r)
+    // console.log(route)
+    const router = useRouter()
     return(
         // <div style={{display:sidebar===true?'block':'none'}}>
         
@@ -137,6 +145,9 @@ const SideBar = ({sidebar,route}) =>{
                                 
                             </li>
                         </ul>
+                    </li>
+                    <li style={{position:'fixed',bottom:'5%',width:"13%"}}>
+                        <a style={{color:"red"}} onClick={()=>Logout()}>Logout</a>
                     </li>
                 </ul>
 
