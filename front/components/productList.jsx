@@ -67,13 +67,14 @@ const TableView=({data,mloading})=>{
   })
 }
 
-// console.log(data)
+
     
   
   if(data.allProducts.edges.length==0)
   return (<div style={{marginTop:"200px",textAlign:"center",fontSize:"20px",fontWeight:"bold"}}>
-          <div>No Product Avaiable please add </div>
-        </div>)
+            <div>No Product Avaiable please add </div>
+          </div>
+        )
     return (
     <div>
       <style jsx>{`
