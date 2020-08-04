@@ -79,7 +79,7 @@ const SideBar = ({sidebar,route}) =>{
                     </li>
                 </ul>
                 <p className="menu-label">
-                    Team
+                    Process
                 </p>
                 <ul className="menu-list">
                     <li><a onClick={(e)=>Toggle(e)}>
@@ -148,6 +148,20 @@ const SideBar = ({sidebar,route}) =>{
                     </li>
                     <li style={{position:'fixed',bottom:'5%',width:"13%"}}>
                         <a style={{color:"red"}} onClick={()=>Logout()}>Logout</a>
+                    </li>
+                </ul>
+                <p className="menu-label">
+                    Settings
+                </p>
+                <ul className="menu-list">
+                    <li>
+                        <Link href="/profile">
+                            <a className={route.startsWith("/profile")?"active":"not"}>Profile</a>
+                        </Link>
+                        
+                    </li>
+                    <li>
+                        <a>Settings</a>
                     </li>
                 </ul>
 

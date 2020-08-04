@@ -52,14 +52,20 @@ width: 15%;
 height: 100%;
 /* background:  rgba(0,0,0,0.08); */
 padding-top:10px;
-border-right: 1px solid rgba(0,0,0,0.08);
-background: white;
+border-right: 1px solid rgba(0,0,0,0.02);
+background: #f9f9f9;
 /* box-shadow:1px 1px 5px rgba(0,0,0,0.2) */
 }
 
 .item .label{
     color:rgba(0,0,0,0.2);
     margin-left: 10px;
+}
+
+input[type="radio"] {
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Chrome, Safari, Opera */
+    transform: scale(1.5);
 }
 
 .icn-block{
@@ -93,8 +99,9 @@ background: white;
 
 ._side .active{
     /* background-color: white; */
-    border-right: 3px solid #00d1b2;
-    background:linear-gradient(to right,#00c4a7,white)
+    /* border-right: 3px solid #00d1b2; */
+    /* background:linear-gradient(to right,#00c4a7,white) */
+    background: linear-gradient(to right,#00c4a7,#f9f9f9);
 }
 
 .container{
@@ -142,7 +149,7 @@ background: white;
     ._side .active{
         /* background-color: white; */
         border-right: none;
-        background:linear-gradient(to top,#00c4a7,white)
+        background:linear-gradient(to top,#00c4a7,#f9f9f9)
     }
 
     .item .label {
@@ -165,7 +172,7 @@ background: white;
         width: auto;
     }
     .sidebar{
-        background: white;
+        background: #f9f9f9;
         /* display: none; */
         height: auto;
         /* width: auto; */

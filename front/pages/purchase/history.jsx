@@ -6,7 +6,8 @@ import {privateRoute} from '../../lib/private_route'
 import { server } from '../../lib/settings'
 import {TableLoading} from '../../components/skeleton'
 import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
-import {faPen, faPlus, faFileInvoice} from '@fortawesome/free-solid-svg-icons'
+import {faPen, faPlus, faFileInvoice,faPaperclip} from '@fortawesome/free-solid-svg-icons'
+import { faTrashAlt,atta } from '@fortawesome/free-regular-svg-icons'
 import {useForm} from 'react-hook-form'
 
 
@@ -176,7 +177,7 @@ const Result = ({loading,data})=>{
                             {/* <td>{item.node.outstanding}</td> */}
                             <td>
                                <a target="_blank" href={`${server}/media/${item.node.invoiceFile}`}>
-                                   <FontAwesomeIcon icon={faFileInvoice} style={{fontSize:"20px"}} color="grey" /> 
+                                   <FontAwesomeIcon icon={faPaperclip} style={{fontSize:"20px"}} color="grey" /> 
                                </a>
                                 
                             </td>

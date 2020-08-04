@@ -16,6 +16,7 @@ from fpdf import FPDF
 import django_filters
 from django_filters import FilterSet
 from graphene_file_upload.scalars import Upload
+from django.db.models import Q
 
 class UserNode(DjangoObjectType):
     class Meta:
@@ -124,6 +125,12 @@ class BillingFilter(FilterSet):
     @property
     def qs(self):
         return super(BillingFilter,self).qs.filter(user_id = self.request.user.id)
+
+class PartialPaymentNode(DjangoObjectType):
+    class Meta:
+        model = ParitalPayment
+        filter_fields =()
+        interfaces = (relay.Node,)
 
 class BillingNode(DjangoObjectType):
     class Meta:
@@ -459,10 +466,11 @@ class CreateBill(graphene.Mutation):
         # productId = graphene.ID(required = True)
         payment_mode = graphene.String(required = True)
         billing_date = graphene.String(required = True)
+        payment = graphene.Float(required=True)
         # gst = graphene.Float(required = True)
         products = graphene.List(MInput)
     bill = graphene.Field(BillingNode)
-    def mutate(self,info,payment_mode,billing_date,products,customerId,remarks):
+    def mutate(self,info,payment_mode,billing_date,products,customerId,remarks,payment):
         # print(products[0])
         # user_id = from_global_id(user_id)[1]
         # name = name.replace(" ({})".format(age),"")
@@ -514,6 +522,8 @@ class CreateBill(graphene.Mutation):
         bill.sgst = round(cgst/2,2)
         bill.net_amount = round(total,2)
         # bill.save() 
+        
+        ParitalPayment.objects.create(paid=payment,outstanding=total-payment,bill_id = bill.id)
 
         # GenerateBill(gross,bill.invoice_number,Medicine.objects.filter(billing_id=bill.id),discount,cgst,total,bill,info.context.user)
         generate_receipt(bill,Sales_Product.objects.filter(billing_id=bill.id),info.context.user)
@@ -768,13 +778,21 @@ class Query(graphene.AbstractType):
     customer_suggestion = graphene.List(CustomerNode,suggestion = graphene.String())
 
     categories = DjangoFilterConnectionField(CategoryNode)
-    vendors = DjangoFilterConnectionField(VendorNode)
+    vendors = DjangoFilterConnectionField(VendorNode,search=graphene.String())
+    vendors_search = DjangoFilterConnectionField(VendorNode,search=graphene.String())
     states = DjangoFilterConnectionField(StateNode)
     city = DjangoFilterConnectionField(CityNode,stateId = graphene.ID())
     purchases = DjangoFilterConnectionField(PurchaseNode,slug=graphene.String())
     purchaseProduct = DjangoFilterConnectionField(PurchaseProductNode,purchaseId=graphene.ID())
 
+# 9899200257
 
+    def resolve_vendors_search(self,info,search,**kwargs):
+        
+        data =  Vendor.objects.filter(Q(name__icontains=search) | Q(company__icontains=search) | Q(email__icontains=search) | Q(city__name__icontains=search) | Q(state__name__icontains=search) | Q(mobile__icontains=search)) 
+        return data
+        # print(data)
+        # return Vendor.objects.all()
 
     def resolve_purchaseProduct(self,info,purchaseId,**kwargs):
         return PurchaseProduct.objects.filter(purchase__id = from_global_id(purchaseId)[1])
@@ -783,8 +801,9 @@ class Query(graphene.AbstractType):
     def resolve_city(self,info,stateId):
         return City.objects.filter(state_id=from_global_id(stateId)[1])
 
-    def resolve_vendors(self,info,**kwargs):
-        return Vendor.objects.filter(user_id = info.context.user.id)
+    def resolve_vendors(self,info,search,**kwargs):
+        return Vendor.objects.filter(Q(name__icontains=search) | Q(company__icontains=search) | Q(email__icontains=search) | Q(city__name__icontains=search) | Q(state__name__icontains=search) | Q(mobile__icontains=search)) 
+        # return Vendor.objects.filter(user_id = info.context.user.id)
 
     def resolve_customer_suggestion(self,info,suggestion):
         return Customer.objects.filter(name__istartswith=suggestion)

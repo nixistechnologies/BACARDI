@@ -142,6 +142,9 @@ class PurchaseProduct(models.Model):
     # state = models.
     # city = models.
 
+
+    
+
 class Billing(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
     invoice_number = models.CharField(max_length=20)
@@ -162,6 +165,14 @@ class Billing(models.Model):
     def __str__(self):
         return self.invoice_number
 
+class ParitalPayment(models.Model):
+    date = models.DateField(auto_now_add=True,blank=True)
+    paid = models.FloatField(blank=True,null=True)
+    outstanding = models.FloatField(blank=True,null=True)
+    bill = models.ForeignKey(Billing,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.paid)
 
 class Sales_Product(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE,blank=True,null=True)

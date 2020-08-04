@@ -52,6 +52,22 @@ const Profile =(props) =>{
     return (
     
         <div>
+            <style jsx>{`
+            .t-head{
+                border-bottom:1px solid rgba(0,0,0,.15);
+                display:flex;
+                margin-bottom:25px;
+            }
+            .t-head span{
+                font-weight:600;
+                line-height:1.2;
+                font-size:22px;
+                border-bottom:1px solid rgba(0,0,0,.54);
+                padding-bottom:20px;
+                margin-bottom:-1px
+            }
+        `}
+        </style>
             <div className="topHeading">
                 <h2>Welcome {user.firstName} {user.lastName}</h2>
             </div>
@@ -60,6 +76,12 @@ const Profile =(props) =>{
                 <h1 className="title">Welcome {user.firstName} {user.lastName}</h1>
             </div> */}
             <div>
+                <div className="t-head">
+                    <span>
+                        Account Information
+                    </span>
+                </div>
+
                 {/* <div>info</div> */}
                 <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="out">
@@ -196,6 +218,10 @@ const Profile =(props) =>{
                 >
                 {isEdit?"Update":"Edit"}
                 </button>
+                <div style={{marginLeft:"20px"}}>
+                    <button type="reset" className={"button is-secondary is-small is-light"}>Cancel</button>
+                </div>
+                
                 {/* <button>
                     Logout
                 </button> */}

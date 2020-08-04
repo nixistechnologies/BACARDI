@@ -3,20 +3,43 @@ import {allVendorQuery} from '../../lib/graphql'
 import {TableLoading} from '../../components/skeleton'
 import { useState} from 'react'
 import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
-import {faPen} from '@fortawesome/free-solid-svg-icons'
-import {useQuery} from '@apollo/react-hooks'
+import {faPen, faSearch, faAngleDown,faArrowDown, faArrowUp,faTimes} from '@fortawesome/free-solid-svg-icons'
+import {useQuery, useLazyQuery} from '@apollo/react-hooks'
 import Modal from '../../components/vendorModel'
 
-const Records = ({items}) =>{
+const Records = ({items,getVendor,search,setSearch}) =>{
     const [active,setActive] = useState("")
     const [info,setInfo] = useState({})
     return (
         <>
         <Modal active={active} setActive={setActive} isNew={false} info={info} />
+        <div style={{overflow:'auto'}}>
+            <form onSubmit={(e)=>{e.preventDefault(), console.log(e.currentTarget[0].value),getVendor({variables:{search:e.currentTarget[0].value}})  }}>
+                <div className="field">
+                <p className="control has-icons-left has-icons-right" style={{width:'200px',float:'right'}}>
+                    <input type="text" value={search} onChange={(e)=>setSearch(e.target.value)} className="input is-small" name="usearch" placeholder="search.." />
+                    <span className="icon is-small is-left">
+                        <FontAwesomeIcon icon={faSearch} />
+                    </span>
+                    {/* <span style={{cursor:'pointer'}} className="icon is-small is-right" onClick={()=>setSearch("")}>
+                        <FontAwesomeIcon icon={faTimes} />
+                    </span> */}
+                </p>
+                </div>
+            </form>
+            
+
+        </div>
         <table className="table is-fullwidth is-hoverable">
             <thead>
                 <tr>
-                    <th className="_w20" >Name</th>
+                    <th className="_w20" >
+                        {/* <div> */}
+                            <span>Name</span>
+                            {/* <span style={{marginLeft:"10px"}}><FontAwesomeIcon icon={faArrowUp} /></span> */}
+                        {/* </div> */}
+                        
+                    </th>
                     {/* <th className="_w20">Address</th> */}
                     <th className="_w20">Company</th>
                     <th className="_w10">Email</th>
@@ -37,9 +60,10 @@ const Records = ({items}) =>{
                 return(
                     <tr key={e.node.id}>
                         <td className="_heading _w30">
-                            <a>
-                                {e.node.name}
-                            </a>
+                            {/* <a> */}
+                                {e.node.name}<br/>
+                                {/* <span style={{fontSize:"0.9em",textTransform:'lowercase',fontWeight:'normal',color:'grey'}}>{e.node.email}</span> */}
+                            {/* </a> */}
                         </td>
                         <td>
                             {e.node.company}
@@ -85,23 +109,38 @@ const Records = ({items}) =>{
 
 
 const Vendor = () =>{
-    const {data,loading} = useQuery(allVendorQuery)
+    const {data,loading} = useQuery(allVendorQuery,{variables:{search:""}})
+    const [getVendor,{data:vdata,loading:vloading}] = useLazyQuery(allVendorQuery)
     const [active,setActive] = useState("")
+    const [search,setSearch] = useState("")
     return(
         <Layout title={"Vendors | Bacardi"}>
+            
             <div>
                 <Modal active={active} setActive={setActive} isNew={true} />
                 <div className="topHeading">
-                    <h2>Vendors</h2>
+                    <div style={{width:"100%",display:'flex',alignItems:'center'}}>
+                        <h2 style={{width:'auto'}}>Vendors</h2>
+                        {/* <div>
+                            <input type="text" className="input is-small" placeholder="search"/>
+                        </div>
+                        
+
+                        <div style={{marginRight:'10px'}}>
+                            <FontAwesomeIcon icon={faSearch}  />
+                        </div> */}
+                    </div>
+
+                    
                     <div>
                         <button type="button" onClick={()=>setActive("is-active")} className="button is-rounded is-small is-primary">Add vendor</button>
                     </div>
                 </div>
 
                 {
-                loading===true?
+                loading===true || vloading ?
                 <TableLoading />
-                :<Records items={data.vendors.edges} />
+                :<Records items={vdata===undefined?data.vendors.edges:vdata.vendors.edges} getVendor={getVendor} search={search} setSearch={setSearch} />
             }
 
             </div>

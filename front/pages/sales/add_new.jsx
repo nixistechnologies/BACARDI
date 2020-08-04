@@ -8,6 +8,7 @@ import React from 'react'
 import client from "../../lib/apolloClient";
 import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
 import { faTrashAlt,faEdit } from '@fortawesome/free-regular-svg-icons'
+import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { generateBill,clearBill } from "../../redux_function/actions";
 import { server } from "../../lib/settings";
 import {BillPageLoading} from '../../components/skeleton'
@@ -62,13 +63,25 @@ const Billingform =() =>{
     
     const [dropdown1,setDropdown1] = useState("")
     const [dropdown2,setDropdown2] = useState("")
+    const [fullPayment,setFullpayment] = useState(true)
+
+
+    const [productFilter,setProductFilter] = useState("")
+    const [productDD,setProductDD] = useState("")
+    const [product,setProduct] = useState({name:"Select Product"})  
+    
+    const [customerFilter,setCustomerFilter] = useState("")
+    const [customerDD,setCustomerDD] = useState("")
+    const [customer,setCustomer] = useState({name:"Select Customer"})      
 
 
     const { register, handleSubmit,setValue,getValues,errors } = useForm();
     const {loading,error,data} = useQuery(getAllCustomersQuery)
-    const product = useSelector(state => state.products);
+    // const product = useSelector(state => state.products);
     const billstore = useSelector(state => state.bills);
+    const [tamount,setTamount] = useState(0)
     const dispatch = useDispatch()
+
     
     useEffect(()=>{
         // console.log("ds")
@@ -149,7 +162,8 @@ const Billingform =() =>{
             "remarks":remarks,
             "date":date,
             "payment":payment,
-            "products":mlist
+            "products":mlist,
+            "paid":getValues("paid") === ""?tamount:getValues("paid")
         }})
 
         // dispatch(generateBill(name,age,gender,date,gst,payment,mlist))
@@ -180,6 +194,9 @@ const Billingform =() =>{
                 "discount":getValues("discount").length?getValues("discount"):0
             }]
         ))
+        
+        setTamount( tamount+(getValues("price") * getValues("qty")??1) - ((getValues("price") * getValues("qty")??1)*getValues("discount")/100))
+
         setPname("")
         setValue([
             // {"medicine":""},
@@ -215,8 +232,18 @@ const Billingform =() =>{
 
     }
     const deletefromtemp=(id)=>{
-        console.log(id)
-        console.log(mlist)
+        // console.log(id)
+        // console.log(mlist)
+        // console.log(mlist[id])
+        
+        // console.log(tamount)
+        const x = (mlist[id].price * mlist[id].qty) - ((mlist[id].price * mlist[id].qty)*mlist[id].discount/100)
+
+        // console.log(tamount)
+        // console.log(x)
+        setTamount(tamount-x)
+
+        // tamount - (mlist[id].price * mlist[id].qty) - ((mlist[id].price * mlist[id].qty)*mlist[id].discount/100)
         
         // mlist.slice(0, id-1).concat(mlist.slice(id, mlist.length))
         // console.log(x)
@@ -241,7 +268,7 @@ const Billingform =() =>{
 
     }
     // console.log(mlist)
-    console.log(billstore)
+    // console.log(billstore)
 
     
 
@@ -268,10 +295,26 @@ const Billingform =() =>{
                 .dropdown-menu{
                     min-width:18rem;
                 }
+                .t-head{
+                    border-bottom:1px solid rgba(0,0,0,.15);
+                    display:flex;
+                    margin-bottom:25px;
+                }
+                .t-head span{
+                    font-weight:600;
+                    line-height:1.2;
+                    font-size:22px;
+                    border-bottom:1px solid rgba(0,0,0,.54);
+                    padding-bottom:20px;
+                    margin-bottom:-1px
+                }
             `} </style>
             {/* <form> */}
-            <div>   
+            {/* <div>   
                 <h2 className="subtitle" style={{marginTop:"10px",fontWeight:'300'}}>User detail</h2>
+            </div> */}
+            <div style={{margin:"20px 2px 5px"}}>   
+                <span className="" style={{fontSize:'22px', marginTop:"10px",fontWeight:'600'}}>User detail</span>
             </div>
             
             <div>
@@ -293,10 +336,41 @@ const Billingform =() =>{
                             </select>                            
                         </article> */}
 
+                        
+                        <div style={{position:'relative',padding:"0"}} >
+                            <div type="text" className="input is-small" 
+                            onClick={()=>{setCustomerDD(customerDD==="dd-active"?"":"dd-active")}}
+                            >
+                                {/* <input type="text" className="input is-small"/> */}
+                                <div style={{width:'100%',padding:"0"}}>
+                                    <span>{customer.name}</span>
+                                    <span style={{float:'right'}}>
+                                        <FontAwesomeIcon icon={faAngleDown} />
+                                    </span>
+                                </div>
+                            </div>
+                            <div style={{padding:"0"}}>
+                                <div className={`control my-d dropdown-content ${customerloading===true?"is-loading":""} ${customerDD}`} style={{padding:"0"}}>
+                                    <input type="text" className={`input is-small `} value={customerFilter} onChange={(e)=>{ setCustomerFilter(e.target.value), showCustomer(e) }} placeholder="Search product.." style={{border:0,outline:0,boxShadow:'none'}}/>
+                                    <div className="dd-list" style={{padding:"0",maxHeight:"170px"}}>
+                                        {
+                                        customerTemp!=null?
+                                        customerTemp.customerSuggestion.map(e=>{
+                                            // return ( e.node.name.toLocaleLowerCase().startsWith(statefilter)?
+                                            return <div style={{padding:"0"}} className="d-item_" onClick={()=>{setCustomer({name:e.name}), selectOption(e), setCustomerDD(customerDD==="dd-active"?"":"dd-active") }} key={e.id} value={e.id}> <a className="dropdown-item">{e.name}</a></div>
+                                            // :null
+                                                }
+                                            ):null
+                                        }
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>  
 
 
 
-                        <div className={`dropdown ${dropdown1}`} id="customer_dropdown" style={{width:"100%"}} >
+                        {/* <div className={`dropdown ${dropdown1}`} id="customer_dropdown" style={{width:"100%"}} >
                         <div style={{width:"100%"}} className="dropdown-trigger" onClick={()=>{dropdown1==="is-active"?setDropdown1(""):setDropdown1("is-active")}}>
                             <button style={{width:"100%"}} className="button is-small" aria-haspopup="true" aria-controls="dropdown-menu3">
                                 <span ref={register} name="name">{cname.length===0?"Select Customer Name":cname}</span>
@@ -324,7 +398,7 @@ const Billingform =() =>{
                             }
                             </div>
                         </div>
-                        </div>
+                        </div> */}
 
                         {/* <div className="dropdown is-hoverable">
                         <div className="dropdown-trigger">
@@ -371,9 +445,18 @@ const Billingform =() =>{
                     </div>
                 </div>
             </div>
-            <div>   
-                <h2 className="subtitle" style={{marginTop:"10px",fontWeight:'300'}}>Billing detail</h2>
+            
+            {/* <div className="t-head">
+                <span>
+                Billing detail
+                </span>
+            </div> */}
+
+            <div style={{margin:"20px 2px 5px"}}>   
+                <span className="" style={{fontSize:'22px', marginTop:"10px",fontWeight:'600'}}>Billing detail</span>
             </div>
+
+
             <div>
             
                 <div className="columns">
@@ -406,8 +489,11 @@ const Billingform =() =>{
             </div>
 
 
-            <div>   
-                <h2 className="subtitle" style={{marginTop:"10px",fontWeight:'300'}}>Add Medicines</h2>
+            {/* <div>   
+                <h2 className="subtitle" style={{marginTop:"10px",fontWeight:'300'}}>Products</h2>
+            </div> */}
+            <div style={{margin:"20px 2px 5px"}}>   
+                <span className="" style={{fontSize:'22px', marginTop:"10px",fontWeight:'600'}}>Products detail</span>
             </div>
 
             <div>
@@ -419,7 +505,40 @@ const Billingform =() =>{
                         {/* <input className="input is-small" list="medicine_name" ref={register({required:"(required)"})} autoComplete="off"
                         type="text" name="medicine"  placeholder="Medicine" onChange={selectMedicineOption} /> */}
 
-                        <div className={`dropdown ${dropdown2}`} id="customer_dropdown" style={{width:"100%"}} >
+
+                        <div style={{position:'relative',padding:"0"}} >
+                            <div type="text" className="input is-small" 
+                            onClick={()=>{setProductDD(productDD==="dd-active"?"":"dd-active")}}
+                            >
+                                {/* <input type="text" className="input is-small"/> */}
+                                <div style={{width:'100%',padding:"0"}}>
+                                    <span>{product.name}</span>
+                                    <span style={{float:'right'}}>
+                                        <FontAwesomeIcon icon={faAngleDown} />
+                                    </span>
+                                </div>
+                            </div>
+                            <div style={{padding:"0"}}>
+                                <div className={`control my-d dropdown-content ${productloading===true?"is-loading":""} ${productDD}`} style={{padding:"0"}}>
+                                    <input type="text" className={`input is-small `} value={productFilter} onChange={(e)=>{ setProductFilter(e.target.value), showProduct(e) }} placeholder="Search product.." style={{border:0,outline:0,boxShadow:'none'}}/>
+                                    <div className="dd-list" style={{padding:"0",maxHeight:"170px"}}>
+                                        {
+                                        productTemp!=null?
+                                        productTemp.productSuggestion.map(e=>{
+                                            // return ( e.node.name.toLocaleLowerCase().startsWith(statefilter)?
+                                            return <div style={{padding:"0"}} className="d-item_" onClick={()=>{setProduct({name:e.name}), selectProduct(e), setProductDD(productDD==="dd-active"?"":"dd-active") }} key={e.id} value={e.id}> <a className="dropdown-item">{e.name}</a></div>
+                                            // :null
+                                                }
+                                            ):null
+                                        }
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>  
+
+
+                        {/* <div className={`dropdown ${dropdown2}`} id="customer_dropdown" style={{width:"100%"}} >
                         <div style={{width:"100%"}} className="dropdown-trigger" onClick={()=>{dropdown2==="is-active"?setDropdown2(""):setDropdown2("is-active")}}>
                             <button type="button" style={{width:"100%"}} className="button is-small" aria-haspopup="true" aria-controls="dropdown-menu3">
                                 <span ref={register} name="name">{pname.length===0?"Product name":pname}</span>
@@ -447,7 +566,7 @@ const Billingform =() =>{
                             }
                             </div>
                         </div>
-                        </div>
+                        </div> */}
 
 
                         
@@ -522,6 +641,7 @@ const Billingform =() =>{
                 
                 <tbody>
                 {mlist.map((e,i)=>{
+                    
                     return(
                         <tr key={e.medicineId} style={{fontSize: "13px",
                             letterSpacing: "1px",
@@ -539,8 +659,39 @@ const Billingform =() =>{
                         </tr>
                     )
                 })}
+                <tr>
+                   <td colspan={4} style={{fontWeight:'bold',fontSize:'1.2rem',padding:'0.5em 0.55em'}}>
+                        Total
+                    </td> 
+                    <td style={{fontWeight:'bold',fontSize:'1.2rem',padding:'0.5em 0.55em'}}>
+                        &#8377;
+                        
+                        <span style={{paddingLeft:"2px"}}>{tamount}</span>
+                    </td>
+                </tr>
                 </tbody>
                 </table>
+
+                <div style={{display:'flex',height:'30px',marginBottom:"20px",fontSize:'1.4em',fontWeight:'bold',alignItems:'center'}}> 
+                    <div>
+                        <h2 className="subtitle">Do you want full payment? </h2>
+                    </div>
+                    
+                    <div style={{marginLeft:"20px",display:'flex'}} class="control">
+                        <label class="radio"style={{marginRight:"15px",display:'flex',alignItems:'center'}}>
+                            <input type="radio" style={{marginRight:'10px'}} name="answer" onClick={()=>setFullpayment(true)} defaultChecked />
+                            Yes
+                        </label>
+                        <label class="radio" style={{display:'flex',alignItems:'center'}}>
+                            <input type="radio" style={{marginRight:'10px'}} name="answer" onClick={()=>setFullpayment(false)}/>
+                            No
+                        </label>
+                    </div>
+                    <div style={{marginLeft:"15px",display:fullPayment===true?"none":"block"}}>
+                        <input type="text" className="input is-small" ref={register} name="paid" placeholder="Payment" />
+                    </div>
+                    
+                </div>
 
                 {billData==undefined?
                 <>

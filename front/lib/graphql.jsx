@@ -138,7 +138,7 @@ mutation x($username:String!$password:String!,$firstName:String!,$lastName:Strin
 
 export const vendorSuggestionQuery = gql`
 query x($name:String!){
-  vendors(nameContains:$name)
+  vendors(nameContains:$name,search:"")
   {
     edges{
       node{
@@ -349,8 +349,8 @@ mutation x($isNew:Boolean!, $name:String!,$email:String!,$mobile:String!,$compan
 `
 
 export const allVendorQuery = gql`
-query {
-  vendors{
+query x($search:String!){
+  vendors(search:$search){
     edges{
       node{
         id
@@ -404,8 +404,8 @@ query x($min:String!,$max:String!){
 
 
 export const generateBillQuery = gql`
-mutation x($products:[MInput!],$remarks:String!,$customerId:ID!,$date:String!,$payment:String!){
-  generateBill(billingDate:$date,products:$products,paymentMode:$payment,customerId:$customerId,remarks:$remarks)
+mutation x($paid:Float!, $products:[MInput!],$remarks:String!,$customerId:ID!,$date:String!,$payment:String!){
+  generateBill(payment:$paid, billingDate:$date,products:$products,paymentMode:$payment,customerId:$customerId,remarks:$remarks)
   {
     bill{
       invoice
