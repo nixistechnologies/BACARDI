@@ -499,7 +499,7 @@ const Billingform =() =>{
             <div>
                 <form onSubmit={handleSubmit(AddRows)}>
                 <div className="columns">
-                    <div className="column">
+                    <div className="column is-4">
                         <label className="label">Product<span className="error_text">{errors.medicine?.message}</span></label>
                         {/* {errors.medicine?.message} */}
                         {/* <input className="input is-small" list="medicine_name" ref={register({required:"(required)"})} autoComplete="off"
@@ -511,8 +511,8 @@ const Billingform =() =>{
                             onClick={()=>{setProductDD(productDD==="dd-active"?"":"dd-active")}}
                             >
                                 {/* <input type="text" className="input is-small"/> */}
-                                <div style={{width:'100%',padding:"0"}}>
-                                    <span>{product.name}</span>
+                                <div style={{width:'100%',padding:"0",display:'flex'}}>
+                                    <span style={{textOverflow:'ellipsis',overflow:'hidden',whiteSpace:'nowrap',paddingRight:'2px',width:'100%'}}>{product.name}</span>
                                     <span style={{float:'right'}}>
                                         <FontAwesomeIcon icon={faAngleDown} />
                                     </span>

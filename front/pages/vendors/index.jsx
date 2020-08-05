@@ -42,7 +42,7 @@ const Records = ({items,getVendor,search,setSearch}) =>{
                     </th>
                     {/* <th className="_w20">Address</th> */}
                     <th className="_w20">Company</th>
-                    <th className="_w10">Email</th>
+                    {/* <th className="_w10">Email</th> */}
                     {/* <th className="_w20">Zip</th> */}
                     <th className="_w10">City</th>
                     <th className="_w10">State</th>
@@ -62,15 +62,15 @@ const Records = ({items,getVendor,search,setSearch}) =>{
                         <td className="_heading _w30">
                             {/* <a> */}
                                 {e.node.name}<br/>
-                                {/* <span style={{fontSize:"0.9em",textTransform:'lowercase',fontWeight:'normal',color:'grey'}}>{e.node.email}</span> */}
+                                <span style={{fontSize:"0.9em",textTransform:'lowercase',fontWeight:'normal',color:'grey'}}>{e.node.email}</span>
                             {/* </a> */}
                         </td>
                         <td>
                             {e.node.company}
                         </td>
-                        <td>
+                        {/* <td>
                             {e.node.email}
-                        </td>
+                        </td> */}
                         {/* <td>
                             {e.node.address}
                         </td> */}

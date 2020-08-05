@@ -48,7 +48,7 @@
     box-shadow:0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
 }
 #nprogress .bar {
-    background: #00d1b2 !important;
+    background: linear-gradient(to right,#00c4a7,#276cda,#00c4a7) !important;
   }
   
   #nprogress .spinner-icon {
@@ -158,9 +158,9 @@ align-self: center;
 }
 
 ._heading{
-    font-weight: 500;
-    color: black;
-    text-transform: uppercase;
+    font-weight: 600;
+    /* color: black; */
+    text-transform: capitalize;
     cursor: pointer;
 }
 

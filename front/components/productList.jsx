@@ -79,11 +79,11 @@ const TableView=({data,mloading})=>{
     <div>
       <style jsx>{`
 
-      ._heading{
-        font-weight:500;
-        color:black;
-        text-transform: uppercase;
-      }
+      // ._heading{
+      //   font-weight:500;
+      //   color:black;
+      //   text-transform: uppercase;
+      // }
       .cont{
         color:grey;
       }

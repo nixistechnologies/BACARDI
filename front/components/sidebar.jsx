@@ -115,12 +115,12 @@ const SideBar = ({sidebar,route}) =>{
                         <ul className="child_" style={{display:route.startsWith("/sales")?"inherit":"none"}}>
                             <li className="is-active">
                             <Link href="/sales/add_new">
-                                <a className={route.startsWith("/sales/add_new")?"is-active":"not"}>Add new</a>
+                                <a className={route.startsWith("/sales/add_new")?"active":"not"}>Add new</a>
                             </Link>
                                 </li>
                             <li>
                                 <Link href="/sales/history">
-                                <a className={route.startsWith("/sales/history")?"is-active":"not"}>All Sales</a>
+                                <a className={route.startsWith("/sales/history")?"active":"not"}>All Sales</a>
                                 </Link>
                                 </li>
                                 

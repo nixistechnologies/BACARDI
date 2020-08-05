@@ -166,8 +166,8 @@ const NewPurchase = () =>{
                             onClick={()=>{setVendorDD(vendorDD==="dd-active"?"":"dd-active")}}
                             >
                                 {/* <input type="text" className="input is-small"/> */}
-                                <div style={{width:'100%',padding:"0"}}>
-                                    <span>{vendor.name}</span>
+                                <div style={{width:'100%',padding:"0",display:'flex'}}>
+                                    <span style={{textOverflow:'ellipsis',overflow:'hidden',whiteSpace:'nowrap',paddingRight:'2px',width:'100%'}}>{vendor.name}</span>
                                     <span style={{float:'right'}}>
                                         <FontAwesomeIcon icon={faAngleDown} />
                                     </span>
@@ -255,8 +255,8 @@ const NewPurchase = () =>{
                             onClick={()=>{setProductDD(productDD==="dd-active"?"":"dd-active")}}
                             >
                                 {/* <input type="text" className="input is-small"/> */}
-                                <div style={{width:'100%',padding:"0"}}>
-                                    <span>{product.name}</span>
+                                <div style={{width:'100%',padding:"0",display:'flex'}}>
+                                    <span style={{textOverflow:'ellipsis',overflow:'hidden',whiteSpace:'nowrap',paddingRight:'2px',width:'100%'}}>{product.name}</span>
                                     <span style={{float:'right'}}>
                                         <FontAwesomeIcon icon={faAngleDown} />
                                     </span>

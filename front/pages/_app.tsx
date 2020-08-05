@@ -17,9 +17,11 @@ import 'nprogress/nprogress.css';
 // import {wrapper} from '../components/store';
 // import {State} from '../components/reducer';
 
-NProgress.configure({showSpinner:false,'color':"#00d1b2",height:5})
+NProgress.configure({showSpinner:false,minimum:0.3})
+// NProgress.set(0.4);
 
 Router.events.on('routeChangeStart', () => NProgress.start()); 
+// NProgress.set(0.4)
 Router.events.on('routeChangeComplete', () => NProgress.done()); 
 Router.events.on('routeChangeError', () => NProgress.done());
 
