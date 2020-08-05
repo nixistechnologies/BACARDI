@@ -50,6 +50,18 @@ class MyApp extends App<AppInitialProps> {
           <ApolloProvider client={client}>
             {/* <Provider store={store}>  */}
               <Component {...pageProps} />
+
+              <style jsx global>{`
+                  @font-face {
+                    font-family: 'tourFont';
+                    src: url('/fonts/Nunito-Regular.ttf');
+                    font-weight: bold;
+                    font-style: normal;
+                    font-display: swap;
+                  }
+                `}</style>
+
+
               {/* </Provider> */}
           </ApolloProvider>
             // <Component {...pageProps} />

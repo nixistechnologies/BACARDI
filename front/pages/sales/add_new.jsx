@@ -643,12 +643,17 @@ const Billingform =() =>{
                 {mlist.map((e,i)=>{
                     
                     return(
-                        <tr key={e.medicineId} style={{fontSize: "13px",
-                            letterSpacing: "1px",
-                            marginBottom: "5px",
-                            textTransform: "uppercase"
-                            }}>
-                            <td style={{fontWeight:'bold'}}>{e.name}</td>
+                        <tr key={e.medicineId} 
+                        // style={{fontSize: "13px",
+                        //     letterSpacing: "1px",
+                        //     marginBottom: "5px",
+                        //     textTransform: "uppercase"
+                        //     }}
+                            >
+                            <td style={{fontWeight:'bold'}}>
+                                {e.name}
+                            
+                            </td>
                             <td>{e.price}</td>
                             <td>{e.qty??1}</td>
                             <td>{e.discount??1}</td>
@@ -672,7 +677,7 @@ const Billingform =() =>{
                 </tbody>
                 </table>
 
-                <div style={{display:'flex',height:'30px',marginBottom:"20px",fontSize:'1.4em',fontWeight:'bold',alignItems:'center'}}> 
+                <div style={{display:'flex',height:'30px',marginBottom:"20px",fontSize:'1em',fontWeight:'bold',alignItems:'center'}}> 
                     <div>
                         <h2 className="subtitle">Do you want full payment? </h2>
                     </div>
