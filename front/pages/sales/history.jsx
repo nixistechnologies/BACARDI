@@ -6,7 +6,7 @@ import {privateRoute} from '../../lib/private_route'
 import { server } from '../../lib/settings'
 import {TableLoading} from '../../components/skeleton'
 import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
-import {faPen, faPlus} from '@fortawesome/free-solid-svg-icons'
+import {faPen, faPlus, faEllipsisV} from '@fortawesome/free-solid-svg-icons'
 import {useForm} from 'react-hook-form'
 
 
@@ -53,12 +53,12 @@ const Modal = ({active,setActive,paid,outstanding})=>{
                             <div className="columns">
                                 <div className="column">
                                     <label className="label">Paid</label>
-                                    <input type="text" defaultValue={paid} ref={register} className="input is-small" />
+                                    <input type="text" ref={register} className="input is-small" />
                                 </div>
                                 
                                 <div className="column">
-                                    <label className="label">Outstanding</label>
-                                    <input type="text" defaultValue={outstanding} ref={register} className="input is-small" />
+                                    <label className="label">Reamin</label>
+                                    <input type="text" defaultValue={outstanding} ref={register} className="input is-small" disabled/>
                                 </div>
                             </div>
                             <div className="columns">
@@ -125,7 +125,11 @@ const Result = ({loading,data})=>{
                             <td>{item.node.outstanding}</td>
                             <td onClick={()=>{setActive("is-active"),setPaid(item.node.paidAmount),setOutstanding(item.node.outstanding)}}>
                                 
-                                <FontAwesomeIcon icon={faPen} color="#00c4a7" /> 
+                                <FontAwesomeIcon icon={faEllipsisV} 
+                                // color="#00c4a7" 
+                                color="grey"
+                                //
+                                /> 
                                 
                                 </td>
                         </tr>)

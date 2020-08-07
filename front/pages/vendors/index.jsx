@@ -3,9 +3,10 @@ import {allVendorQuery} from '../../lib/graphql'
 import {TableLoading} from '../../components/skeleton'
 import { useState} from 'react'
 import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
-import {faPen, faSearch, faAngleDown,faArrowDown, faArrowUp,faTimes} from '@fortawesome/free-solid-svg-icons'
+import {faPen, faSearch, faAngleDown,faArrowDown, faArrowUp,faTimes, faEllipsisV,faEllipsisH} from '@fortawesome/free-solid-svg-icons'
 import {useQuery, useLazyQuery} from '@apollo/react-hooks'
 import Modal from '../../components/vendorModel'
+import { useEffect } from 'react'
 
 const Records = ({items,getVendor,search,setSearch}) =>{
     const [active,setActive] = useState("")
@@ -61,8 +62,8 @@ const Records = ({items,getVendor,search,setSearch}) =>{
                     <tr key={e.node.id}>
                         <td className="_heading _w30">
                             {/* <a> */}
-                                {e.node.name}<br/>
-                                <span style={{fontSize:"0.9em",textTransform:'lowercase',fontWeight:'normal',color:'grey'}}>{e.node.email}</span>
+                                {e.node.name}
+                                <span className="sub">{e.node.email}</span>
                             {/* </a> */}
                         </td>
                         <td>
@@ -94,8 +95,16 @@ const Records = ({items,getVendor,search,setSearch}) =>{
                         <td className="hover" 
                             onClick={()=>{setActive("is-active"),setInfo({"id":e.node.id,"name":e.node.name,"address":e.node.address,"city":e.node.city.name,"cityId":e.node.city.id,"stateId":e.node.state.id, "state":e.node.state.name,"zipCode":e.node.zipCode,"gst":e.node.gst,"email":e.node.email,"mobile":e.node.mobile,"company":e.node.company}) }}
                         >
-                            <FontAwesomeIcon icon={faPen} color="#00d1b2" />
+                            <FontAwesomeIcon icon={faPen} color="#00d1b2" /> 
+                            {/* <div style={{zIndex:1001,position:'absolute'}}>
+                            
+                            <div className="s_menu" role="menu" style={{position:'absolute',background:'white',padding:'5px 0',boxShadow:"0 2px 10px 0 rgba(0,0,0,0.2)"}} tabIndex={-1}>
+                                <div className="s_menuitem" role="menuitem">Edt</div>
+                                <div className="s_menuitem" role="menuitem">Delete</div>
+                            </div>
+                            </div>                        */}
                         </td>
+                        
                     </tr>
                         
                         )
@@ -113,6 +122,18 @@ const Vendor = () =>{
     const [getVendor,{data:vdata,loading:vloading}] = useLazyQuery(allVendorQuery)
     const [active,setActive] = useState("")
     const [search,setSearch] = useState("")
+    const [show,setShow] = useState(false)
+    // const close=()=>{
+
+    // }
+    useEffect(()=>{
+
+    },[show])
+    
+    const Showing=()=>{
+        setShow(true)
+        console.log("show")
+    }
     return(
         <Layout title={"Vendors | Bacardi"}>
             
@@ -120,7 +141,13 @@ const Vendor = () =>{
                 <Modal active={active} setActive={setActive} isNew={true} />
                 <div className="topHeading">
                     <div style={{width:"100%",display:'flex',alignItems:'center'}}>
-                        <h2 style={{width:'auto'}}>Vendors</h2>
+                        <h2 style={{width:'auto'}} onClick={()=>Showing()}>Vendors</h2>
+                        
+                        
+                        
+                        
+                        
+
                         {/* <div>
                             <input type="text" className="input is-small" placeholder="search"/>
                         </div>

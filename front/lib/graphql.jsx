@@ -55,6 +55,7 @@ export const getAllProductQuery = gql`
           id
           name
           purchaseFrom
+          mrp
           price
           qty
           typeOfPacking

@@ -209,7 +209,7 @@ const CRecords = ({items}) =>{
                     <tr>
                         <th className="_w20" >Name</th>
                         <th className="_w20">Address</th>
-                        <th className="_w10">Email</th>
+                        {/* <th className="_w10">Email</th> */}
                         <th className="_w10">Mobile</th>
                         <th className="_w10">GST</th>
                         
@@ -222,17 +222,20 @@ const CRecords = ({items}) =>{
                     {items.map((e)=>{
                         return(<tr key={e.node.id}>
                             <td className="_heading _w30">
-                                <a>
+                                {/* <a> */}
                                     {e.node.name}
-                                </a>
+                                    <span className="sub">
+                                        {e.node.email}
+                                    </span>
+                                {/* </a> */}
                             </td>
                             <td>
                                 {e.node.address}
                             </td>
                             
-                            <td>
+                            {/* <td>
                                 {e.node.email}
-                            </td>
+                            </td> */}
                             <td>
                                 {e.node.mobile}
                             </td>

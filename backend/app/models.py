@@ -174,6 +174,14 @@ class ParitalPayment(models.Model):
     def __str__(self):
         return str(self.paid)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        p = Billing.objects.get(id = self.bill.id)
+        p.paid_amount = self.paid
+        p.outstanding = self.outstanding
+        # p.qty = p.qty - self.quantity
+        p.save()
+
 class Sales_Product(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE,blank=True,null=True)
     product_name = models.CharField(max_length=50)

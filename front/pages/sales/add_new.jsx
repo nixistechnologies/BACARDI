@@ -198,6 +198,9 @@ const Billingform =() =>{
         setTamount( tamount+(getValues("price") * getValues("qty")??1) - ((getValues("price") * getValues("qty")??1)*getValues("discount")/100))
 
         setPname("")
+        setProduct({name:"Select Product"})
+        setProductFilter("")
+        
         setValue([
             // {"medicine":""},
             {"qty":""},
@@ -643,14 +646,14 @@ const Billingform =() =>{
                 {mlist.map((e,i)=>{
                     
                     return(
-                        <tr key={e.medicineId} 
+                        <tr style={{fontFamily:'nfont'}} key={e.medicineId} 
                         // style={{fontSize: "13px",
                         //     letterSpacing: "1px",
                         //     marginBottom: "5px",
                         //     textTransform: "uppercase"
                         //     }}
                             >
-                            <td style={{fontWeight:'bold'}}>
+                            <td style={{fontWeight:'bold',fontFamily:'nfontB'}}>
                                 {e.name}
                             
                             </td>

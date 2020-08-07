@@ -138,20 +138,24 @@ const TableView=({data,mloading})=>{
                   <td>
                     <div className="_heading">
                       {prd.node.name}
+                      <span className="sub">
+                      {prd.node.mfg}
+                      </span>
                     </div>
                     
                   </td>
-                  <td className="cont">
+                  <td className="_cont">
                     {prd.node.mfg}
                   </td>
-                  <td className="cont">
+                  <td className="_cont">
                     {prd.node.qty}
                   </td>
-                  <td className="cont">
-                    {prd.node.price}
+                  <td className="_cont">
+                  &#8377; {prd.node.price}<br/>
+                    <span style={{fontSize:"0.8em",color:'grey' }}>&#8377; {prd.node.mrp}</span>
                   </td>
 
-                  <td className="cont">
+                  <td className="_cont">
                     <Link href={`products/[product]?name=${prd.node.name}`} as={`products/${prd.node.id}?name=${prd.node.name}`}>
                       <a>
                         <FontAwesomeIcon icon={faPen} color="#00d1b2" />

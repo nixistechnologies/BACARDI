@@ -124,7 +124,7 @@ class BillingFilter(FilterSet):
         fields = ["customer__name","invoice_number"]
     @property
     def qs(self):
-        return super(BillingFilter,self).qs.filter(user_id = self.request.user.id)
+        return super(BillingFilter,self).qs.filter(user_id = self.request.user.id).order_by("-id")
 
 class PartialPaymentNode(DjangoObjectType):
     class Meta:
@@ -523,7 +523,7 @@ class CreateBill(graphene.Mutation):
         bill.net_amount = round(total,2)
         # bill.save() 
         
-        ParitalPayment.objects.create(paid=payment,outstanding=total-payment,bill_id = bill.id)
+        # ParitalPayment.objects.create(paid=payment,outstanding=total-payment,bill_id = bill.id)
 
         # GenerateBill(gross,bill.invoice_number,Medicine.objects.filter(billing_id=bill.id),discount,cgst,total,bill,info.context.user)
         generate_receipt(bill,Sales_Product.objects.filter(billing_id=bill.id),info.context.user)
@@ -532,6 +532,7 @@ class CreateBill(graphene.Mutation):
         with open(pdfname,'rb') as pdf:
             bill.invoice.save(pdfname,File(pdf),save=True)
         bill.save()
+        ParitalPayment.objects.create(paid=payment,outstanding=total-payment,bill_id = bill.id)
         os.remove(pdfname)
         return CreateBill(bill=bill)
 

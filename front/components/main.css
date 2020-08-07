@@ -15,7 +15,9 @@
     align-items: center;
 }
 
+
 .topHeading h2{
+    font-family: nfontB;
     font-weight: bold;
     font-size: 30px;
     /* margin-bottom: 20px; */
@@ -162,7 +164,33 @@ align-self: center;
     /* color: black; */
     text-transform: capitalize;
     cursor: pointer;
+    font-family: nfontb;
 }
+tr{
+   font-family: nfont; 
+}
+th{
+    font-family: nfontb;
+}
+._heading .sub{
+    font-size:0.9em;
+    text-transform:lowercase;
+    font-weight:normal;
+    color:grey;
+    display: block;
+    font-family: nfont;
+}
+
+.s_menu{
+    display: none;
+}
+.s_menu .s_menuitem{
+    padding: 5px;
+}
+.s_menu:hover{
+    display: block;
+}
+
 
 .w30{
     width:30%

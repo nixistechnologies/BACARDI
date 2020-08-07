@@ -53,8 +53,15 @@ class MyApp extends App<AppInitialProps> {
 
               <style jsx global>{`
                   @font-face {
-                    font-family: 'tourFont';
+                    font-family: 'nFont';
                     src: url('/fonts/Nunito-Regular.ttf');
+                    font-weight: bold;
+                    font-style: normal;
+                    font-display: swap;
+                  }
+                  @font-face {
+                    font-family: 'nFontB';
+                    src: url('/fonts/Nunito-Bold.ttf');
                     font-weight: bold;
                     font-style: normal;
                     font-display: swap;
