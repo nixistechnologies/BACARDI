@@ -1,6 +1,6 @@
 import  {FontAwesomeIcon,}  from '@fortawesome/react-fontawesome'
 // import { faTrashAlt,faEdit, faHospital, faBuilding } from '@fortawesome/free-regular-svg-icons'
-import {faAngleRight} from '@fortawesome/free-solid-svg-icons'
+import {faAngleRight, faChartBar,faMale, faUserTie,faThList} from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import Cookie from "js-cookie";
 import $ from 'jquery'
@@ -64,6 +64,9 @@ const SideBar = ({sidebar,route}) =>{
                         <div className="item">
                             <Link href="/">
                                 <a className={route=="/"?"active":"not"}>
+                                    
+                                    
+                                    
                                     Dashboard
                                 </a>
                             </Link>
@@ -71,10 +74,15 @@ const SideBar = ({sidebar,route}) =>{
                         </li>
                     <li>
                         <Link href="/customers">
-                            <a className={route.startsWith("/customers") ?"active":"not"}>Customers</a>
+                            
+                            <a className={route.startsWith("/customers") ?"active":"not"}>
+                                
+                                Customers</a>
                         </Link>
                         <Link href="/vendors">
-                            <a className={route.startsWith("/vendors") ?"active":"not"}>Vendors</a>
+                            <a className={route.startsWith("/vendors") ?"active":"not"}>
+                                
+                                Vendors</a>
                         </Link>
                     </li>
                 </ul>
@@ -82,7 +90,8 @@ const SideBar = ({sidebar,route}) =>{
                     Process
                 </p>
                 <ul className="menu-list">
-                    <li><a onClick={(e)=>Toggle(e)}>
+                    <li><a onClick={(e)=>Toggle(e)}>            
+                        
                         Products
                         <span style={{float:"right"}}>
                             <FontAwesomeIcon icon={faAngleRight}/>
@@ -91,13 +100,13 @@ const SideBar = ({sidebar,route}) =>{
                         <ul className="child_" style={{display:route.startsWith("/products") || route.startsWith("/category")?"inherit":"none"}}>
                             <li>
                                 <Link href="/products/category">
-                                    <a className={route.startsWith("/products/category") ||route.startsWith("/category") ?"is-active":"not"}>Categories</a>
+                                    <a className={route.startsWith("/products/category") ||route.startsWith("/category") ?"active":"not"}>Categories</a>
                                 </Link>
                             </li>
                             {/* <li><a>SubCategory</a></li> */}
                             <li>
                                 <Link href="/products">
-                                    <a className={route==="/products"?"is-active":"not"}>
+                                    <a className={route==="/products"?"active":"not"}>
                                         Products
                                     </a>
                                 </Link>

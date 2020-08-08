@@ -79,14 +79,22 @@ class Layout extends React.Component{
 
                         <div className="container" style={{padding:'0'}}>
                             <header>
-                                {navbar===true?
+                                
+                                {/* {navbar===true?
                                 <Navbar/>
                                 :""    
-                                }
+                                } */}
                                 
                             </header>
-                            <div className="main-container">
-                                {children}
+                            <div>
+                                
+                                {navbar===true?
+                                    <Navbar />:""
+                                }
+                                <div className="main-container">
+                                    
+                                    {children}
+                                </div>
                             </div>
                             <div className="_foot">
 
