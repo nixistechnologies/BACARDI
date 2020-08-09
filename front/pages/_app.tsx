@@ -1,5 +1,6 @@
 import { ApolloProvider } from 'react-apollo'
 import client from '../lib/apolloClient'
+import '../node_modules/react-vis/dist/style.css';
 import 'bulma/css/bulma.css'
 import '../components/sidebar.css'
 import '../components/main.css'

@@ -8,6 +8,7 @@ import Login from './login'
 import { withAuthSync } from '../lib/auth'
 import {AuthProps,privateRoute} from '../lib/private_route'
 import {AuthToken} from '../lib/auth_token'
+import Dashboard from '../components/dashboard/dashboard'
 
 
 // import {Cookies} from 'react-cookie'
@@ -48,7 +49,7 @@ const HomePageX =(props)=>{
   // if(token)
   console.log(props)
   
-  return <HomePage />
+  return <Dashboard />
   
   // return token.token==null?<HomePage/>:<Login/>
 }
