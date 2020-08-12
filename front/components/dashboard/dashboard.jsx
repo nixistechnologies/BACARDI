@@ -1,5 +1,5 @@
 import Layout from '../layout'
-import {XYPlot, LineSeries,VerticalBarSeries} from 'react-vis'
+import {XYPlot, LineSeries,VerticalBarSeries,HorizontalGridLines,XAxis,YAxis,Hint,VerticalGridLines,LabelSeries} from 'react-vis'
 import { historyBySlugQuery } from '../../lib/graphql'
 import { useQuery } from 'react-apollo'
 import { TableLoading } from '../skeleton'
@@ -7,6 +7,7 @@ import { server } from '../../lib/settings'
 import Link from 'next/link'
 import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
 import {faPen, faPlus, faEllipsisV, faDolly,faLuggageCart, faRupeeSign, faCoins} from '@fortawesome/free-solid-svg-icons'
+import { useState } from 'react'
 
 const SalesTable = ()=>{
     const {data:pageData,loading:pageLoading} = useQuery(historyBySlugQuery,{variables:{"slug":""}})
@@ -85,17 +86,19 @@ const SalesTable = ()=>{
 }
 
 const Graph=()=>{
+    const [value,setValue] = useState(null)
     const data = [
-        {x: 0, y: 8},
-        {x: 1, y: 5},
-        {x: 2, y: 4},
-        {x: 3, y: 9},
-        {x: 4, y: 1},
-        {x: 5, y: 7},
-        {x: 6, y: 6},
-        {x: 7, y: 3},
-        {x: 8, y: 2},
-        {x: 9, y: 0}
+        {x: "Jan", y: 2},
+        {x: "Feb", y: 5},
+        {x: "Mar", y: 4},
+        {x: "Apr", y: 9},
+        {x: "May", y: 1},
+        {x: "Jun", y: 7},
+        {x: "Jul", y: 6},
+        {x: "Aug", y: 3},
+        {x: "Sep", y: 2},
+        {x: "Nov", y: 3},
+        {x: "Dec", y: 5}
       ];
     return <>
     <style jsx>{`
@@ -116,8 +119,30 @@ const Graph=()=>{
                 <h2>Sales</h2>
             </div>
             
-                <XYPlot height={300} width={500} color="#00c4a7">
-                    <VerticalBarSeries data={data} />
+                <XYPlot height={300} width={500} color="#00c4a7" stackBy="y" xType="ordinal">
+                    <HorizontalGridLines />
+                    <VerticalGridLines />
+                    {/* <LabelSeries /> */}
+                    <VerticalBarSeries 
+                    
+                    onValueMouseOver={(datapoint,event)=>{
+                        console.log(datapoint)
+                        setValue(datapoint);
+                    }}
+                    onSeriesMouseOut={v=>setValue(null)}
+                    
+                    // animation 
+                    opacity={0.8} stroke="#00c4a7" style={{strokeLinejoin: "round"}} data={data} />
+                    <XAxis />
+                    <YAxis />
+                    {
+                        value &&
+                        <Hint value={value} />
+
+                    }
+                    
+                    {/* <Hint className="first-hint" data={data}/> */}
+                    {/* <Hint className="second-hint"/> */}
                 </XYPlot>
             </div>
             <div className="column">

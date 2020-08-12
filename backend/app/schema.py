@@ -18,6 +18,19 @@ from django_filters import FilterSet
 from graphene_file_upload.scalars import Upload
 from django.db.models import Q
 
+class Dashboard(graphene.ObjectType):
+    sales = graphene.Int()
+    purchase = graphene.Int()
+
+    def resolve_sales(parent,info):
+        # print(parent)
+        return parent.sales
+    
+    def resolve_purchase(parent,info):
+        return 500
+
+
+
 class UserNode(DjangoObjectType):
     class Meta:
         model = User
@@ -785,8 +798,18 @@ class Query(graphene.AbstractType):
     city = DjangoFilterConnectionField(CityNode,stateId = graphene.ID())
     purchases = DjangoFilterConnectionField(PurchaseNode,slug=graphene.String())
     purchaseProduct = DjangoFilterConnectionField(PurchaseProductNode,purchaseId=graphene.ID())
+    dashboard = graphene.Field(Dashboard)
 
 # 9899200257
+
+
+    def resolve_dashboard(self,info):
+        sales=0
+        
+        for i in Billing.objects.filter(user_id=info.context.user.id):
+            sales+=i
+            
+        return {"sales":sales} 
 
     def resolve_vendors_search(self,info,search,**kwargs):
         

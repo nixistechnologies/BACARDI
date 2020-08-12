@@ -13,6 +13,7 @@ admin.site.register(Vendor)
 admin.site.register(City)
 admin.site.register(State)
 admin.site.register(Purchase)
+admin.site.register(PurchaseProduct)
 admin.site.register(ParitalPayment)
 
 

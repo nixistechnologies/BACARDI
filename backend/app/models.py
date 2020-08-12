@@ -109,6 +109,7 @@ class Purchase(models.Model):
     invoice_date = models.DateField()
     date = models.DateField(auto_now_add=True,blank=True)
     invoice_number = models.CharField(max_length=50)
+    total_bill = models.FloatField(null=True,blank=True)
     invoice_file = models.FileField(upload_to="purchase_invoice/",blank=True,null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     
@@ -135,6 +136,13 @@ class PurchaseProduct(models.Model):
         p.price = self.list_price
         p.cost = self.cost
         p.save()
+
+        purchase = Purchase.objects.get(id=self.purchase.id)
+        if(purchase.total_bill):
+            purchase.total_bill = purchase.total_bill + (self.cost * self.qty)
+        else:
+            purchase.total_bill = (self.cost * self.qty)
+        purchase.save()
 
 
 
