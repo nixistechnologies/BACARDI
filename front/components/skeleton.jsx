@@ -35,6 +35,21 @@ export const BillPageLoading = () =>{
     )
 }
 
+export const DashboadGridLoad = () =>{
+    return <div>
+        <div>
+            <Skeleton height={5} width={"30%"}/>
+        </div>
+
+        <div>
+        <Skeleton height={13} width={"50%"} />
+        </div>    
+        <div style={{marginTop:'10px'}}>
+            <Skeleton height={5} width={"20%"} />
+        </div>
+        
+        </div>
+}
 
 export const TableLoading = () =>{
     return(

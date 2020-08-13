@@ -268,6 +268,15 @@ query ($name:String!){
 }
 `
 
+export const dashboardQuery = gql `
+{
+  dashboard{
+    sales
+    purchase
+  }
+}
+`
+
 export const historyBySlugQuery = gql`
 query x($slug:String!){
   history(slug:$slug,first:20){

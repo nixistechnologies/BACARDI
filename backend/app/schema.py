@@ -23,11 +23,12 @@ class Dashboard(graphene.ObjectType):
     purchase = graphene.Int()
 
     def resolve_sales(parent,info):
-        # print(parent)
-        return parent.sales
+        print(parent)
+
+        return parent['sales']
     
     def resolve_purchase(parent,info):
-        return 500
+        return parent['purchase']
 
 
 
@@ -807,9 +808,12 @@ class Query(graphene.AbstractType):
         sales=0
         
         for i in Billing.objects.filter(user_id=info.context.user.id):
-            sales+=i
+            sales=sales+i.net_amount
+        purchase = 0
+        for i in Purchase.objects.filter(user_id=info.context.user.id):
+            purchase +=  i.total_bill if i.total_bill else 0
             
-        return {"sales":sales} 
+        return {"sales":sales,"purchase":purchase} 
 
     def resolve_vendors_search(self,info,search,**kwargs):
         

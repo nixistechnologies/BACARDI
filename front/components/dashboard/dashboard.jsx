@@ -1,8 +1,8 @@
 import Layout from '../layout'
 import {XYPlot, LineSeries,VerticalBarSeries,HorizontalGridLines,XAxis,YAxis,Hint,VerticalGridLines,LabelSeries} from 'react-vis'
-import { historyBySlugQuery } from '../../lib/graphql'
+import { historyBySlugQuery,dashboardQuery } from '../../lib/graphql'
 import { useQuery } from 'react-apollo'
-import { TableLoading } from '../skeleton'
+import { TableLoading,DashboadGridLoad } from '../skeleton'
 import { server } from '../../lib/settings'
 import Link from 'next/link'
 import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
@@ -159,6 +159,7 @@ const Graph=()=>{
 
 
 const TopGrid=()=>{
+    const {data,loading} = useQuery(dashboardQuery)
     return <>
     <style jsx>{`
     .top-item{
@@ -191,41 +192,98 @@ const TopGrid=()=>{
     
     <div>
 
+        {
+            
+        
+        
         <div className="columns top">
+            {loading==true?
+            <div className="column">
+                <DashboadGridLoad />
+            </div>
+            :
             <div className="column is-card top-item" style={{position:"relative", background:"linear-gradient(to right,#FF8872,#FF6E97)"}}> 
-                <h3 className="up ">Sales</h3>
-                <h2 className="u_num">&#8377; 16,850</h2>
-                <h5>Since last month</h5>
-                <div style={{position:'absolute',top:'25%',right:'5%'}}>
-                    <FontAwesomeIcon size="3x" icon={faDolly} color="rgba(255,255,255,0.2)" />
-                </div>
+                
+                <>
+                    <h3 className="up ">Sales</h3>
+                        <h2 className="u_num">&#8377; {data.dashboard.sales}</h2>
+                    <h5>Since last month</h5>
+                    <div style={{position:'absolute',top:'25%',right:'5%'}}>
+                        <FontAwesomeIcon size="3x" icon={faDolly} color="rgba(255,255,255,0.2)" />
+                    </div>
+
+                </>
+                
+                
+                
+
                 
             </div>
-            <div className="column is-card top-item" style={{position:"relative",background:"linear-gradient(to right,#33CBC1, #18A9CB)"}}> 
-                <h3 className="up ">Purchase</h3>
-                <h2 className="u_num">&#8377; 52,390</h2>
-                <h5>Since last month</h5>
-                <div style={{position:'absolute',top:'25%',right:'5%'}}>
-                    <FontAwesomeIcon size="3x" icon={faLuggageCart} color="rgba(255,255,255,0.2)" />
+            }
+            
+            
+                {loading===true?
+                    <div className="column">
+                    <DashboadGridLoad />
+                    </div>
+                    :
+                    <>
+                    <div className="column is-card top-item" style={{position:"relative",background:"linear-gradient(to right,#33CBC1, #18A9CB)"}}> 
+                    <h3 className="up ">Purchase</h3>
+                    <h2 className="u_num">&#8377; {data.dashboard.purchase}</h2>
+                    <h5>Since last month</h5>
+                    <div style={{position:'absolute',top:'25%',right:'5%'}}>
+                        <FontAwesomeIcon size="3x" icon={faLuggageCart} color="rgba(255,255,255,0.2)" />
+                    </div>
+                    </div>
+                    </>
+                
+                }
+                    
+                
+                
+            
+            
+                {loading===true?
+                    <div className="column">
+                        <DashboadGridLoad />
+                    </div>
+                    :
+                    <>
+                    <div className="column is-card top-item" style={{position:"relative",background:"linear-gradient(to right,#57A0DE,#7F85EB)"}}> 
+                        <h3 className="up ">Revenue</h3>
+                        <h2 className="u_num">&#8377; 1,21,000</h2>
+                        <h5>Since last month</h5>
+                        <div style={{position:'absolute',top:'25%',right:'5%'}}>
+                            <FontAwesomeIcon size="3x" icon={faRupeeSign} color="rgba(255,255,255,0.2)" />
+                        </div>
+                    </div>
+                    </>
+
+                }
+                
+            
+            
+                {loading===true?
+                    <div className="column">
+                <DashboadGridLoad />
                 </div>
-            </div>
-            <div className="column is-card top-item" style={{position:"relative",background:"linear-gradient(to right,#57A0DE,#7F85EB)"}}> 
-                <h3 className="up ">Revenue</h3>
-                <h2 className="u_num">&#8377; 1,21,000</h2>
-                <h5>Since last month</h5>
-                <div style={{position:'absolute',top:'25%',right:'5%'}}>
-                    <FontAwesomeIcon size="3x" icon={faRupeeSign} color="rgba(255,255,255,0.2)" />
+                :
+                <>
+                <div className="column is-card top-item" style={{position:"relative",background:"linear-gradient(to right,#ED7AED, #8D69E4)"}}> 
+                    <h3 className="up ">Profit</h3>
+                    <h2 className="u_num">&#8377; 50,000</h2>
+                    <h5>Since last month</h5>
+                    <div style={{position:'absolute',top:'25%',right:'5%'}}>
+                        <FontAwesomeIcon size="3x" icon={faCoins} color="rgba(255,255,255,0.2)" />
+                    </div>
                 </div>
-            </div>
-            <div className="column is-card top-item" style={{position:"relative",background:"linear-gradient(to right,#ED7AED, #8D69E4)"}}> 
-                <h3 className="up ">Profit</h3>
-                <h2 className="u_num">&#8377; 50,000</h2>
-                <h5>Since last month</h5>
-                <div style={{position:'absolute',top:'25%',right:'5%'}}>
-                    <FontAwesomeIcon size="3x" icon={faCoins} color="rgba(255,255,255,0.2)" />
-                </div>
-            </div>
+                </>
+                }
+                
+            
         </div>
+        }
     </div>
 
     </>    
