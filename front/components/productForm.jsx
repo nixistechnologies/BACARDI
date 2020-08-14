@@ -11,7 +11,7 @@ import { useSnackbar } from 'react-simple-snackbar'
 function X({productId=null,name=null,purchase=null,setActive=null }){
     const [openSnackbar, closeSnackbar] = useSnackbar({position:"top-center",style:{zIndex:"999", marginTop:"50px"}})
     const {data:single,loading:sLoading} = useQuery(getProductByIdQuery,{variables:{id:productId}})
-    const {data,loading:mainLoading} = useQuery(allCategory)
+    const {data,loading:mainLoading} = useQuery(allCategory,{variables:{"search":""}})
     const [getSub,{data:subData,loading:subLoading}] = useLazyQuery(subCategoryById)
     const [createNewProduct,{data:newData,loading:createLoading}] = useMutation(createProductQuery)
     const [notify,setNotify] = useState(false)

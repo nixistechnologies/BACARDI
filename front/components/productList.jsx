@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Head from 'next/head'
 import { withApollo } from "next-apollo";
 import gql from 'graphql-tag';
-import { useQuery, useMutation } from '@apollo/react-hooks'
+import { useQuery, useMutation,useLazyQuery } from '@apollo/react-hooks'
 import {getAllProductQuery,deleteProductQuery} from '../lib/graphql'
 import { useStore,useDispatch, useSelector } from 'react-redux'
 import { useEffect,useState } from 'react';
@@ -200,15 +200,18 @@ const TableView=({data,mloading})=>{
       )
 }
 
-function GetProduct(){
-  const {data,loading} = useQuery(getAllProductQuery)
+function GetProduct({text}){
+  const {data,loading} = useQuery(getAllProductQuery,{variables:{"search":""}})
+  const [getData,{data:udata,loading:uloading}] = useLazyQuery(getAllProductQuery)
+  
   // const product = useSelector(state => state);
   // const dispatch = useDispatch();
   
 
-  // useEffect(()=>{
-  //   dispatch(addProduct("X"))
-  // },[])
+  useEffect(()=>{
+    // dispatch(addProduct("X"))
+      getData({variables:{"search":text}})
+  },[text])
   
   // const action=()=>{
   //   dispatch(addProduct("X"))
@@ -216,7 +219,18 @@ function GetProduct(){
 
   return (
     <div>
-    <TableView data={data} mloading={loading} />
+    <TableView 
+    data={
+      udata!=undefined?udata:
+      data
+    } 
+    
+    
+      mloading={
+        uloading ||
+        loading
+        
+        } />
     </div>
     )  
   ;

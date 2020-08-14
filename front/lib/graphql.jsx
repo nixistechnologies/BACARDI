@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 export const getAllCustomersQuery = gql`
-query{
-  customers{
+query($search:String!){
+  customers(search:$search){
     edges{
       node{
         id
@@ -48,22 +48,22 @@ mutation x($name:String!,$id:String!, $mobile:String!$gst:String!,$address:Strin
 
 
 export const getAllProductQuery = gql`
-{
-    allProducts{
-      edges{
-        node{
-          id
-          name
-          purchaseFrom
-          mrp
-          price
-          qty
-          typeOfPacking
-          mfg
-        }
+query x($search:String!){
+  allProducts(search:$search){
+    edges{
+      node{
+        id
+        name
+        purchaseFrom
+        mrp
+        price
+        qty
+        typeOfPacking
+        mfg
       }
     }
   }
+}
 `;
 
 
@@ -506,9 +506,9 @@ export const createSubCategoryQuery = gql`
 `
 
 export const subCategoryById = gql`
-query x($id:ID!)
+query x($id:ID!,$search:String!)
 {
-  subcategoy(id:$id)
+  subcategoy(id:$id,search:$search)
   {
     edges{
       node{
@@ -553,8 +553,8 @@ mutation x($id:ID!,$isUpdate:Boolean!,$name:String!){
 `
 
 export const allCategory=gql`
-{
-  categories{
+query x($search:String!){
+  categories(search:$search){
     edges{
       node{
         subCategory

@@ -781,18 +781,18 @@ class Mutation(graphene.ObjectType):
     
 
 class Query(graphene.AbstractType):
-    customers = DjangoFilterConnectionField(CustomerNode)
-    all_products = DjangoFilterConnectionField(ProductNode)
+    customers = DjangoFilterConnectionField(CustomerNode,search=graphene.String())
+    all_products = DjangoFilterConnectionField(ProductNode,search=graphene.String())
     product_by_id = graphene.Field(ProductNode,id=graphene.ID())
     product_suggestion = graphene.List(ProductNode,suggestion=graphene.String())
     category_suggestion = graphene.List(CategoryNode,suggestion=graphene.String())
     report = DjangoFilterConnectionField(BillingNode,min=graphene.String(),max=graphene.String())
     history = DjangoFilterConnectionField(BillingNode,slug=graphene.String())
-    subcategoy = DjangoFilterConnectionField(SubCategoryNode,id = graphene.ID())
+    subcategoy = DjangoFilterConnectionField(SubCategoryNode,id = graphene.ID(),search=graphene.String())
     user = graphene.Field(UserNode)
     customer_suggestion = graphene.List(CustomerNode,suggestion = graphene.String())
 
-    categories = DjangoFilterConnectionField(CategoryNode)
+    categories = DjangoFilterConnectionField(CategoryNode,search=graphene.String())
     vendors = DjangoFilterConnectionField(VendorNode,search=graphene.String())
     vendors_search = DjangoFilterConnectionField(VendorNode,search=graphene.String())
     states = DjangoFilterConnectionField(StateNode)
@@ -833,13 +833,16 @@ class Query(graphene.AbstractType):
         return Vendor.objects.filter(Q(name__icontains=search) | Q(company__icontains=search) | Q(email__icontains=search) | Q(city__name__icontains=search) | Q(state__name__icontains=search) | Q(mobile__icontains=search)) 
         # return Vendor.objects.filter(user_id = info.context.user.id)
 
+    def resolve_customers(self,info,search,**kwargs):
+        return Customer.objects.filter(Q(name__icontains=search) | Q(email__icontains=search) | Q(mobile__icontains=search) | Q(gst_number__icontains=search) | Q(address__icontains=search)).filter(user_id=info.context.user.id)
+
     def resolve_customer_suggestion(self,info,suggestion):
         return Customer.objects.filter(name__istartswith=suggestion)
-    def resolve_customers(self,info):
-        return Customer.objects.filter(user_id=info.context.user.id)
+    # def resolve_customers(self,info):
+    #     return Customer.objects.filter(user_id=info.context.user.id)
 
-    def resolve_subcategoy(self,info,id):
-        return SubCategory.objects.filter(category_id=from_global_id(id)[1])
+    def resolve_subcategoy(self,info,id,search,**kwargs):
+        return SubCategory.objects.filter(category_id=from_global_id(id)[1]).filter(Q(name__icontains=search))
     
 
     def resolve_user(self,info):
@@ -873,8 +876,10 @@ class Query(graphene.AbstractType):
         
         # else if(Billing.objects.filter(patient__name__iexact="aman"))
 
-    def resolve_categories(self,info):
-        return Category.objects.filter(user_id = info.context.user.id)
+    def resolve_categories(self,info,search,**kwargs):
+        
+        # return Category.objects.filter(user_id = info.context.user.id)
+        return Category.objects.filter(Q(name__icontains=search)).filter(user_id=info.context.user.id)
 
     def resolve_report(self,info,min,max):
         return Billing.objects.filter(billing_date__range=[min,max]).order_by('-id')
@@ -885,9 +890,12 @@ class Query(graphene.AbstractType):
         # return Product.objects.all()
         return Product.objects.filter(name__icontains=suggestion)
 
-    def resolve_all_products(self,info,**kwargs):
-        print(info.context.user)
-        return Product.objects.all()
+    def resolve_all_products(self,info,search,**kwargs):
+        # print(info.context.user)
+
+        return Product.objects.filter(Q(name__icontains=search) | Q(mfg__icontains=search) | Q(mrp__icontains=search) | Q(price__icontains=search)).filter(user_id=info.context.user.id)
+
+        # return Product.objects.all()
     
     def resolve_product_by_id(self,info,id):
         print(from_global_id(id)[1])

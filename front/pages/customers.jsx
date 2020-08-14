@@ -1,7 +1,7 @@
 import Layout from '../components/layout'
 import {FullPageLoading} from '../components/skeleton'
 import {getAllCustomersQuery,createOrUpdateCustomerQuery} from '../lib/graphql'
-import {useQuery,useMutation} from '@apollo/react-hooks'
+import {useQuery,useMutation, useLazyQuery} from '@apollo/react-hooks'
 
 import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
 import {faPen, faPlus} from '@fortawesome/free-solid-svg-icons'
@@ -204,6 +204,12 @@ const CRecords = ({items}) =>{
     return(
         <>
         <Modal active={active} setActive={setActive} isNew={false} info={info} />
+        
+        {
+            items.length === 0?
+            <h1 className="title" style={{textAlign:'center'}}>No Data Found</h1>
+        :
+        
         <table className="table is-fullwidth is-hoverable">
                 <thead>
                     <tr>
@@ -271,16 +277,30 @@ const CRecords = ({items}) =>{
                     </tbody>
                     
             </table>
+            }
             </>
     )
 }
 
 
 const Customers = () =>{
-    const {data,loading} = useQuery(getAllCustomersQuery)
+    const {data,loading} = useQuery(getAllCustomersQuery,{variables:{'search':''}})
     const [active,setActive] = useState("")
+    const [text,setText] = useState("")
+    const [searchData,{data:udata,loading:uloading}] = useLazyQuery(getAllCustomersQuery)
+    
+    useEffect(()=>{
+        // console.log(text)
+        // if(text.length>1){
+            searchData({variables:{"search":text}})
+            // data = udata
+            // loading = uloading
+
+        // }
+    },[text])
+    
     return(
-        <Layout title={"Customers"}>
+        <Layout title={"Customers"} text={text} setText={setText}>
             <div>
                 < Modal active={active} setActive={setActive} isNew={true} />
                 <div className="topHeading">
@@ -293,9 +313,16 @@ const Customers = () =>{
             </div>
 
             {
-            loading===true?
+            loading===true || uloading==true?
                 <FullPageLoading />
-                :<CRecords items={data.customers.edges} />
+                :<CRecords 
+                
+                items={
+                    udata===undefined?    
+                    data.customers.edges : udata.customers.edges
+                } 
+                
+                />
             }
 
 

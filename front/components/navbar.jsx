@@ -7,7 +7,7 @@ import  {currentUser} from '../redux_function/actions'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faSortDown,faCaretDown, faUser, faSearch} from '@fortawesome/free-solid-svg-icons'
 
-  const Navbar =()=>{
+  const Navbar =({text,setText=undefined})=>{
     const {loading,data:profile,error} = useQuery(currentUserQuery)
     const data = true;
     if(data)
@@ -64,7 +64,14 @@ import {faSortDown,faCaretDown, faUser, faSearch} from '@fortawesome/free-solid-
           <div className="navbar-start">
             <div className="navbar-item">
               <p className="control has-icons-left has-icons-right">
-                <input type="input" className="input is-small" placeholder="Search anything..." style={{outline:'none',border:'none',boxShadow:'none'}}  />  
+                <input type="input" className="input is-small" 
+                value={text}
+                onChange={(e)=>
+                  setText===undefined ?{}:
+                  // setText(e.target.value)
+                  setText(e.target.value)
+                }
+                placeholder="Search anything..." style={{outline:'none',border:'none',boxShadow:'none'}}  />  
                 <span className="icon is-small is-left">
                   <FontAwesomeIcon icon={faSearch} />
                 </span>

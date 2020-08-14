@@ -46,9 +46,10 @@ class Layout extends React.Component{
         
         // console.log(this.props.router.pathname)
         let route = this.props.router.pathname;
-        const { children,active,loading,loadingText,title = "BACARDI",sidebar=true,navbar=true } = this.props;
+        const { children,active,loading,loadingText,title = "BACARDI",sidebar=true,navbar=true,text,setText } = this.props;
         // const title = "Welcome to Nextjs";
         // console.log(active)
+        console.log(setText)
         return(
             // <Provider store={store}>
 
@@ -89,7 +90,7 @@ class Layout extends React.Component{
                             <div>
                                 
                                 {navbar===true?
-                                    <Navbar />:""
+                                    <Navbar text={text} setText={setText} />:""
                                 }
                                 <div className="main-container">
                                     

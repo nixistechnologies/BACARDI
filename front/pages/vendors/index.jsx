@@ -14,7 +14,7 @@ const Records = ({items,getVendor,search,setSearch}) =>{
     return (
         <>
         <Modal active={active} setActive={setActive} isNew={false} info={info} />
-        <div style={{overflow:'auto'}}>
+        {/* <div style={{overflow:'auto'}}>
             <form onSubmit={(e)=>{e.preventDefault(), console.log(e.currentTarget[0].value),getVendor({variables:{search:e.currentTarget[0].value}})  }}>
                 <div className="field">
                 <p className="control has-icons-left has-icons-right" style={{width:'200px',float:'right'}}>
@@ -22,15 +22,12 @@ const Records = ({items,getVendor,search,setSearch}) =>{
                     <span className="icon is-small is-left">
                         <FontAwesomeIcon icon={faSearch} />
                     </span>
-                    {/* <span style={{cursor:'pointer'}} className="icon is-small is-right" onClick={()=>setSearch("")}>
-                        <FontAwesomeIcon icon={faTimes} />
-                    </span> */}
                 </p>
                 </div>
             </form>
-            
+        </div> */}
 
-        </div>
+
         <table className="table is-fullwidth is-hoverable">
             <thead>
                 <tr>
@@ -123,19 +120,21 @@ const Vendor = () =>{
     const [active,setActive] = useState("")
     const [search,setSearch] = useState("")
     const [show,setShow] = useState(false)
+    const [text,setText] = useState("")
+
     // const close=()=>{
 
     // }
     useEffect(()=>{
-
-    },[show])
+        getVendor({variables:{"search":text}})
+    },[text])
     
     const Showing=()=>{
         setShow(true)
         console.log("show")
     }
     return(
-        <Layout title={"Vendors | Bacardi"}>
+        <Layout title={"Vendors | Bacardi"} text={text} setText={setText}>
             
             <div>
                 <Modal active={active} setActive={setActive} isNew={true} />

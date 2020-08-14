@@ -4,7 +4,7 @@ import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
 import {faPen, faPlus} from '@fortawesome/free-solid-svg-icons'
 import { faTrashAlt,faEdit } from '@fortawesome/free-regular-svg-icons'
 import {subCategoryById,createSubCategoryQuery,allCategory,deleteSubCategoryQuery} from '../../../lib/graphql'
-import {useQuery,useMutation} from '@apollo/react-hooks'
+import {useQuery,useMutation, useLazyQuery} from '@apollo/react-hooks'
 import {TableLoading} from '../../../components/skeleton'
 // import Link from 'next/Link'
 // import {} from '@apollo/react-hooks'
@@ -288,15 +288,20 @@ const SubCategory=()=>{
     const router = useRouter()
     const {query} = router
     const subCategoryId = query.subcategory
-    const {data,loading} = useQuery(subCategoryById,{variables:{"id":subCategoryId}})
+    const {data,loading} = useQuery(subCategoryById,{variables:{"id":subCategoryId,"search":""}})
+    const [getData,{data:udata,loading:uloading}] = useLazyQuery(subCategoryById)
     const [info,setInfo] = useState({})
     // console.log(query.subcategory)
     const [active,setActive] = useState("")
 
+    const [text,setText] = useState("")
     // console.log(router)
     // console.log(data)
+    useEffect(()=>{
+        getData({variables:{"id":subCategoryId,"search":text}})
+    },[text])
     return(
-        <Layout title="Sub Category">
+        <Layout title="Sub Category" text={text} setText={setText}>
             <>
             <div className="topHeading">
                 <div style={{width:"100%"}}>
@@ -312,9 +317,13 @@ const SubCategory=()=>{
                 <Model active={active} setActive={setActive} info={info} setInfo={setInfo} isUpdate={false} categoryId={subCategoryId}/>
             </div>
             {
-                loading==true
+                loading==true ||uloading===true
                 ?<TableLoading/>
-                :<Records rdata={data.subcategoy.edges} id={subCategoryId}/>
+                :<Records rdata={
+                    udata===undefined?
+                    data.subcategoy.edges:
+                    udata.subcategoy.edges
+                    } id={subCategoryId}/>
             }
             </>
         </Layout>

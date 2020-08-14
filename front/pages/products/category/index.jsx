@@ -1,5 +1,5 @@
 import Layout from '../../../components/layout'
-import {useQuery, useMutation} from '@apollo/react-hooks'
+import {useQuery, useMutation, useLazyQuery} from '@apollo/react-hooks'
 import {FullPageLoading} from '../../../components/skeleton'
 import {allCategory} from '../../../lib/graphql'
 import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
@@ -12,6 +12,7 @@ import { useDispatch,useSelector}from 'react-redux'
 // import { useEffect } from 'react'
 import SnackbarProvider,{ useSnackbar } from 'react-simple-snackbar'
 import {renameCategory,createCategoryQuery} from '../../../lib/graphql'
+import { useEffect } from 'react'
 
 
 const Modal = ({active,setActive})=>{
@@ -253,16 +254,21 @@ const Records = ({rdata}) => {
 
 
 const Category=()=>{
-    const {data,loading,error} = useQuery(allCategory)
+    const {data,loading,error} = useQuery(allCategory,{variables:{search:""}})
     const [active,setActive] = useState("")
+    const [getData,{data:udata,loading:uloading}] = useLazyQuery(allCategory)
+    const [text,setText] = useState("")
     // const dispatch = useDispatch();
     // useEffect(()=>{
     //     dispatch(addProduct("X"))
     // },[])
     // useSelector(state=state.category)
+    useEffect(()=>{
+        getData({variables:{search:text}})
+    },[text])
     return(
         <SnackbarProvider>
-        <Layout title="Category">
+        <Layout title="Category" text={text} setText={setText}>
             <>
             <div className="topHeading">
                 <div style={{width:"100%"}}>
@@ -275,9 +281,14 @@ const Category=()=>{
                 </div>            
             </div>
             {
-                loading==true
+                loading==true || uloading===true
                 ?<FullPageLoading/>
-                :<Records rdata={data.categories.edges} />
+                :<Records rdata={
+                    udata===undefined?
+                    data.categories.edges:
+                    udata.categories.edges
+                
+                } />
             }
             <Modal active={active} setActive={setActive} />
             </>
