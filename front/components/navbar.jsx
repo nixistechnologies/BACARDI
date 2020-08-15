@@ -6,9 +6,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import  {currentUser} from '../redux_function/actions'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faSortDown,faCaretDown, faUser, faSearch} from '@fortawesome/free-solid-svg-icons'
+import {useRouter} from 'next/router'
+import Cookie from "js-cookie";
 
   const Navbar =({text,setText=undefined})=>{
     const {loading,data:profile,error} = useQuery(currentUserQuery)
+    const router = useRouter()
+
     const data = true;
     if(data)
     {
@@ -37,13 +41,57 @@ import {faSortDown,faCaretDown, faUser, faSearch} from '@fortawesome/free-solid-
         // }
         // console.log("clicked")
       }
+      const Logout = () =>{
+        console.log("logout")
+        Cookie.remove("token")
+        // const r = Router()
+        // console.log(r)
+        // console.log(router)
+        // r.push("/login")
+        router.push("/login") 
+        // Router.push("/login")
+        // console.log(route)
+        // route.push("/login")
+    }
 
 
 
       // console.log(data.currentUser.username)
       return(
         loading===true || profile==undefined?"":
-        <div className="main_content">            
+        <div className="main_content">  
+        <style jsx>{`
+          .dropdown-content{
+          position:absolute;
+          // border-radius: 6px;
+          border-top: none;
+          box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
+          display: none;
+          // opacity: 0;
+          // pointer-events: none;
+          top: calc(100% + (-4px));
+          transform: translateY(-5px);
+          transition-duration: 86ms;
+          transition-property: opacity,transform;
+          }
+          .dropdown {
+            position: relative;
+            // display: inline-block;
+          }
+
+          .dropdown-content a {
+            color: black;
+            padding: 0.375rem 1rem;
+            text-decoration: none;
+            display: block;
+            font-size:0.875rem;
+          }
+
+          .dropdown-content a:hover {background-color: #fafafa;}
+
+          .dropdown:hover .dropdown-content {display:block}
+          
+        `}</style>          
         <div className="navbar" style={{boxShadow:"0px 0px 1px rgba(0,0,0,0.1)",position:'fixed',width:"85%", }} role="navigation" aria-label="main navigation">
         <div className="navbar-brand" style={{display:'none'}}>
             <Link href="/">
@@ -117,7 +165,8 @@ import {faSortDown,faCaretDown, faUser, faSearch} from '@fortawesome/free-solid-
           </div>
       
           <div className="navbar-end">
-            <div className="navbar-item has-dropdown_">
+            <div className="navbar-item has-dropdown_ dropdown">
+              {/* <div> */}
               <div className="buttons_" style={{fontSize:"14px",fontFamily:'nfontb',cursor:'pointer'}}>
                 <span style={{marginRight:"10px",color:'grey'}}>
                   <FontAwesomeIcon icon={faUser} color="grey" style={{fontSize:"17px"}}/>
@@ -133,18 +182,29 @@ import {faSortDown,faCaretDown, faUser, faSearch} from '@fortawesome/free-solid-
                 {/* <a className="">
                 Rahul
                 </a> */}
-              <div className="navbar-dropdown">
-                <a className="navbar-item">
-                  About
-                </a>
-                <a className="navbar-item">
-                  Jobs
-                </a>
-                <a className="navbar-item">
-                  Contact
-                </a>
+                <div className="navbar-dropdown">
+                  <a className="navbar-item">
+                    About
+                  </a>
+                  <a className="navbar-item">
+                    Jobs
+                  </a>
+                  <a className="navbar-item">
+                    Contact
+                  </a>
+                </div>
+                
               </div>
-              </div>
+              <div className="dropdown-content" style={{width:'85%'}}>
+                  <Link href="/profile">
+                    <a>Profile</a>
+                  </Link>
+                  
+                  <a onClick={()=>Logout()}>Logout</a>
+                  {/* <a href="#">Link 3</a> */}
+                </div>
+
+              {/* </div> */}
               
 
             </div>
