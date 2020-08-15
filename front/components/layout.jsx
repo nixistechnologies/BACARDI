@@ -46,7 +46,7 @@ class Layout extends React.Component{
         
         // console.log(this.props.router.pathname)
         let route = this.props.router.pathname;
-        const { children,active,loading,loadingText,title = "BACARDI",sidebar=true,navbar=true,text,setText } = this.props;
+        const { children,active,loading,loadingText,title = "BACARDI",sidebar=true,navbar=true,text,setText,login } = this.props;
         // const title = "Welcome to Nextjs";
         // console.log(active)
         console.log(setText)
@@ -63,6 +63,11 @@ class Layout extends React.Component{
                     <meta charSet="utf-8" />
                     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
                 </Head>
+
+                {login===true?
+                    children
+
+                :
 
                 
                 <main className="main">
@@ -106,6 +111,7 @@ class Layout extends React.Component{
                     
                     
                 </main>
+        }
             </div>
             </ApolloHooksProvider>
             </ApolloProvider>
