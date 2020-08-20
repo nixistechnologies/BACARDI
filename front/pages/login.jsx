@@ -78,7 +78,7 @@ const Login =() =>{
                 
                 <div className="login_context">
                     <div>
-                        <img src="/company.png" />
+                        <img src="/company.webp" />
                         {/* <h1 className="title">Welcome to Bacardi</h1> */}
                     </div>
                 </div>
