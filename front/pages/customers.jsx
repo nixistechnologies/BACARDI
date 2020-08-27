@@ -210,12 +210,12 @@ const CRecords = ({items}) =>{
             <h1 className="title" style={{textAlign:'center'}}>No Data Found</h1>
         :
         
-        <table className="table is-fullwidth is-hoverable">
+        <table className="table is-fullwidth is-hoverable is-bordered">
                 <thead>
                     <tr>
                         <th className="_w20" >Name</th>
                         <th className="_w20">Address</th>
-                        {/* <th className="_w10">Email</th> */}
+                        <th className="_w10">Email</th>
                         <th className="_w10">Mobile</th>
                         <th className="_w10">GST</th>
                         
@@ -230,18 +230,18 @@ const CRecords = ({items}) =>{
                             <td className="_heading _w30">
                                 {/* <a> */}
                                     {e.node.name}
-                                    <span className="sub">
+                                    {/* <span className="sub">
                                         {e.node.email}
-                                    </span>
+                                    </span> */}
                                 {/* </a> */}
                             </td>
                             <td>
                                 {e.node.address}
                             </td>
                             
-                            {/* <td>
+                            <td>
                                 {e.node.email}
-                            </td> */}
+                            </td>
                             <td>
                                 {e.node.mobile}
                             </td>

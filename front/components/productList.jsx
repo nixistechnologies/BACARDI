@@ -110,7 +110,7 @@ const TableView=({data,mloading})=>{
       
     </div>
     <div style={{overflow:"auto"}}>
-     <table className="table is-fullwidth is-hoverable ">
+     <table className="table is-fullwidth is-hoverable is-bordered">
        <thead>
        <tr>
          <th className="w30">Name</th>

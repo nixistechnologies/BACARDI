@@ -40,7 +40,7 @@ const SalesTable = ()=>{
         
     </div>
     <table className="table is-fullwidth is-hoverable">
-        <thead>
+        <thead style={{background:'transparent !important'}}>
             <tr>
                 {/* <th>SN.</th> */}
                 {/* <th>Invoice Number</th> */}
@@ -109,12 +109,15 @@ const Graph=()=>{
         font-size:20px;
         font-family:nfontb;
     }
+    .sh{
+        box-shadow:1px 1px 2px 0px rgba(0,0,0,0.2)
+    }
     `}
 
     </style>
     <div style={{marginTop:"50px"}}>
         <div className="columns">
-            <div className="column">
+            <div className="column sh" style={{background:'white',marginRight:'5px',borderRadius:'3px'}}>
             <div className="s-head">
                 <h2>Sales</h2>
             </div>
@@ -145,7 +148,7 @@ const Graph=()=>{
                     {/* <Hint className="second-hint"/> */}
                 </XYPlot>
             </div>
-            <div className="column">
+            <div className="column sh" style={{background:'white',marginLeft:'5px',borderRadius:'3px'}}>
                 <SalesTable />
             </div>
         </div>

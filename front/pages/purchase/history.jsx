@@ -59,7 +59,7 @@ const Modal = ({active,setActive,loading,item,info})=>{
                                     </div>
                                 :""
                             }
-                            <table className="table is-fullwidth is-hoverable">
+                            <table className="table is-fullwidth is-hoverable is-bordered">
                                 <thead>
                                     <tr>
                                         {/* <th>SN.</th> */}
@@ -132,9 +132,9 @@ const Result = ({loading,data})=>{
     return(
         <div className="data">
             <style jsx>{`
-             td,th{
-                 font-size:15px;
-             }
+            //  td,th{
+            //      font-size:15px;
+            //  }
              .data{
                  margin-top:50px;
              }
@@ -143,7 +143,7 @@ const Result = ({loading,data})=>{
             ?(<div style={{textAlign:'center',fontWeight:'bold',fontSize:'20px'}}><TableLoading /></div>):
             data!=undefined?
             data.length?
-            <table className="table is-fullwidth is-hoverable">
+            <table className="table is-fullwidth is-hoverable is-bordered">
                 <thead>
                     <tr>
                         {/* <th>SN.</th> */}

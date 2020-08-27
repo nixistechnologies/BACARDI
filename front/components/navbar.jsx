@@ -3,9 +3,9 @@ import {useState} from 'react'
 import {useQuery} from '@apollo/react-hooks'
 import {currentUserQuery} from '../lib/graphql'
 import { useDispatch, useSelector } from 'react-redux'
-import  {currentUser} from '../redux_function/actions'
+import  {currentUser, toggle_side_bar} from '../redux_function/actions'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faSortDown,faCaretDown, faUser, faSearch} from '@fortawesome/free-solid-svg-icons'
+import {faSortDown,faCaretDown, faUser, faSearch, faBars} from '@fortawesome/free-solid-svg-icons'
 import {useRouter} from 'next/router'
 import Cookie from "js-cookie";
 
@@ -16,9 +16,9 @@ import Cookie from "js-cookie";
     const data = true;
     if(data)
     {
-      // const dispatch = useDispatch()
+      const dispatch = useDispatch()
       // dispatch(currentUser(data))
-      // const store = useSelector(state => state.user)
+      const store = useSelector(state => state.width)
       // console.log(store)
       
 
@@ -54,6 +54,7 @@ import Cookie from "js-cookie";
         // route.push("/login")
     }
 
+    // console.log(store)
 
 
       // console.log(data.currentUser.username)
@@ -92,11 +93,12 @@ import Cookie from "js-cookie";
           .dropdown:hover .dropdown-content {display:block}
           
         `}</style>          
-        <div className="navbar" style={{boxShadow:"0px 0px 1px rgba(0,0,0,0.1)",position:'fixed',width:"85%", }} role="navigation" aria-label="main navigation">
+        <div className="navbar" style={{boxShadow:"0px 0px 1px rgba(0,0,0,0.1)",position:'fixed',width:`${store.sidebar==true?"82%":"95%"}`,}} role="navigation" aria-label="main navigation">
         <div className="navbar-brand" style={{display:'none'}}>
             <Link href="/">
             <a className="navbar-item" >
-                <h1 className="is-4 custom-brand">Bacardi</h1>
+              {/* <img src="/logo.png" /> */}
+                {/* <h1 className="is-4 custom-brand">Bacardi</h1> */}
                 {/* <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28"/> */}
             </a>
             </Link>
@@ -110,6 +112,9 @@ import Cookie from "js-cookie";
 
         <div id="navbarBasicExample" className="navbar-menu">
           <div className="navbar-start">
+            <div className="navbar-item" style={{cursor:'pointer'}} onClick={()=>dispatch(toggle_side_bar(store.sidebar))}>
+              <FontAwesomeIcon icon={faBars} color="grey"/>
+            </div>
             <div className="navbar-item">
               <p className="control has-icons-left has-icons-right">
                 <input type="input" className="input is-small" 

@@ -7,6 +7,8 @@ import client from '../lib/apolloClient';
 import { withRouter, Router } from 'next/router'
 // import Router:s from 'next/router'
 
+import {connect} from 'react-redux'
+
 import Navbar from './navbar';
 import LoadingOverlay from 'react-loading-overlay'
 
@@ -40,16 +42,17 @@ class Layout extends React.Component{
     
 
     render(){
-        
+        // console.log(this.props.side_bar.sidebar)
         // const r = new Router()
         // console.log(r)
         
         // console.log(this.props.router.pathname)
         let route = this.props.router.pathname;
-        const { children,active,loading,loadingText,title = "BACARDI",sidebar=true,navbar=true,text,setText,login } = this.props;
+        const { children,active,loading,loadingText,title = "BACARDI",sidebar=true,navbar=true,text,setText,login,side_bar } = this.props;
         // const title = "Welcome to Nextjs";
         // console.log(active)
-        console.log(setText)
+        // console.log(setText)
+        // console.log(side_bar)
         return(
             // <Provider store={store}>
 
@@ -71,11 +74,10 @@ class Layout extends React.Component{
 
                 
                 <main className="main">
-                    
-                    
                     <div className="es_" >
                         
                         {
+                            // this.props.side_bar.side_bar == true &&
                             sidebar===true?
                             <SideBar route={route} sidebar={sidebar}/>:
                             <div></div>
@@ -83,7 +85,7 @@ class Layout extends React.Component{
                         
 
 
-                        <div className="container" style={{padding:'0'}}>
+                        <div className="container" style={{padding:'0',maxWidth:`${side_bar.sidebar==true?'82%':'95%'}`}}>
                             <header>
                                 
                                 {/* {navbar===true?
@@ -122,4 +124,20 @@ class Layout extends React.Component{
     }    
 }
 
-export default withRouter(Layout);
+const mapStateToProps=(state,props)=>{
+    return {
+        side_bar:state.width
+    }
+}
+
+const mapDispatchToProps=(dispatch,props)=>({
+    toggleSideBar:()=>{
+        console.log(props)
+        // dispatch(togglebar())
+    }   
+})
+
+export default withRouter(
+    connect(mapStateToProps,mapDispatchToProps)
+    (Layout)
+    );

@@ -7,6 +7,9 @@
 /* div,.navbar{
     width: 100%;
 } */
+body{
+    background-color: #EDEDEE;
+}
 
 
 .topHeading{
@@ -134,8 +137,18 @@
 }
 
 td,th{
+    color: black;
+}
+td{
+    font-size:14px;
+}
+thead{
+    background: linear-gradient(to right,#00c4a7,#276cda) !important;
+}
+th{
     font-size:15px;
 }
+
 .data{
     margin-top:50px;
 }
@@ -197,6 +210,26 @@ th{
 }
 .w20{
     width: 20%;
+}
+.mw300{
+    max-width: 250px;
+}
+
+.mw200{
+    max-width: 200px;
+}
+
+
+td
+{
+ /* max-width: 100px; */
+ overflow: hidden;
+ text-overflow: ellipsis;
+ white-space: nowrap;
+}
+
+.table.is-hoverable tbody tr:not(.is-selected):hover {
+    background-color: #EDEDEE;
 }
 .is-small{
     font-size:0.85rem !important;

@@ -4,12 +4,14 @@ import billReducer from './bill';
 import loginReducer from './login';
 import userReducer from './user';
 import {categoryReducer} from './category'
+import widthReducer from './width'
 export default combineReducers({
     products:productsReducer,
     bills:billReducer,
     user:userReducer,
     login:loginReducer,
-    category:categoryReducer
+    category:categoryReducer,
+    width:widthReducer
 })
 
 // export default products;
