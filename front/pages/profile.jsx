@@ -53,6 +53,9 @@ const Profile =(props) =>{
     
         <div>
             <style jsx>{`
+            body{
+                background:white !important
+            }
             .t-head{
                 border-bottom:1px solid rgba(0,0,0,.15);
                 display:flex;
@@ -71,7 +74,7 @@ const Profile =(props) =>{
             <div className="topHeading">
                 <h2>Welcome {user.firstName} {user.lastName}</h2>
             </div>
-        <div>
+        <div style={{background:'white',padding:'20px'}}>
             {/* <div>
                 <h1 className="title">Welcome {user.firstName} {user.lastName}</h1>
             </div> */}
@@ -83,7 +86,7 @@ const Profile =(props) =>{
                 </div>
 
                 {/* <div>info</div> */}
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(onSubmit)} style={{width:'70%'}}>
                 <div className="out">
                     <div className="left-1">
                         Username

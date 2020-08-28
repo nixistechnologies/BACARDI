@@ -4,6 +4,7 @@ from django.template import Context
 import pdfkit
 from rest_framework import status,viewsets
 from app.serializer import *
+from num2words import num2words
 
 
 
@@ -21,6 +22,12 @@ class PurchaseSer(viewsets.ModelViewSet):
         serializer.save(invoice_file = self.request.data["invoice_file"])
 
 
+
+def invoice(request,pk):
+    bill = Billing.objects.get(id=pk)
+    payble_amount = num2words(bill.net_amount, to='cardinal', lang='en_IN').replace("-"," ").capitalize()
+
+    return render(request,"invoice.html",{"bill":bill,"user":request.user,"payble_amount":payble_amount})
 
 def example(request):
     return render(request,"e.html")

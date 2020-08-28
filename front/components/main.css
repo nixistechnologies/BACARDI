@@ -119,17 +119,20 @@ body{
     float: right;
 }
 .left-1{
-    width: 40%;
+    width: 30%;
     align-self: center;
     font-size: 15px;
+    font-weight: lighter;
 }
 .right-1{
-    width: 60%;
+    width: 40%;
+    font-family: nfont;
 }
 .out{
     overflow: auto;
     display: flex;
-    padding: 5px;
+    padding: 15px 0 15px;
+    border-bottom:1px solid #e4eef2
 }
 ._list-item .right{
     font-size: 11px;

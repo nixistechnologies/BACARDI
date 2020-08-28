@@ -15,5 +15,7 @@ admin.site.register(State)
 admin.site.register(Purchase)
 admin.site.register(PurchaseProduct)
 admin.site.register(ParitalPayment)
+admin.site.register(Sales_Product)
 
 
+admin.site.site_header = 'BACARDI'

@@ -32,28 +32,33 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
     
     
     const  onSubmit = async(data) =>{
+        console.log(data)
         createNewProduct(
             {
                 variables:{
                 "isNew":productId===null?true:false,
-                "id":productId===null?"":productId,
-                "categoryId":data.category,
-                "subCategoryId":data.subCategory,
+                "pid":productId===null?"":productId,
+                // "categoryId":data.category,
+                // "subCategoryId":data.subCategory,
                 "name": data.product,
-                "qty": data.qty,
-                "typeofpack": data.typeofpack,
+                "taga":data.taga,
+                "grossm":data.grossm,
+                "less":data.less,
+                "netm":data.netm,
+                // "qty": data.qty,
+                // "typeofpack": data.typeofpack,
 
-                "mrp": data.mrp,
-                "list":data.listprice,
-                "cost":data.cost,
+                // "mrp": data.mrp,
+                "listPrice":parseFloat(data.listprice),
+                "costPrice":parseFloat(data.cost),
 
-                "mfg":data.mfg,
+                // "mfg":data.mfg,
                 "exp":data.exp_date,
-                "exp_time":data.exp_time,
+                // "exp_time":data.exp_time,
 
-                "discount":data.discount,
+                // "discount":data.discount,
                 "hsn":data.hsn,
-                "batch":data.batch,                 
+                // "batch":data.batch,                 
             },
             optimisticResponse:true,
             update:(cache,{data})=>{
@@ -73,10 +78,10 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                                 {
                                     console.log("matches")
                                     existCache.allProducts.edges[i].node.name = data.createProduct.product.name
-                                    existCache.allProducts.edges[i].node.mfg = data.createProduct.product.mfg
+                                    existCache.allProducts.edges[i].node.taga = data.createProduct.product.taga
                                     existCache.allProducts.edges[i].node.price = data.createProduct.product.price
-                                    existCache.allProducts.edges[i].node.qty = data.createProduct.product.qty
-                                    existCache.allProducts.edges[i].node.typeOfPacking = data.createProduct.product.typeOfPacking
+                                    existCache.allProducts.edges[i].node.grossm = data.createProduct.product.grossm
+                                    existCache.allProducts.edges[i].node.netm = data.createProduct.product.netm
                                 }
                             }
                         }
@@ -113,22 +118,22 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
         getSub({variables:{"id":e.target.value}})
 
     }
-    useEffect(()=>{
-        if(single!=undefined)
-        {
-            // console.log("getsubcategory")
-            // const p = single.productById
-            // setValue([
-            //     {"gst":p.GST},{"mrp":p.mrp},{"product":p.name},{"qty":p.qty},{"typeofpack":p.typeOfPacking},{"exp_date":p.expiryDate},
-            //     {"mfg":p.mfg},{"cost":p.cost},{"listprice":p.price},
-            //     {"exp_time":p.expiryTime},{"discount":p.discount},
-            // ])
-            getSub({variables:{"id":single.productById.subcategory.category.id}})
+    // useEffect(()=>{
+    //     if(single!=undefined)
+    //     {
+    //         console.log("getsubcategory")
+    //         const p = single.productById
+    //         setValue([
+    //             {"gst":p.GST},{"mrp":p.mrp},{"product":p.name},{"qty":p.qty},{"typeofpack":p.typeOfPacking},{"exp_date":p.expiryDate},
+    //             {"mfg":p.mfg},{"cost":p.cost},{"listprice":p.price},
+    //             {"exp_time":p.expiryTime},{"discount":p.discount},
+    //         ])
+    //         getSub({variables:{"id":single.productById.subcategory.category.id}})
             
             
             
-        }
-    },[single,productId])
+    //     }
+    // },[single,productId])
     // single.productById.subcategory.category.id
 
     // console.log(subData)
@@ -155,7 +160,9 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                  product has been uploaded
                 </div>
             </div>
-        <div style={{maxWidth:"1000px",}} className="createform">
+        <div 
+        // style={{maxWidth:"1000px",}} 
+        className="createform">
             
             {purchase===null?
             <div className="topHeading">
@@ -164,11 +171,6 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                     name
                 
                 }</h2>
-                {/* {
-                    purchase!=null?
-                    <button type="buttom" className="button is-primary is-small is-rounded" onClick={()=>setActive("is-active")}> Add Vendor</button>
-                    :""
-                } */}
                 <div>
                     
                 </div>
@@ -185,13 +187,10 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
             
             {/* <h2 style={{fontSize:"20px",marginBottom:"15px",fontWeight:'300'}}> Product Detail</h2> */}
             
-            <div className="i_row" style={{display:"flex"}}>
+            {/* <div className="i_row" style={{display:"flex"}}>
 
                 <div>
                     <label className="label">Category Name</label>
-                    
-                    {/* <input type="text" className="input is-small" placeholder="Category Name" name="category"
-                    onChange={getCategoryName} autoComplete="off" ref={register}/> */}
                     <article className="select is-small" style={{width:"100%"}}>
                         <select className="_input is-small" style={{width:"100%"}} ref={register} name="category" onChange={(e)=>select_Sub_Category(e)}>
                             <option>-----</option>
@@ -229,40 +228,23 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                             }
                         </select>
                     </article>
-                    {/* <input type="text" className="input is-small" placeholder="Sub Category Name" name="subCategory" ref={register}
-                    onChange={selectSubCategory}
-                    /> */}
-                    
                 </div>
                 
 
-            </div>
+            </div> */}
+
             <div className="i_row" style={{display:"flex"}}>
                 <div>
                     <label className="label">Product Name</label>
                     <input className="input is-small" ref={register}
-                    // onChange={()=>setMedicine(medicine)}  value={medicine} 
                     autoComplete="off"
                     defaultValue={productId!=null?single.productById.name:""}
-                    // onChange={selectMedicineOption}
                      name="product" type="text"placeholder="Product Name" required/>
-
-                        {/* <div style={{'padding':0,'maxWidth':'350px', position:'absolute',zIndex:'1',background:'white',display:list.length?"block":"none"}} role="combobox" className="_list">
-                            { list.map((e)=>{
-                            return <div className="_list-item" key={e.id} onClick={()=>fillProductInfo(e)}>
-                                <div key={e.id} >
-                                        <span className="left">{e.name}</span>
-                                        <span className="right">&#x20b9; {e.price}</span>
-                                </div>
-                            </div>
-                            })}   
-                        </div> */}
                 </div>
                 
-                <div>
+                {/* <div>
                     <label className="label">Quantity</label>
                     <input className="input is-small" ref={register}
-                    //  onChange={()=>setQty(qty)} value={qty} 
                     defaultValue={productId!=null?single.productById.qty:""}
                      type="text" name="qty"  placeholder="Quantity" required/>
                 </div>
@@ -270,33 +252,44 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                     <label className="label">Type of packing</label>
                     <input className="input is-small" ref={register}
                     defaultValue={productId!=null?single.productById.typeOfPacking:""}
-                    //  onChange={()=>setTypeofpack(typeofpack)} value={typeofpack} 
                     type="text" name="typeofpack" placeholder="Type of Packing" required/>
+                </div> */}
+                <div>
+                    <label className="label">List Price</label>
+                    <input className="input is-small" ref={register}
+                    defaultValue={productId!=null?single.productById.price:""}
+                     type="text" name="listprice"  placeholder="List Price" required/>
                 </div>
+                <div>
+                    <label className="label">Cost Price</label>
+                    <input className="input is-small" ref={register}
+                    defaultValue={productId!=null?single.productById.cost:""}
+                     type="text" name="cost"  placeholder="Cost Price" required/>
+                </div>
+                                
                 
             </div>
             
             <div className="i_row" style={{display:'flex'}}>
                 <div>
-                    <label className="label">MRP</label>
-                    <input className="input is-small" ref={register}
-                    // onChange={()=>setMrp(mrp)} value={mrp} 
-                    defaultValue={productId!=null?single.productById.mrp:""}
-                    type="text" name="mrp" placeholder="MRP" required/>
+                    <label className="label">Purchase Date</label>
+                    <input className="input is-small"  ref={register}
+                    defaultValue={productId!=null?single.productById.expiryDate:""}
+                    type="date" name="exp_date"  placeholder="Purchase Date" required/>
                 </div>
+
                 <div>
-                    <label className="label">Cost Price</label>
+                    <label className="label">HSN</label>
                     <input className="input is-small" ref={register}
                     //  onChange={()=>setQty(qty)} value={qty} 
-                    defaultValue={productId!=null?single.productById.cost:""}
-                     type="text" name="cost"  placeholder="Cost Price" required/>
+                    defaultValue={productId!=null?single.productById.hsn:""}
+                     type="text" name="hsn"  placeholder="HSN"/>
                 </div>
                 <div>
-                    <label className="label">List Price</label>
+                    <label className="label">Taga</label>
                     <input className="input is-small" ref={register}
-                    //  onChange={()=>setQty(qty)} value={qty} 
-                    defaultValue={productId!=null?single.productById.price:""}
-                     type="text" name="listprice"  placeholder="List Price" required/>
+                    defaultValue={productId!=null?single.productById.taga:""}
+                     type="text" name="taga"  placeholder="Taga" required/>
                 </div>
 
             </div>
@@ -304,26 +297,25 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
 
             <div className="i_row" style={{display:'flex'}}>
                 <div>
-                    <label className="label">Brand/Manufeacture</label>
+                    <label className="label">Gross Meter</label>
                     <input className="input is-small"  ref={register}
-                    // onChange={()=>setExt(exp)}  value={exp} 
-                    defaultValue={productId!=null?single.productById.mfg:""}
-                    type="text" name="mfg"  placeholder="Manfacturing" required/>
-                </div>
+                    defaultValue={productId!=null?single.productById.grossm:""}
+                    type="text" name="grossm"  placeholder="Gross Meter" required/>
+                </div>                
                 
                 <div>
-                    <label className="label">Expiry Date</label>
+                    <label className="label">Less(%)</label>
                     <input className="input is-small"  ref={register}
-                    // onChange={()=>setExt(exp)}  value={exp} 
-                    defaultValue={productId!=null?single.productById.expiryDate:""}
-                    type="date" name="exp_date"  placeholder="Expiry Date" required/>
+                    defaultValue={productId!=null?single.productById.less:""}
+                    type="text" name="less"  placeholder="Less" required/>
                 </div>
+                
+
                 <div>
-                    <label className="label">Expiry Time (in months)</label>
+                    <label className="label">Net Meter</label>
                     <input className="input is-small"  ref={register}
-                    // onChange={()=>setExt(exp)}  value={exp} 
-                    defaultValue={productId!=null?single.productById.expiryTime:""}
-                    type="text" name="exp_time"  placeholder="Expiry Time" required/>
+                    defaultValue={productId!=null?single.productById.netm:""}
+                    type="text" name="netm"  placeholder="Next meter" required />
                 </div>
                 
             </div> 
@@ -342,7 +334,7 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                 </div>
             </div> */}
 
-            <div className="i_row" style={{display:'flex'}}>
+            {/* <div className="i_row" style={{display:'flex'}}>
                 <div>
                     <label className="label">Discount(%)</label>
                     <input className="input is-small" ref={register}
@@ -350,20 +342,14 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                     defaultValue={productId!=null?single.productById.discount:""}
                     type="text" name="discount" placeholder="Discount" required/>
                 </div>
-                <div>
-                    <label className="label">HSN</label>
-                    <input className="input is-small" ref={register}
-                    //  onChange={()=>setQty(qty)} value={qty} 
-                    // defaultValue={productId!=null?single.productById.expiryDate:""}
-                     type="text" name="hsn"  placeholder="HSN"/>
-                </div>
+
                 <div>
                     <label className="label">Batch</label>
                     <input className="input is-small" ref={register}
                     // onChange={()=>setMrp(mrp)} value={mrp} 
                     type="text" name="batch" placeholder="batch"/>
                 </div>
-            </div>
+            </div> */}
 
 
             {/* <div className="i_row" style={{display:'flex'}}>

@@ -203,48 +203,56 @@ class CreateProduct(graphene.Mutation):
         pid = graphene.String(required=True)
 
         name = graphene.String(required=True)
-        qty = graphene.Int(required=True)
-        typeofpacking = graphene.String(required=True)
+        taga = graphene.Float(required=True)
+        grossm = graphene.Float(required=True)
+        less = graphene.Float(required=True)
+        netm = graphene.Float(required=True)
+        # qty = graphene.Int(required=True)
+        # typeofpacking = graphene.String(required=True)
 
-        mrp = graphene.Float(required=True)
+
+        # mrp = graphene.Float(required=True)
         cost_price = graphene.Float(required=True)
         list_price = graphene.Float(required=True)
         # purchase_from = graphene.String(required=True)
         
         # gst = graphene.String(required=True)
-        mfg = graphene.String(required=True)
+        # mfg = graphene.String(required=True)
         exp = graphene.String(required=True)
-        exp_time = graphene.Int(required=True)
+        # exp_time = graphene.Int(required=True)
 
-        discount = graphene.Float(required=True)
+        # discount = graphene.Float(required=True)
         hsn = graphene.String(required=True)
-        batch = graphene.String(required=True)
+        # batch = graphene.String(required=True)
 
-        category_id = graphene.ID(required=True)
-        sub_category_id = graphene.ID(required=True)
+        # category_id = graphene.ID(required=True)
+        # sub_category_id = graphene.ID(required=True)
 
     product = graphene.Field(ProductNode)
     isNew = graphene.Boolean()
-    def mutate(self,info,pid,is_new,name,qty,typeofpacking,mrp,cost_price,list_price,mfg,exp,exp_time,discount,hsn,batch,sub_category_id,category_id):
+    def mutate(self,info,pid,is_new,name,taga,grossm,less,netm, cost_price,list_price,exp,hsn):
         # p = Product.objects.filter(name=name)
         if(is_new is False):
             p = Product.objects.get(id=from_global_id(pid)[1])
             p.name = name
-            p.qty = qty
-            p.type_of_packing = typeofpacking
+            p.taga = taga
+            # p.type_of_packing = typeofpacking
 
-            p.mrp = mrp
+            # p.mrp = mrp
             p.price = list_price
             p.cost = cost_price
 
-            p.mfg = mfg
+            # p.mfg = mfg
             p.expiry_date = datetime.datetime.strptime(exp,"%Y-%m-%d") 
-            p.expiry_time = exp_time
+            # p.expiry_time = exp_time
 
-            p.discount = discount
+            # p.discount = discount
             p.hsn = hsn
-            p.batch = batch
-            p.subcategory_id = from_global_id(sub_category_id)[1]
+            p.grossm = grossm
+            p.netm = netm
+            p.less = less
+            # p.batch = batch
+            # p.subcategory_id = from_global_id(sub_category_id)[1]
             p.save()
 
             return CreateProduct(product = p,isNew = False)
@@ -253,22 +261,26 @@ class CreateProduct(graphene.Mutation):
         else:
             product = Product.objects.create(
                 name = name,
-                qty = qty,
-                type_of_packing = typeofpacking,
+                taga = taga,
+                # qty = qty,
+                # type_of_packing = typeofpacking,
 
-                mrp = mrp,
+                # mrp = mrp,
                 price = list_price,
                 cost = cost_price,
 
-                mfg = mfg,
+                # mfg = mfg,
                 expiry_date = datetime.datetime.strptime(exp,"%Y-%m-%d") ,
-                expiry_time = exp_time,
+                # expiry_time = exp_time,
 
-                discount = discount,
-                # hsn = hsn,
-                batch = batch,
+                # discount = discount,
+                hsn = hsn,
+                # batch = batch,
+                grossm = grossm,
+                netm = netm,
+                less = less,
                 user_id=info.context.user.id,
-                subcategory_id = from_global_id(sub_category_id)[1]
+                # subcategory_id = from_global_id(sub_category_id)[1]
             )
             return CreateProduct(product = product,isNew = True)
         

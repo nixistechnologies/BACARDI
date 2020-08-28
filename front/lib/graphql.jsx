@@ -54,12 +54,12 @@ query x($search:String!){
       node{
         id
         name
-        purchaseFrom
-        mrp
+        taga
         price
-        qty
-        typeOfPacking
-        mfg
+        cost
+        grossm
+        less
+        netm
       }
     }
   }
@@ -611,11 +611,13 @@ query x($suggestion:String!){
   productSuggestion(suggestion:$suggestion){
     id
     name
-    qty
+    grossm
+    less
+    netm
     price
+    cost
     discount
     expiryDate
-    GST
   }
 }
 `;
@@ -633,18 +635,19 @@ export const getAllPatient = gql`
 `;
 
 export const createProductQuery = gql`
-mutation x($id:String!,$isNew:Boolean!, $categoryId:ID!,$subCategoryId:ID!, $name:String!,$qty:Int!,$typeofpack:String!,$mrp:Float!,$list:Float!,$cost:Float!, $exp:String!,$exp_time:Int!,$mfg:String!,$discount:Float!,$hsn:String!,$batch:String!)
-{
-  createProduct(pid:$id,isNew:$isNew,categoryId:$categoryId,subCategoryId:$subCategoryId, name:$name,qty:$qty, mrp:$mrp,typeofpacking:$typeofpack,exp:$exp,hsn:$hsn,mfg:$mfg,discount:$discount,batch:$batch,expTime:$exp_time,listPrice:$list,costPrice:$cost)
+mutation x($isNew:Boolean!,$pid:String!,$name:String!,$taga:Float!,$listPrice:Float!,$costPrice:Float!,$exp:String!,$hsn:String!,$grossm:Float!,$less:Float!,$netm:Float!){
+  createProduct(isNew:$isNew,pid:$pid,name:$name,taga:$taga,listPrice:$listPrice,costPrice:$costPrice,exp:$exp,hsn:$hsn,grossm:$grossm,less:$less,netm:$netm)
   {
     product{
       id
       name
-      purchaseFrom
+      taga
       price
-      qty
-      typeOfPacking
-      mfg
+      cost
+      hsn
+      grossm
+      less
+      netm
     }
     isNew
   }
@@ -666,25 +669,14 @@ query x($id:ID!){
   {
     id
     name
+    taga
     price
-    mrp
     cost
-    qty
-    typeOfPacking
+    hsn
     expiryDate
-    expiryTime
-    GST
-    mfg
-    discount
-    batch
-    subcategory {
-      id
-      name
-      category{
-        id
-        name
-      }
-    }
+    grossm
+    less
+    netm
   }
 }
 `;

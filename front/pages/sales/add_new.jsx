@@ -124,7 +124,7 @@ const Billingform =() =>{
     }
     const selectProduct=(e)=>{
         setPname(e.name)
-        setQlabel(` (${e.qty})`)
+        setQlabel(` (${e.netm})`)
         // setValue([
         //     {"id":id},
         //     {"medicine":medicine},
@@ -187,15 +187,17 @@ const Billingform =() =>{
             [{
                 "productId":getValues("id"),
                 "name":pname,
-                "qty":getValues("qty").length? getValues("qty"):1,
+                "grossm":getValues("grossm").length? getValues("grossm"):1,
                 "price":getValues("price"),
-                "expiry":getValues("expiry"),
-                "gst":getValues("pgst"),
-                "discount":getValues("discount").length?getValues("discount"):0
+                "less":getValues("less"),
+                "net":getValues("net"),
+                // "discount":getValues("discount").length?getValues("discount"):0
             }]
         ))
         
-        setTamount( tamount+(getValues("price") * getValues("qty")??1) - ((getValues("price") * getValues("qty")??1)*getValues("discount")/100))
+        // setTamount( tamount+(getValues("price") * getValues("qty")??1) - ((getValues("price") * getValues("qty")??1)*getValues("discount")/100))
+        
+        setTamount(tamount+parseFloat(getValues("price")))
 
         setPname("")
         setProduct({name:"Select Product"})
@@ -587,11 +589,25 @@ const Billingform =() =>{
 
                     </div>
                     <div className="column">
-                        <label className="label">Quantity<span style={{fontSize:12,fontWeight:'normal'}}>{qlabel}</span></label>
+                        <label className="label">Gross(mtr)<span style={{fontSize:12,fontWeight:'normal'}}>{qlabel}</span></label>
                         <input type="hidden" name="id" ref={register}/>
                         <input className="input is-small" ref={register}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
-                        type="text" name="qty" placeholder="Quantity" required/>
+                        type="text" name="grossm" placeholder="Gross(mtr)" required/>
+                    </div>
+                    <div className="column is-1">
+                        <label className="label">Less(%)</label>
+                        <input type="hidden" name="id" ref={register}/>
+                        <input className="input is-small" ref={register}
+                        // onChange={()=>setMrp(mrp)} value={mrp} 
+                        type="text" name="less" placeholder="Less" required/>
+                    </div>
+                    <div className="column">
+                        <label className="label">Net(mtr)</label>
+                        <input type="hidden" name="id" ref={register}/>
+                        <input className="input is-small" ref={register}
+                        // onChange={()=>setMrp(mrp)} value={mrp} 
+                        type="text" name="net" placeholder="Net(mtr)" required/>
                     </div>
                     <input type="hidden" name="pgst" ref={register} />
                     <div className="column">
@@ -600,18 +616,18 @@ const Billingform =() =>{
                         // onChange={()=>setMrp(mrp)} value={mrp} 
                         type="text" name="price" placeholder="Price" required/>
                     </div>
-                    <div className="column">
+                    {/* <div className="column">
                         <label className="label">Expiry Date</label>
                         <input className="input is-small" ref={register}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
                         type="date" name="expiry" placeholder="Expiry Date" required/>
-                    </div>
-                    <div className="column">
+                    </div> */}
+                    {/* <div className="column">
                         <label className="label">Discount</label>
                         <input className="input is-small" ref={register}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
                         type="text" name="discount" placeholder="Discount" required />
-                    </div>
+                    </div> */}
                     <div className="column is-1">
                     {/* <label className="label">Add</label> */}
                         <div style={{display:'table',height:'100%',width:'100%',textAlign:'center'}}>
@@ -635,9 +651,10 @@ const Billingform =() =>{
                         <tr>
                             <th>Name</th>
                             <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Discount</th>
-                            <th>Total Amount</th>
+                            <th>Gross (mtr)</th>
+                            <th>Less(%)</th>
+                            <th>Net(mtr)</th>
+                            {/* <th>Total Amount</th> */}
                             <th></th>
                         </tr>
                     </thead>
@@ -658,9 +675,11 @@ const Billingform =() =>{
                             
                             </td>
                             <td>{e.price}</td>
-                            <td>{e.qty??1}</td>
-                            <td>{e.discount??1}</td>
-                            <td>{(e.price * e.qty??1) - ((e.price * e.qty??1)*e.discount/100)  }</td>
+                            <td>{e.grossm}</td>
+                            <td>{e.less}</td>
+                            <td>{e.net}</td>
+                            {/* <td>{e.discount??1}</td> */}
+                            {/* <td>{(e.price * e.qty??1) - ((e.price * e.qty??1)*e.discount/100)  }</td> */}
                             <td onClick={deletefromtemp.bind(null,i)} style={{cursor:'pointer'}}>
                                 <FontAwesomeIcon icon={faTrashAlt} color="red" />
                             </td>

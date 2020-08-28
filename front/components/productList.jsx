@@ -114,9 +114,12 @@ const TableView=({data,mloading})=>{
        <thead>
        <tr>
          <th className="w30">Name</th>
-         <th className="w10">Brand</th>
-         <th className="w10">Qty</th>
-         <th className="w10">Price</th>
+         <th className="w10">Taga</th>
+         <th className="w10">List</th>
+         <th className="w10">Cost</th>
+         <th className="w10">Gross(mtr)</th>
+         <th className="w10">Less</th>
+         <th className="w10">Net(mtr)</th>         
          <th className="w5"></th>
          <th className="w5"></th>
          </tr>
@@ -138,22 +141,38 @@ const TableView=({data,mloading})=>{
                   <td>
                     <div className="_heading">
                       {prd.node.name}
-                      <span className="sub">
+                      {/* <span className="sub">
                       {prd.node.mfg}
-                      </span>
+                      </span> */}
                     </div>
                     
                   </td>
                   <td className="_cont">
-                    {prd.node.mfg}
+                    {prd.node.taga}
+                  </td>
+                  {/* <td className="_cont">
+                    {prd.node.price}
+                  </td> */}
+                  {/* <td className="_cont">
+                    {prd.node.cost}
+                  </td> */}
+                  <td className="_cont">
+                    &#8377; {prd.node.price}<br/>
+                    {/* <span style={{fontSize:"0.8em",color:'grey' }}>&#8377; {prd.node.mrp}</span> */}
                   </td>
                   <td className="_cont">
-                    {prd.node.qty}
+                    &#8377; {prd.node.cost}
                   </td>
                   <td className="_cont">
-                  &#8377; {prd.node.price}<br/>
-                    <span style={{fontSize:"0.8em",color:'grey' }}>&#8377; {prd.node.mrp}</span>
+                    {prd.node.grossm}
                   </td>
+                  <td className="_cont">
+                    {prd.node.less}
+                  </td>
+                  <td className="_cont">
+                    {prd.node.netm}
+                  </td>
+
 
                   <td className="_cont">
                     <Link href={`products/[product]?name=${prd.node.name}`} as={`products/${prd.node.id}?name=${prd.node.name}`}>

@@ -1,0 +1,407 @@
+<!Doctype html>
+<html>
+	<head>
+		<title>Bill</title>
+		<style type="text/css">
+			body {
+			    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+			    font-size: 14px;
+			    line-height: 1.42857143;
+			    color: #333;
+			    background-color: #fff;
+			}
+			.bill_container{
+				padding: 0 3%;
+			}
+			.bill_container h4{
+				border-bottom: 1px solid grey;
+    			text-align: center;
+    			margin-bottom: unset;
+			}
+			.bill_container .gst_no{
+				margin: unset;
+			    margin-top: 4px;
+			    font-size: 12px;
+			    font-weight: 700;
+			}
+			.comp_info{
+				text-align: center;
+			}
+			.comp_info .comp_name{
+				font-size: 27px;
+    			margin-bottom: 5px;
+			}
+			.comp_info .addr_1{
+				margin: unset;
+				font-size: 12px;
+				font-weight: 600;
+			}
+			.bill_summary{
+				margin-top: 2%;
+				width: 100%;
+			}
+			.bill_summary .bill_table{
+				width: 100%;
+			}
+			.bill_summary .bill_table td{				
+				border: 1px solid grey;padding: 3px;font-size: 10px;
+			}
+			.bill_summary .bill_table th{				
+				border: 1px solid grey;padding: 3px;text-align: center;
+			}
+			.tab2{
+				width: 100%;
+			}
+			.tab2 td{
+				border: none !important;
+			}
+			.tab_cont{
+				width: 100%;
+			}
+			.tab_cont th,.tab_cont td{
+				border: none !important;
+    			padding: unset !important;
+    			text-align: center;
+			}
+			.tab_th{
+				padding:unset !important;
+			}
+			.tab_td{
+				padding:unset !important;				
+			}
+			.tab_cont1{
+				width: 100%;
+			}
+			.tab_cont1 th,.tab_cont1 td{
+    			padding: unset !important;
+    			text-align: left;
+			}
+			.tab_cont2{
+				width: 100%;
+			}
+			.tab_cont2 td{
+				padding:3px !important;
+				border: none !important;	
+				text-align: right;			
+			}
+			.tab_cont2 th{
+				padding:3px !important;
+				border: none !important;	
+				text-align: left !important;
+			}
+			.tab_cont1 td{
+				padding:3px !important;			
+			}
+			.tab_cont3{
+				width: 100%;
+			}
+			.tab_cont3 td{
+				border: none !important;
+    			padding: 5px !important;
+			}
+			.th_head{
+				font-size: 12px;background-color: #efefef;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="bill_container">
+			<h4>TAX INVOICE</h4>
+			<p class="gst_no">07CID523661K1Z1</p>
+			<div class="comp_info">
+				<h3 class="comp_name" style="text-transform: uppercase;">{{user.profile.firm_name}}</h3>
+				<p class="addr_1">{{user.profile.address}}</p>
+				<p class="addr_1">NEW DELHI - 110005</p>
+				<p class="addr_1">State Code - 07</p>
+				<p class="addr_1">Mobile : {{user.profile.contact_number}}</p>
+			</div>
+			<div class="bill_summary">
+				<table class="bill_table" cellspacing="0">
+				      <tr>
+				        <td colspan="5">
+				        	<table class="tab2">
+				        		<tr>
+				        			<td>Invoice No.   :  <b>{{bill.invoice_number}}</b></td>
+				        			<td>Dated   :  {{bill.billing_date}}</td>
+				        		</tr>
+				        		<tr>
+				        			<td>Place of Supply : </td>
+				        		</tr>
+				        		<tr>
+				        			<td>Private Marka : </td>
+				        		</tr>
+				        		<tr>
+				        			<td>Remarks : </td>
+				        		</tr>
+				        	</table>
+				        </td>
+				        <td colspan="5">
+				        	<table class="tab2">
+				        		<tr>
+				        			<td>Transport   :  </td>
+				        			<td>Booking   :  </td>
+				        		</tr>
+				        		<tr>
+				        			<td>LR No.   :  </td>
+				        			<td>LR Date   :  </td>
+				        		</tr>
+				        		<tr>
+				        			<td>Cases   :  </td>
+				        			<td>Eway Bill No.   :  </td>
+				        		</tr>
+				        		<tr>
+				        			<td>&nbsp;</td>
+				        			<td>&nbsp;</td>
+				        		</tr>
+				        	</table>
+				        </td>
+				      </tr>
+				      <tr>
+				        <th colspan="5">Details of Receiver (Billed To)</th>
+				        <th colspan="5">Details of Consignee (Shipped To)</th>
+				      </tr>
+				      <tr>				        
+				        <td colspan="5">
+				        	<table class="tab2">
+				        		<tr>
+				        			<td>Party   :  <b>{{bill.customer.name}}</b></td>
+				        		</tr>
+				        		<tr>
+				        			<td>Address : {{bill.customer.address}}</td>
+				        		</tr>
+				        		<tr>
+				        			<td>State : </td>
+				        			<td>State Code : </td>
+				        		</tr>
+				        		<tr>
+				        			<td>GSTIN NO. : </td>
+				        		</tr>
+				        		<tr>
+				        			<td>AADHAR NO. : </td>
+				        		</tr>
+				        	</table>
+				        </td>			        
+				        <td colspan="5">
+				        	<table class="tab2">
+				        		<tr>
+				        			<td>Party   :  <b>{{bill.customer.name}}</b></td>
+				        		</tr>
+				        		<tr>
+				        			<td>Address : {{bill.customer.address}}</td>
+				        		</tr>
+				        		<tr>
+				        			<td>State : </td>
+				        			<td>State Code : </td>
+				        		</tr>
+				        		<tr>
+				        			<td>GSTIN NO. : </td>
+				        		</tr>
+				        		<tr>
+				        			<td>AADHAR NO. : </td>
+				        		</tr>
+				        	</table>
+				        </td>
+				      </tr>
+				      <tr>
+				      	<th class="th_head">Sr.</th>
+				      	<th class="th_head">Description</th>
+				      	<th class="th_head">Size</th>
+				      	<th class="th_head">HSN Code</th>
+				      	<th class="th_head">Taga</th>
+				      	<th class="th_head">Rate</th>				      	
+				      	<th class="tab_th">
+				      		<table class="tab_cont"><tr><th class="th_head" colspan="2" style="border-bottom: 1px solid grey !important;">Discount</th></tr>
+				      		<tr><th class="th_head">%</th><th class="th_head">Amt.</th></tr></table>
+				      	</th>
+				      	<th class="tab_th">
+				      		<table class="tab_cont"><tr><th class="th_head" colspan="2" style="border-bottom: 1px solid grey !important;">CGST</th></tr>
+				      		<tr><th class="th_head">%</th><th class="th_head">Amt.</th></tr></table>
+				      	</th>
+				      	<th class="tab_th">
+				      		<table class="tab_cont"><tr><th class="th_head" colspan="2" style="border-bottom: 1px solid grey !important;">SGST</th></tr>
+				      		<tr><th class="th_head">%</th><th class="th_head">Amt.</th></tr></table>
+				      	</th>
+				      	<th class="th_head">Amount</th>
+				      </tr>
+					{% for i in bill.sales_product_set.all %}
+				      <tr>
+				      	<td>1</td>
+				      	<td>{{i.product.name}}</td>
+				      	<td>32</td>
+				      	<td>{{i.product.name}}</td>
+				      	<td>{{i.product.price}}</td>
+				      	<td>490</td>				      	
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td>{{i.GST}}</td><td>{{i.CGST}}</td></tr></table>
+				      	</td>
+				      	<td style="text-align: right;">{{i.total}}</td>
+					  </tr>
+					  {% endfor %}
+				      <tr>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>				      	
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td>&nbsp;</td>
+				      </tr>
+				      <tr>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>				      	
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td>&nbsp;</td>
+				      </tr>
+				      <tr>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>				      	
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td>&nbsp;</td>
+				      </tr>
+				      <tr>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>				      	
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td>&nbsp;</td>
+				      </tr>
+				      <tr>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>
+				      	<td>&nbsp;</td>				      	
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td class="tab_td">
+				      		<table class="tab_cont">
+				      		<tr><td></td><td></td></tr></table>
+				      	</td>
+				      	<td>&nbsp;</td>
+				      </tr>
+				      <tr>
+				      	<td colspan="4" style="text-align: center;">&nbsp;</td>
+				      	<td style="text-align: center;"></td>
+				      	<td colspan="2" style="text-align: center;">&nbsp;</td>
+				      	<td colspan="2" style="text-align: center;"><b>Total</b></td>
+				      	<td style="text-align: right;">{{bill.gross_amount}}</td>
+				      </tr>
+				      <tr>
+				      	<td colspan="7">Tax Chargable in Words:<br><b>Rs. Two Thousand twenty Five Only</b></td>
+				      	<td class="tab_td" colspan="3">
+				      		<table class="tab_cont1" cellspacing="0">
+				      		<tr><td style="text-align: left;width: 66%;">Taxable value</td><td style="text-align: right;">{{bill.gross_amount}}</td></tr>
+				      	<tr><td><table class="tab_cont2" cellspacing="0">
+				      		<tr><th>CGST</th><td>0</td></tr>
+				      	<tr><th>SGST</th><td>0</td></tr>
+				      <tr><th>IGST</th><td>2025</td></tr></table></td><td style="text-align: right;">2025</td></tr>
+				      </table>
+				      	</td>
+				      </tr>
+
+				      <tr>
+				      	<td colspan="7">Amount in words : <b style="text-transform: capitalize;">Rs. {{payble_amount}} Only</b></td>
+				      	<th colspan="2">Grand Total</th>
+				      	<th style="text-align: right;">{{bill.net_amount }}</th>
+				      </tr>
+				      <tr>
+				      	<td colspan="10">Declaration   :   We declare that this invoice shows the actual price of the goods described and that all the particulars are true and correct.</td>
+				      </tr>
+				      <tr>
+				      	<td colspan="10"><b>Our bank Details : </b>
+				      	<table class="tab_cont3" cellspacing="0">
+				      		<tr>
+				      			<td>A/c Name : R R ENTERPRISES</td>
+				      			<td>A/c No. : 135805000832</td>
+				      			<td>IFSC : ICIC0001358</td>
+				      		</tr>
+				      		<tr>
+				      			<td>Bank Name : ICICI BANK</td>
+				      			<td>Branch : REGHAR PURA</td>
+				      		</tr>
+				      	</table>
+				      	</td>
+				      </tr>
+				      <tr>
+				      	<td colspan="8" style="border-right: none !important;padding-bottom: 5%;"><b>Terms And Conditions : </b></td>
+				      	<td colspan="2" style="text-align: right;padding-bottom: 5%;border-left: none !important;">For <b>R R ENTERPRISES</b></td>
+				      </tr>
+				  </table>
+				  <p style="right: 50px;text-align: right;position: absolute;margin: -23px 7px;font-size: 10px;">Authorised Signatory</p>
+				  <p style="margin: unset;text-align: center;font-size: 10px;">*This is a Computer Generated Invoice</p>
+			</div>
+		</div>
+	</body>
+</html>

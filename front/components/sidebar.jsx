@@ -1,6 +1,6 @@
 import  {FontAwesomeIcon,}  from '@fortawesome/react-fontawesome'
 // import { faTrashAlt,faEdit, faHospital, faBuilding } from '@fortawesome/free-regular-svg-icons'
-import {faAngleRight, faChartBar,faMale, faUserTie,faThList, faHome, faUser, faUsers, faShippingFast, faPlus, faHistory, faSmile, faCog} from '@fortawesome/free-solid-svg-icons'
+import {faAngleRight, faChartBar,faMale, faUserTie,faThList, faHome, faUser, faUsers, faShippingFast, faPlus, faHistory, faSmile, faCog, faSignOutAlt, faList} from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import Cookie from "js-cookie";
 import $ from 'jquery'
@@ -179,38 +179,66 @@ const SideBar = ({sidebar,route}) =>{
                             </div>
 
                         <ul className="child_" style={{display:route.startsWith("/products") || route.startsWith("/category")?"inherit":"none"}}>
-                            <li>
+                            {/* <li>
                                 <Link href="/products/category">
                                     <a className={route.startsWith("/products/category") ||route.startsWith("/category") ?"active":"not"}>Categories</a>
                                 </Link>
-                            </li>
+                            </li> */}
                             {/* <li><a>SubCategory</a></li> */}
                             <li>
-                                <Link href="/products">
-                                    <a className={route==="/products"?"active":"not"}>
-                                        Products
-                                    </a>
+                                <Link href="/products/create">
+                                    <div className="item">
+                                        <a className={route.startsWith("/products/create")?"active":"not"}>
+                                            <div>
+                                                <span className="s-bar-icon">
+                                                    <FontAwesomeIcon icon={faPlus} />
+                                                </span>
+                                                <span className="s-bar-text">
+                                                    Add
+                                                </span>
+                                                
+                                            </div>
+                                        </a>
+                                    </div>
+                                </Link>
+                            </li>
+                            <li>
+                            <Link href="/products">
+                                    <div className="item">
+                                        <a className={route == "/products"?"active":"not"}>
+                                            <div>
+                                                <span className="s-bar-icon">
+                                                    <FontAwesomeIcon icon={faList} />
+                                                </span>
+                                                <span className="s-bar-text">
+                                                    All
+                                                </span>
+                                                
+                                            </div>
+                                        </a>
+                                    </div>
                                 </Link>
                             </li>
                         </ul>
                     </li>
+                    
                     <li>
-                            <div className="item" onClick={(e)=>Toggle(e)}>
-                                <a>
-                                    <div >
-                                        <span className="s-bar-icon">
-                                            <FontAwesomeIcon icon={faShippingFast} />
-                                        </span>
-                                        <span className="s-bar-text" style={{width:'100%'}}>
-                                            Sales
-                                        </span>
-                                        <span className="rr-icon" style={{float:"right"}}>
-                                            <FontAwesomeIcon icon={faAngleRight}/>
-                                        </span>
-                                        
-                                    </div>
-                                </a>
-                            </div>
+                        <div className="item" onClick={(e)=>Toggle(e)}>
+                            <a>
+                                <div >
+                                    <span className="s-bar-icon">
+                                        <FontAwesomeIcon icon={faShippingFast} />
+                                    </span>
+                                    <span className="s-bar-text" style={{width:'100%'}}>
+                                        Sales
+                                    </span>
+                                    <span className="rr-icon" style={{float:"right"}}>
+                                        <FontAwesomeIcon icon={faAngleRight}/>
+                                    </span>
+                                    
+                                </div>
+                            </a>
+                        </div>
                         
                         <ul className="child_" style={{display:route.startsWith("/sales")?"inherit":"none"}}>
                             <li className="is-active">
@@ -249,6 +277,65 @@ const SideBar = ({sidebar,route}) =>{
                                 
                         </ul>
                     </li>
+
+
+                    <li>
+                        <div className="item" onClick={(e)=>Toggle(e)}>
+                            <a>
+                                <div >
+                                    <span className="s-bar-icon">
+                                        <FontAwesomeIcon icon={faShippingFast} />
+                                    </span>
+                                    <span className="s-bar-text" style={{width:'100%'}}>
+                                        Instant Sales
+                                    </span>
+                                    <span className="rr-icon" style={{float:"right"}}>
+                                        <FontAwesomeIcon icon={faAngleRight}/>
+                                    </span>
+                                    
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <ul className="child_" style={{display:route.startsWith("/isales")?"inherit":"none"}}>
+                            <li className="is-active">
+                            <Link href="/isales/add_new">
+                                <div className="item">
+                                    <a className={route.startsWith("/isales/add_new")?"active":"not"}>
+                                        <div>
+                                            <span className="s-bar-icon">
+                                                <FontAwesomeIcon icon={faPlus} />
+                                            </span>
+                                            <span className="s-bar-text">
+                                                Add
+                                            </span>
+                                            
+                                        </div>
+                                    </a>
+                                </div>
+                            </Link>
+                                </li>
+                            <li>
+                                <Link href="/isales/history">
+                                    <div className="item">
+                                        <a className={route.startsWith("/isales/history")?"active":"not"}>
+                                            <div>
+                                                <span className="s-bar-icon">
+                                                    <FontAwesomeIcon icon={faHistory} />
+                                                </span>
+                                                <span className="s-bar-text">
+                                                    All Sales
+                                                </span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </Link>
+                                </li>
+                                
+                        </ul>
+                    </li>
+
+
                     <li>
                         <div className="item" onClick={(e)=>Toggle(e)}>
                             <a>
@@ -306,9 +393,21 @@ const SideBar = ({sidebar,route}) =>{
                             </li>
                         </ul>
                     </li>
-                    <li style={{position:'fixed',bottom:'5%',width:"18.4%"}}>
-                        <a style={{color:"red"}} onClick={()=>Logout()}>Logout</a>
-                    </li>
+                    {/* <li style={{position:'fixed',bottom:'5%',width:"18.4%"}}>
+                        <div className="item">
+                        <a style={{color:"red"}} onClick={()=>Logout()}>
+                                <div>
+                                        <span className="s-bar-icon">
+                                            <FontAwesomeIcon icon={faSmile} />
+                                        </span>
+                                        <span className="s-bar-text">
+                                            Logout
+                                        </span>
+                                        
+                                    </div>
+                            </a>
+                            </div>
+                    </li> */}
                 </ul>
                 <p className="menu-label">
                     Settings
@@ -334,10 +433,8 @@ const SideBar = ({sidebar,route}) =>{
                         
                     </li>
                     <li>
-                        {/* <a>Settings</a> */}
                         <div className="item">
                                 <a 
-                                // className={route.startsWith("/profile") ?"active":"not"}
                                 >
                                     <div>
                                         <span className="s-bar-icon">
@@ -345,6 +442,22 @@ const SideBar = ({sidebar,route}) =>{
                                         </span>
                                         <span className="s-bar-text">
                                             Settings
+                                        </span>
+                                        
+                                    </div>
+                                </a>
+                            </div>
+                    </li>
+                    <li>
+                        <div className="item" style={{marginTop:"100px"}}>
+                                <a  onClick={()=>Logout()}
+                                >
+                                    <div>
+                                        <span className="s-bar-icon">
+                                            <FontAwesomeIcon icon={faSignOutAlt} color={"red"} />
+                                        </span>
+                                        <span className="s-bar-text" style={{color:'red'}}>
+                                            Logout
                                         </span>
                                         
                                     </div>

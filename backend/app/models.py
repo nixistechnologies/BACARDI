@@ -41,22 +41,26 @@ class SubCategory(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
-    qty = models.IntegerField()
+    qty = models.IntegerField(null=True,blank=True)
     expiry_date = models.DateField(auto_now_add=True,blank=True)
     expiry_time = models.IntegerField(null=True,blank=True)
     mrp = models.FloatField(null=True,blank=True)
     cost = models.FloatField(null=True,blank=True)
-    price = models.FloatField()
-    purchase_from = models.CharField(max_length=100)
-    GST = models.FloatField(default=0)
-    type_of_packing = models.CharField(max_length=30)
+    price = models.FloatField(null=True,blank=True)
+    purchase_from = models.CharField(max_length=100,null=True,blank=True)
+    GST = models.FloatField(default=0,null=True,blank=True)
+    type_of_packing = models.CharField(max_length=30,null=True,blank=True)
     discount = models.FloatField(blank=True,default=0)
     image = models.ImageField(upload_to="products/",blank=True,null=True)
-    # hsn = models.CharField(max_length=20,null=True,blank=True)
+    hsn = models.CharField(max_length=20,null=True,blank=True)
     batch = models.CharField(max_length=20,null=True,blank=True)
     mfg = models.CharField(max_length=50,null=True,blank=True)
     remarks = models.TextField(null=True,blank=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE)
+    grossm = models.FloatField(blank=True,null=True)
+    netm = models.FloatField(blank=True,null=True)
+    less = models.FloatField(blank=True,null=True)
+    taga = models.FloatField(blank=True,null=True)
     subcategory = models.ForeignKey(SubCategory,on_delete=models.CASCADE,null=True,blank=True)
     data = JSONField(null=True,blank=True)
     def __str__(self):
@@ -207,7 +211,7 @@ class Sales_Product(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         p = Product.objects.get(id = self.product.id)
-        p.qty = p.qty - self.quantity
+        # p.qty = p.qty - self.quantity
         p.save()
 
     
