@@ -19,6 +19,18 @@ const userReducer = (state={"user":{},loading:true,error:null,created:true} ,act
             return{
                 ...state,user:action.data,created:true
             }
+        case 'UPDATED_ADDRESS':
+            return {
+                ...state,"user":{...user,"profile":{...profile,"address":"",city:"",state:"",zipcode:""}}
+            }
+        case 'UPDATED_PERSONAL':
+            return {
+                ...state,"user":{...user,firstName:"",lastName:"",email:"","profile":{...profile,contactNumber:""}}
+            }
+        case 'UPDATED_FIRM':
+            return {
+                ...state,user:{...user,profile:{...profile,GSTNo:"",firmName:""}}
+            }                
         default:
             return state
     

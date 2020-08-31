@@ -111,8 +111,8 @@
 			<div class="comp_info">
 				<h3 class="comp_name" style="text-transform: uppercase;">{{user.profile.firm_name}}</h3>
 				<p class="addr_1">{{user.profile.address}}</p>
-				<p class="addr_1">NEW DELHI - 110005</p>
-				<p class="addr_1">State Code - 07</p>
+				<p class="addr_1">{{user.profile.city}} - {{user.profile.zipcode}}</p>
+				<p class="addr_1">State - {{user.profile.state}}</p>
 				<p class="addr_1">Mobile : {{user.profile.contact_number}}</p>
 			</div>
 			<div class="bill_summary">
@@ -226,10 +226,10 @@
 					{% for i in bill.sales_product_set.all %}
 				      <tr>
 				      	<td>1</td>
-				      	<td>{{i.product.name}}</td>
+				      	<td>{{i.product_name}}</td>
 				      	<td>32</td>
-				      	<td>{{i.product.name}}</td>
-				      	<td>{{i.product.price}}</td>
+				      	<td>{{i.product_name}}</td>
+				      	<td>{{i.price}}</td>
 				      	<td>490</td>				      	
 				      	<td class="tab_td">
 				      		<table class="tab_cont">
@@ -383,7 +383,7 @@
 				      	<td colspan="10"><b>Our bank Details : </b>
 				      	<table class="tab_cont3" cellspacing="0">
 				      		<tr>
-				      			<td>A/c Name : R R ENTERPRISES</td>
+				      			<td>A/c Name : {{user.profile.firm_name}}</td>
 				      			<td>A/c No. : 135805000832</td>
 				      			<td>IFSC : ICIC0001358</td>
 				      		</tr>
@@ -396,7 +396,7 @@
 				      </tr>
 				      <tr>
 				      	<td colspan="8" style="border-right: none !important;padding-bottom: 5%;"><b>Terms And Conditions : </b></td>
-				      	<td colspan="2" style="text-align: right;padding-bottom: 5%;border-left: none !important;">For <b>R R ENTERPRISES</b></td>
+				      	<td colspan="2" style="text-align: right;padding-bottom: 5%;border-left: none !important;">For <b style="text-transform: uppercase;">{{user.profile.firm_name}}</b></td>
 				      </tr>
 				  </table>
 				  <p style="right: 50px;text-align: right;position: absolute;margin: -23px 7px;font-size: 10px;">Authorised Signatory</p>

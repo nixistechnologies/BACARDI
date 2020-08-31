@@ -8,6 +8,7 @@
 }
 .menu-label{
     color: #00c4a7;
+    /* text-align: center; */
 }
 .cnavbar-item{
     visibility: hidden;
@@ -111,6 +112,7 @@ input[type="radio"] {
 
 ._side .item .s-bar-icon{
     width: 30px;
+    text-align: center;
 }
 
 ._side .active{

@@ -71,7 +71,8 @@ const SideBar = ({sidebar,route}) =>{
                 display:${store.sidebar==true?"initial":"none"}
             }
             .menu-label{
-                font-size:${store.sidebar==true?'0.75em':'0.6em'}
+                font-size:${store.sidebar==true?'0.75em':'0.5em'};
+                text-align:${store.sidebar==true?'left':'center'}
             }
         
                     

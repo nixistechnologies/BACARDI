@@ -74,9 +74,11 @@ const NewPurchase = () =>{
             [{
                 "name":product.name,
                 "productId":data.productId,
-                "qty":data.qty,
-                "discount":data.discount?data.discount:0,
-                "mrp":data.mrp,
+                "grossm":data.grossm,
+                // "discount":data.discount?data.discount:0,
+                // "mrp":data.mrp,
+                "less":data.less,
+                "netm":data.netm,
                 "price":data.list,
                 "cost":data.cost,
             }]
@@ -122,7 +124,7 @@ const NewPurchase = () =>{
                     setMlist([])
                     setVendor({name:""})
                     reset({
-                        "name":"","productId":"","qty":"","discount":"","mrp":"","list":"","cost":"","vendor_email":"","vendor_GST":"","invoice_date":"","invoice_number":""
+                        "name":"","productId":"","netm":"","less":"","grossm":"","list":"","cost":"","vendor_email":"","vendor_GST":"","invoice_date":"","invoice_number":""
                     })
     
                     openSnackbar("Purchase has been added successfully")
@@ -270,7 +272,7 @@ const NewPurchase = () =>{
                                         productData!=null?
                                         productData.allProducts.edges.map(e=>{
                                             // return ( e.node.name.toLocaleLowerCase().startsWith(statefilter)?
-                                            return <div style={{padding:"0"}} className="d-item_" onClick={()=>{setProduct({name:e.node.name}), setValue([{"qty":e.node.qty},{"mrp":e.node.mrp}, {"productId":e.node.id},{"cost":e.node.cost},{"list":e.node.price}]), setProductDD(productDD==="dd-active"?"":"dd-active") }} key={e.node.id} value={e.node.id}> <a className="dropdown-item">{e.node.name}</a></div>
+                                            return <div style={{padding:"0"}} className="d-item_" onClick={()=>{setProduct({name:e.node.name}), setValue([{"less":e.node.less},{"netm":e.node.netm},{"grossm":e.node.grossm}, {"productId":e.node.id},{"cost":e.node.cost},{"list":e.node.price}]), setProductDD(productDD==="dd-active"?"":"dd-active") }} key={e.node.id} value={e.node.id}> <a className="dropdown-item">{e.node.name}</a></div>
                                             // :null
                                                 }
                                             ):null
@@ -284,18 +286,18 @@ const NewPurchase = () =>{
                     
                     </div>
                     <div className="column">
-                        <label className="label">Quantity</label>
+                        <label className="label">Gross(mtr)</label>
                         <input type="hidden" name="productId" ref={register}/>
                         <input className="input is-small" ref={register}
-                        type="text" name="qty"  placeholder="Quantity" required/>
+                        type="text" name="grossm"  placeholder="Gross" required/>
                     </div>
                     <div className="column">
-                        <label className="label">Discount</label>
-                        <input type="text" placeholder="Discount" ref={register} name="discount" className="input is-small" />
+                        <label className="label">Less</label>
+                        <input type="text" placeholder="Less" ref={register} name="less" className="input is-small" />
                     </div>
                     <div className="column">
-                        <label className="label">MRP</label>
-                        <input type="text" placeholder="MRP" ref={register} name="mrp" className="input is-small" />
+                        <label className="label">Net(mtr)</label>
+                        <input type="text" placeholder="Net" ref={register} name="netm" className="input is-small" />
                     </div>
                     <div className="column">
                         <label className="label">List Price</label>
@@ -323,11 +325,12 @@ const NewPurchase = () =>{
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Quantity</th>
-                            <th>MRP</th>
+                            <th>Gross</th>
+                            <th>Less</th>
+                            <th>Net</th>
                             <th>List Price</th>
                             <th>Cost Price</th>
-                            <th>Discount</th>
+                            {/* <th>Discount</th> */}
                             {/* <th>Total Amount</th> */}
                             <th></th>
                         </tr>
@@ -342,11 +345,12 @@ const NewPurchase = () =>{
                             textTransform: "uppercase"
                             }}>
                             <td style={{fontWeight:'bold'}}>{e.name}</td>
-                            <td>{e.qty}</td>
-                            <td>{e.mrp}</td>
+                            <td>{e.grossm}</td>
+                            <td>{e.less}</td>
+                            <td>{e.netm}</td>
                             <td>{e.price}</td>
                             <td>{e.cost}</td>
-                            <td>{e.discount??1}</td>
+                            {/* <td>{e.discount??1}</td> */}
                             {/* <td>{(e.price * e.qty??1) - ((e.price * e.qty??1)*e.discount/100)  }</td> */}
                             <td onClick={deletefromtemp.bind(null,i)} style={{cursor:'pointer'}}>
                                 <FontAwesomeIcon icon={faTrashAlt} color="red" />

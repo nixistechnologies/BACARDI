@@ -5,6 +5,7 @@ import pdfkit
 from rest_framework import status,viewsets
 from app.serializer import *
 from num2words import num2words
+from graphene.relay.node import from_global_id
 
 
 
@@ -24,7 +25,11 @@ class PurchaseSer(viewsets.ModelViewSet):
 
 
 def invoice(request,pk):
-    bill = Billing.objects.get(id=pk)
+    if(type(pk)==int):
+        bill = Billing.objects.get(id=pk)
+    else:
+        bill = Billing.objects.get(id=from_global_id(pk)[1])
+    print(bill.id)
     payble_amount = num2words(bill.net_amount, to='cardinal', lang='en_IN').replace("-"," ").capitalize()
 
     return render(request,"invoice.html",{"bill":bill,"user":request.user,"payble_amount":payble_amount})

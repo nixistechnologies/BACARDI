@@ -11,6 +11,9 @@ query($search:String!){
         email
         mobile
         gstNumber
+        state
+        addharNo
+        city        
       }
     }
   }
@@ -26,13 +29,16 @@ query x($suggestion:String!){
     address
     mobile
     email
+    state
+    city
+    addharNo    
   }
 }
 `
 
 export const createOrUpdateCustomerQuery = gql`
-mutation x($name:String!,$id:String!, $mobile:String!$gst:String!,$address:String!,$email:String!,$isNew:Boolean!){
-  createCustomer(id:$id,name:$name,mobile:$mobile,gst:$gst,address:$address,email:$email,isNew:$isNew)
+mutation x($city:String!,$state:String!$addhar:String!,$name:String!,$id:String!, $mobile:String!$gst:String!,$address:String!,$email:String!,$isNew:Boolean!){
+  createCustomer(id:$id,name:$name,mobile:$mobile,gst:$gst,address:$address,email:$email,isNew:$isNew,city:$city,state:$state,addhar:$addhar)
   {
     customer{
       id
@@ -41,6 +47,9 @@ mutation x($name:String!,$id:String!, $mobile:String!$gst:String!,$address:Strin
       gstNumber
       address
       email
+      state
+      city
+      addharNo 
     }
   }
 }
@@ -66,10 +75,93 @@ query x($search:String!){
 }
 `;
 
+export const updateAddressQuery = gql`
+mutation x($state:String!,$city:String!,$zipcode:String!,$address:String!){
+  updateAddress(state:$state,city:$city,zipcode:$zipcode,address:$address)
+  {
+    user{
+      profile{
+        state
+        city
+        zipcode
+        address
+      }
+    }
+  }
+}
+`
+
+export const updateFirmQuery = gql`
+mutation x($firm:String!,$gst:String!){
+  updateFirm(firmName:$firm,gst:$gst)
+  {
+    user{
+      profile{
+        firmName,
+        GSTNo
+      }
+    }
+  }
+}
+`
+
+export const getPersonalQuery = gql`
+{
+  user{
+    firstName
+    lastName
+    username
+    email
+    profile{
+      contactNumber
+    }
+  }
+}
+`
+export const getAddressQuery = gql`
+{
+  user{
+    profile{
+			city
+      state
+      zipcode
+      address
+    }
+  }
+}
+`
+
+export const getFirmQuery = gql`
+{
+  user{
+    profile{
+      firmName
+      GSTNo
+    }
+  }
+}
+`
+
+export const updatePersonalQuery = gql`
+mutation x($firstname:String!,$lastname:String!,$phone:String!,$email:String!){
+  updatePersonal(firstname:$firstname,lastname:$lastname,phone:$phone,email:$email)
+  {
+    user{
+			firstName
+      lastName
+      email
+      username
+      profile{
+        contactNumber
+      }
+    }
+  }
+}
+`
 
 export const updateCurrentUserQuery = gql`
-mutation x($gst:String!,$tin:String!,$firstName:String!,$lastName:String!,$phone:String!,$email:String!,$firm:String!,$address:String!){
-  updateUser(gst:$gst,tin:$tin,firstname:$firstName,lastname:$lastName,phone:$phone,email:$email,firmName:$firm,address:$address)
+mutation x($gst:String!,$firstName:String!,$lastName:String!,$phone:String!,$email:String!,$firm:String!,$address:String!,$state:String!,$city:String!,$zipcode:String!){
+  updateUser(gst:$gst,firstname:$firstName,lastname:$lastName,phone:$phone,email:$email,firmName:$firm,address:$address,city:$city,state:$state,zipcode:$zipcode)
   {
     user{
       id
@@ -80,7 +172,9 @@ mutation x($gst:String!,$tin:String!,$firstName:String!,$lastName:String!,$phone
       profile{
         firmName
         GSTNo
-        TINNo
+        state
+        city
+        zipcode
         address
         contactNumber
       }
@@ -100,9 +194,11 @@ query x{
     profile{
       firmName
       GSTNo
-      TINNo
       address
       contactNumber
+      state
+      city
+      zipcode
     }
   }
 }
@@ -163,12 +259,12 @@ query x($purchaseId:ID!){
         product{
           id
           name
-          mfg
         }
         listPrice
-        mrp
         discount
-        qty
+        grossm
+        netm
+        less
         cost
       }
     }
@@ -253,15 +349,18 @@ query x($slug:String!){
 
 export const productStartsWithQuery = gql`
 query ($name:String!){
-  allProducts(nameStartswith:$name){
+  allProducts(search:$name,first:10){
     edges{
       node{
         id
         name
-        mrp
+        
         price
         cost
-        qty
+        less
+        grossm
+        netm
+        
       }
     }
   }
@@ -413,11 +512,24 @@ query x($min:String!,$max:String!){
 `
 
 
-export const generateBillQuery = gql`
+export const generateBillQueryOld = gql`
 mutation x($paid:Float!, $products:[MInput!],$remarks:String!,$customerId:ID!,$date:String!,$payment:String!){
   generateBill(payment:$paid, billingDate:$date,products:$products,paymentMode:$payment,customerId:$customerId,remarks:$remarks)
   {
     bill{
+      invoice
+      invoiceNumber
+    }
+  }
+}
+`
+
+export const generateBillQuery = gql`
+mutation x($products:[MInput!],$remarks:String!,$customerId:ID!,$date:String!,$payment:String!){
+  generateBill(billingDate:$date,products:$products,paymentMode:$payment,customerId:$customerId,remarks:$remarks)
+  {
+    bill{
+      id
       invoice
       invoiceNumber
     }

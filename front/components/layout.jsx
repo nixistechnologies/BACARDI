@@ -48,7 +48,7 @@ class Layout extends React.Component{
         
         // console.log(this.props.router.pathname)
         let route = this.props.router.pathname;
-        const { children,active,loading,loadingText,title = "BACARDI",sidebar=true,navbar=true,text,setText,login,side_bar } = this.props;
+        const { children,active,loading,loadingText,title = "BACARDI",sidebar=true,navbar=true,text,setText,login,side_bar,body_color } = this.props;
         // const title = "Welcome to Nextjs";
         // console.log(active)
         // console.log(setText)

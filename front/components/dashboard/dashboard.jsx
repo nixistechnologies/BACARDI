@@ -47,8 +47,8 @@ const SalesTable = ()=>{
                 <th>Name</th>
                 <th>Date</th>
                 <th>Net Amount</th>
-                <th>Paid</th>
-                <th>Outstanding</th>
+                {/* <th>Paid</th>
+                <th>Outstanding</th> */}
                 
             </tr>
         </thead>
@@ -64,8 +64,8 @@ const SalesTable = ()=>{
                     <td style={{fontFamily:'nfontb'}}>{item.node.customer.name}</td>
                     <td>{item.node.billingDate}</td>
                     <td>{item.node.netAmount}</td>
-                    <td style={{color:'green',fontWeight:'bold'}}>{item.node.paidAmount}</td>
-                    <td>{item.node.outstanding}</td>
+                    {/* <td style={{color:'green',fontWeight:'bold'}}>{item.node.paidAmount}</td>
+                    <td>{item.node.outstanding}</td> */}
                     {/* <td onClick={()=>{setActive("is-active"),setPaid(item.node.paidAmount),setOutstanding(item.node.outstanding)}}>
                         
                         <FontAwesomeIcon icon={faEllipsisV} 

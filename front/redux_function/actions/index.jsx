@@ -1,7 +1,7 @@
 import client from '../../lib/apolloClient';
 import { gql } from 'apollo-boost';
 import Router from  'next/router'
-import {createUserQuery,getAllProductQuery,createProductQuery,generateBillQuery, currentUserQuery, updateCurrentUserQuery,getTokenQuery,getCateogryQuery} from '../../lib/graphql'
+import {createUserQuery,getAllProductQuery,createProductQuery,generateBillQuery, currentUserQuery, updateCurrentUserQuery,getTokenQuery,getCateogryQuery, updateFirmQuery, updateAddressQuery,updatePersonalQuery} from '../../lib/graphql'
 
 
 
@@ -69,6 +69,64 @@ export const getCurrentUser=()=>{
 //     }
 // }
 
+export const updatePersonal = (data) =>{
+    return dispatch=>{
+        dispatch(userUpdateLoading());
+        return client.mutate({
+            mutation:updatePersonalQuery,
+            variables:{
+                "firstname": data.firstName,
+                "lastname": data.lastName,
+                "phone": data.phone,
+                "email": data.email,
+            }
+        }).then((e)=>{
+            dispatch(updatedPersonal(e.data.updatePersonal.user))
+        }).then((e)=>{
+            dispatch(userError(e))
+        })
+    }
+}
+
+export const updateFirm = (data) =>{
+    return dispatch=>{
+        dispatch(userUpdateLoading());
+        return client.mutate({
+            mutation:updateFirmQuery,
+            variables:{
+                "firm": data.firm,
+                "gst": data.lastName,
+                // "phone": data.phone,
+                // "email": data.email,
+            }
+        }).then((e)=>{
+            dispatch(updateFirm(e.data.updateFirm.user))
+        }).then((e)=>{
+            dispatch(userError(e))
+        })
+    }
+}
+
+export const updateAddress = (data) =>{
+    return dispatch=>{
+        dispatch(userUpdateLoading());
+        return client.mutate({
+            mutation:updateAddressQuery,
+            variables:{
+                "address": data.address,
+                "state":data.state,
+                "city":data.city,
+                "zipcode":data.zipcode
+            }
+        }).then((e)=>{
+            dispatch(updatedAddress(e.data.updateAddress.user))
+        }).then((e)=>{
+            dispatch(userError(e))
+        })
+    }
+}
+
+
 export const updateUser = (data) =>{
     return dispatch=>{
         dispatch(userUpdateLoading());
@@ -76,13 +134,16 @@ export const updateUser = (data) =>{
             mutation:updateCurrentUserQuery,
             variables:{
                 "gst": data.gst,
-                "tin": data.tin,
+                // "tin": data.tin,
                 "firstName": data.firstName,
                 "lastName": data.lastName,
                 "phone": data.phone,
                 "email": data.email,
                 "firm": data.firm,
-                "address": data.address                
+                "address": data.address,
+                "state":data.state,
+                "city":data.city,
+                "zipcode":data.zipcode
             }
         }).then((e)=>{
             dispatch(updatedUser(e.data.updateUser.user))
@@ -276,6 +337,23 @@ export const updatedUser = (user) =>({
     data:user
 
 })
+
+export const updatedFirm = (user) =>({
+    type:'UPDATED_FIRM',
+    data:user
+
+})
+export const updatedPersonal = (user) =>({
+    type:'UPDATED_PERSONAL',
+    data:user
+
+})
+export const updatedAddress = (user) =>({
+    type:'UPDATED_ADDRESS',
+    data:user
+
+})
+
 
 
 

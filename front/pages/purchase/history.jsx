@@ -64,9 +64,9 @@ const Modal = ({active,setActive,loading,item,info})=>{
                                     <tr>
                                         {/* <th>SN.</th> */}
                                         <th>Name</th>
-                                        <th>Brand</th>
-                                        <th>Qty</th>
-                                        <th>MRP</th>
+                                        <th>Gross(mtr)</th>
+                                        <th>Less</th>
+                                        <th>Net(mtr)</th>
                                         <th>List Price</th>
                                         <th>Cost Price</th>
                                         <th>Discount</th>
@@ -77,9 +77,9 @@ const Modal = ({active,setActive,loading,item,info})=>{
                                         return (
                                             <tr key={i.node.id}>
                                             <td>{i.node.product.name}</td>
-                                            <td>{i.node.product.mfg}</td>
-                                            <td>{i.node.qty}</td>
-                                            <td>{i.node.mrp}</td>
+                                            <td>{i.node.grossm}</td>
+                                            <td>{i.node.less}</td>
+                                            <td>{i.node.netm}</td>
                                             <td>{i.node.listPrice}</td>
                                             <td>{i.node.cost}</td>
                                             <td>{i.node.discount}</td>

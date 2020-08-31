@@ -15,12 +15,13 @@ import { useEffect } from 'react'
 const Modal = ({active,setActive,isNew, info=null})=>{
     const [createCustomer,{data,loading}] = useMutation(createOrUpdateCustomerQuery)
     const {register,setValue,handleSubmit,reset} = useForm()
-    console.log(info)
+    // console.log(info)
     
     useEffect(()=>{
         if(info!=null)
         {
-            reset({name:info.name,address:info.address,email:info.email,id:info.id,gst:info.gst,mobile:info.mobile})
+            // console.log(info)
+            reset({name:info.name,address:info.address,email:info.email,id:info.id,gst:info.gst,mobile:info.mobile,state:info.state,city:info.city,addhar:info.addhar})
         }
         
     },[info])
@@ -28,7 +29,8 @@ const Modal = ({active,setActive,isNew, info=null})=>{
 
     const sendToServer=(e)=>{
         // e.preventDefault()
-        console.log(e)
+        // console.log(e)
+        
         createCustomer({
             variables:{
                 name: e.name,
@@ -37,20 +39,23 @@ const Modal = ({active,setActive,isNew, info=null})=>{
                 gst: e.gst,
                 email: e.email,
                 address: e.address,
-                isNew: isNew
+                isNew: isNew,
+                addhar:e.addhar,
+                state:e.state,
+                city:e.city
 
             },
             optimisticResponse:true,
             update:(cache,{data})=>{
                 if(data!=true)
                 {
-                    const existingCache = cache.readQuery({query:getAllCustomersQuery})
+                    const existingCache = cache.readQuery({query:getAllCustomersQuery,variables:{"search":""}})
                     if(isNew === true){
                         console.log(data)
                         existingCache.customers.edges.push({"node":data.createCustomer.customer,"__typename":"CustomerNodeEdge"})
-                        // console.log(existingCache)
                     }
                     else{
+                        console.log(existingCache.customers)
                         for(var i=0;i<existingCache.customers.edges.length;i++)
                         {
                             if(existingCache.customers.edges[i].node.id===e.id)
@@ -60,22 +65,24 @@ const Modal = ({active,setActive,isNew, info=null})=>{
                                 existingCache.customers.edges[i].node.mobile = data.createCustomer.customer.mobile
                                 existingCache.customers.edges[i].node.gstNumber = data.createCustomer.customer.gstNumber
                                 existingCache.customers.edges[i].node.email = data.createCustomer.customer.email
+                                existingCache.customers.edges[i].node.state = data.createCustomer.customer.state
+                                existingCache.customers.edges[i].node.city = data.createCustomer.customer.city
+                                existingCache.customers.edges[i].node.addharNo = data.createCustomer.customer.addharNo
                             }
 
                         }
                     }
+                    setActive("")
                     cache.writeQuery({
                         query:getAllCustomersQuery,
+                        variables:{"search":""},
                         data:existingCache
                     })
                     if(isNew===true)
                     {
-                        reset({"name":"","gst":"","mobile":"","address":"","email":""})
-                    }
-                    // reset({"name":"","gst":"","mobile":"","address":"","email":""})
+                        reset({"name":"","gst":"","mobile":"","address":"","email":"","addhar":"","city":"","state":""})
+                    }                    
                     
-                    
-                    setActive("")
                 }
             }
         })
@@ -179,6 +186,36 @@ const Modal = ({active,setActive,isNew, info=null})=>{
                                     placeholder="Mobile Number" />
                                 </div>
                             </div>
+                            <div className="columns">
+                                <div className="column">
+                                <label className="label">Aadhar Number</label>
+                                    <input type="text" className="input is-small"
+                                    name="addhar"
+                                    defaultValue={!isNew?info.addhar:""}
+                                    ref={register}
+                                    placeholder="Aadhar Number" />
+                                </div>
+                            </div>
+                            <div className="columns">
+                                <div className="column">
+                                <label className="label">State</label>
+                                    <input type="text" className="input is-small"
+                                    name="state"
+                                    defaultValue={!isNew?info.state:""}
+                                    ref={register}
+                                    placeholder="State" />
+                                </div>
+                            </div>
+                            <div className="columns">
+                                <div className="column">
+                                <label className="label">City</label>
+                                    <input type="text" className="input is-small"
+                                    name="city"
+                                    defaultValue={!isNew?info.city:""}
+                                    ref={register}
+                                    placeholder="City" />
+                                </div>
+                            </div>
 
                             <div className="columns">
                                 <div className="column">
@@ -218,6 +255,9 @@ const CRecords = ({items}) =>{
                         <th className="_w10">Email</th>
                         <th className="_w10">Mobile</th>
                         <th className="_w10">GST</th>
+                        <th className="_w10">Aadhar</th>
+                        <th className="_w10">State</th>
+                        <th className="_w10">City</th>
                         
                         <th className="_w5"></th>
                         {/* <th className="w5"></th> */}
@@ -248,12 +288,21 @@ const CRecords = ({items}) =>{
                             <td>
                                 {e.node.gstNumber}
                             </td>
+                            <td>
+                                {e.node.addharNo}
+                            </td>
+                            <td>
+                                {e.node.state}
+                            </td>
+                            <td>
+                                {e.node.city}
+                            </td>
 
 
                             
                             <td className="hover" 
                             
-                            onClick={()=>{setActive("is-active"),setInfo({"name":e.node.name,"address":e.node.address,"email":e.node.email,"mobile":e.node.mobile,"gst":e.node.gstNumber,"id":e.node.id}) }}
+                            onClick={()=>{setActive("is-active"),setInfo({"city":e.node.city,"state":e.node.state,"addhar":e.node.addharNo,"name":e.node.name,"address":e.node.address,"email":e.node.email,"mobile":e.node.mobile,"gst":e.node.gstNumber,"id":e.node.id}) }}
                             
 
                             >

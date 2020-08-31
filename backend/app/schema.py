@@ -288,18 +288,25 @@ class CreateProduct(graphene.Mutation):
 class MInput(graphene.InputObjectType):
     product_id = graphene.String(required=True)
     name = graphene.String(required=True)
-    qty = graphene.Int()
+    # qty = graphene.Int()
+    grossm = graphene.Float()
+    less = graphene.Float()
+    net = graphene.Float()
     price = graphene.Float()
-    gst = graphene.Float()
-    discount = graphene.Float()
-    expiry = graphene.String()
+    # gst = graphene.Float()
+    # discount = graphene.Float()
+    # expiry = graphene.String()
 
 
 class PurchaseInput(graphene.InputObjectType):
     product_id = graphene.String(required=True)
     name = graphene.String(required=True)
-    qty = graphene.Int()
-    mrp = graphene.Float()
+    # qty = graphene.Int()
+    # taga = graphene.Int()
+    # mrp = graphene.Float()
+    grossm = graphene.Float()
+    less = graphene.Float()
+    netm = graphene.Float()
     price = graphene.Float()
     cost = graphene.Float()
     discount = graphene.Float()
@@ -324,8 +331,11 @@ class AddPurchase(graphene.Mutation):
         for i in products:
             PurchaseProduct.objects.create(
                 product_id = from_global_id(i.product_id)[1],
-                qty = i.qty,
-                mrp = i.mrp,
+                # qty = i.qty,
+                # mrp = i.mrp,
+                grossm = i.grossm,
+                less = i.less,
+                netm = i.netm,
                 list_price = i.price,
                 cost = i.cost,
                 discount = i.discount,
@@ -459,8 +469,8 @@ def generate_receipt(bill,products,user):
 
 
 def GenerateBill(gross,invoice_number,medicines,discount,cgst,total,bill,user):
-    print("invoice ...")
-    print(invoice_number)
+    # print("invoice ...")
+    # print(invoice_number)
     template = get_template("x.html")
     context = {"gross":gross,"medicines": medicines,"discount":discount,"cgst":cgst,"sgst":cgst,"total":total,"invoice":invoice_number,"bill":bill,"user":user}
     html = template.render(context)
@@ -492,11 +502,11 @@ class CreateBill(graphene.Mutation):
         # productId = graphene.ID(required = True)
         payment_mode = graphene.String(required = True)
         billing_date = graphene.String(required = True)
-        payment = graphene.Float(required=True)
+        # payment = graphene.Float(required=True)
         # gst = graphene.Float(required = True)
         products = graphene.List(MInput)
     bill = graphene.Field(BillingNode)
-    def mutate(self,info,payment_mode,billing_date,products,customerId,remarks,payment):
+    def mutate(self,info,payment_mode,billing_date,products,customerId,remarks):
         # print(products[0])
         # user_id = from_global_id(user_id)[1]
         # name = name.replace(" ({})".format(age),"")
@@ -513,27 +523,30 @@ class CreateBill(graphene.Mutation):
         bill = Billing.objects.create( 
             user_id=1,invoice_number="INV#{}".format(user_id),customer_id=user_id,payment_mode=payment_mode,billing_date=datetime.datetime.strptime(billing_date,"%Y-%m-%d")
             )
+        print(bill)
         bill.invoice_number = "INV#{}-{}".format(bill.id,user_id)
 
         gross = total = discount = cgst =  0.0
 
         for i in products:
-            gross += i["price"] * i["qty"]
-            total += (i["price"] * i["qty"]) - (i["price"]*i["qty"] * i["discount"]/100)
-            discount += i["price"]*i["qty"] * i["discount"]/100
-            cgst += i["price"]*i["qty"] * i["gst"] /100
+            gross += i["price"] * i["net"]
+            total += (i["price"] * i["net"])  #- (i["price"]*i["qty"] * i["discount"]/100)
+            # discount += i["price"]*i["qty"] * i["discount"]/100
+            cgst += i["price"]*i["net"] * 10 /100
 
             print(i)
             Sales_Product.objects.create(
                 product_id = from_global_id(i["product_id"])[1],
                 product_name = i["name"],
-                quantity = int(i["qty"]),
+                lessm = int(i["less"]),
                 price = round(float(i["price"]),2),
-                discount = round(float(i["discount"])),
-                expiry_date = datetime.datetime.strptime(i["expiry"],"%Y-%m-%d"),
-                CGST = round(float(i["price"]) * int(i["qty"]) * float(i["gst"])/100/2,2),
-                SGST = round(float(i["price"]) * int(i["qty"]) * float(i["gst"])/100/2,2),
-                total = round(int(i["qty"]) * float(i["price"]) - (i["price"]*i["qty"]*i["discount"]/100),2),
+                # discount = round(float(i["discount"])),
+                grossm = float(i["grossm"]),
+                netm = float(i["net"]),
+                # expiry_date = datetime.datetime.strptime(i["expiry"],"%Y-%m-%d"),
+                CGST = round(float(i["price"]) * int(i["net"]) * float(10)/100/2,2),
+                SGST = round(float(i["price"]) * int(i["net"]) * float(10)/100/2,2),
+                total = round(int(i["net"]) * float(i["price"])), # - (i["price"]*i["netm"]*i["discount"]/100),2),
                 billing_id = bill.id,
             )
         # bill = Billing.objects.get(id=14)
@@ -552,31 +565,90 @@ class CreateBill(graphene.Mutation):
         # ParitalPayment.objects.create(paid=payment,outstanding=total-payment,bill_id = bill.id)
 
         # GenerateBill(gross,bill.invoice_number,Medicine.objects.filter(billing_id=bill.id),discount,cgst,total,bill,info.context.user)
-        generate_receipt(bill,Sales_Product.objects.filter(billing_id=bill.id),info.context.user)
-        pdfname = "{}.pdf".format(bill.invoice_number)
+        # generate_receipt(bill,Sales_Product.objects.filter(billing_id=bill.id),info.context.user)
+        # pdfname = "{}.pdf".format(bill.invoice_number)
         # print(pdfname)
-        with open(pdfname,'rb') as pdf:
-            bill.invoice.save(pdfname,File(pdf),save=True)
+        # with open(pdfname,'rb') as pdf:
+        #    bill.invoice.save(pdfname,File(pdf),save=True)
         bill.save()
-        ParitalPayment.objects.create(paid=payment,outstanding=total-payment,bill_id = bill.id)
-        os.remove(pdfname)
+        # ParitalPayment.objects.create(paid=payment,outstanding=total-payment,bill_id = bill.id)
+        # os.remove(pdfname)
         return CreateBill(bill=bill)
 
+
+
+class UpdatePersonal(graphene.Mutation):
+    class Arguments:
+        firstname = graphene.String(required=True)
+        lastname = graphene.String(required=True)
+        phone = graphene.String(required=True)
+        email = graphene.String(required=True)
+    user = graphene.Field(UserNode)
+    def mutate(self,info,firstname,lastname,phone,email):
+        userid = info.context.user.id
+        user = User.objects.get(id=userid)
+        user.first_name = firstname
+        user.last_name = lastname
+        user.email = email
+        user.save()
+
+        profile = Profile.objects.get(user_id = userid)
+        profile.contact_number = phone
+        profile.save()
+        return UpdatePersonal(user=user)
+
+class UpdateFirm(graphene.Mutation):
+    class Arguments:
+        firm_name = graphene.String(required=True)
+        gst = graphene.String(required=True)
+        # tin = graphene.String(required=True)
+    user = graphene.Field(UserNode)
+    def mutate(self,info,firm_name,gst):
+        userid = info.context.user.id
+        user = User.objects.get(id=userid)
+        profile = Profile.objects.get(user_id = userid)
+        profile.GST_no = gst
+        # profile.TIN_no = tin
+        profile.firm_name = firm_name
+        profile.save()
+        return UpdateFirm(user=user)
+
+class UpdateAddress(graphene.Mutation):
+    class Arguments:
+        address = graphene.String(required=True)
+        state = graphene.String(required=True)
+        city = graphene.String(required=True)
+        zipcode = graphene.String(required=True)
+    user = graphene.Field(UserNode)
+    def mutate(self,info,address,state,city,zipcode):
+        userid = info.context.user.id
+        user = User.objects.get(id=userid)
+        profile = Profile.objects.get(user_id = userid)
+        profile.address = address
+        # profile.contact_number = phone
+        profile.state = state
+        profile.city = city
+        profile.zipcode = zipcode
+        profile.save()
+        return UpdateAddress(user=user)
 
 
 class UpdateUser(graphene.Mutation):
     class Arguments:
         gst = graphene.String(required=True)
-        tin = graphene.String(required=True)
+        # tin = graphene.String(required=True)
         firm_name = graphene.String(required=True)
         address = graphene.String(required=True)
+        state = graphene.String(required=True)
+        city = graphene.String(required=True)
+        zipcode = graphene.String(required=True)
         email = graphene.String(required=True)
         firstname = graphene.String(required=True)
         lastname = graphene.String(required=True)
         phone = graphene.String(required=True)
         
     user = graphene.Field(UserNode)
-    def mutate(self,info,gst,tin,firm_name,address,email,firstname,lastname,phone):
+    def mutate(self,info,gst,firm_name,address,email,firstname,lastname,phone,state,city,zipcode):
         userid = info.context.user.id
         user = User.objects.get(id = userid)
         user.first_name = firstname
@@ -586,9 +658,12 @@ class UpdateUser(graphene.Mutation):
         
         profile = Profile.objects.get(user_id = userid)
         profile.GST_no = gst
-        profile.TIN_no = tin
+        # profile.TIN_no = tin
         profile.address = address
         profile.contact_number = phone
+        profile.state = state
+        profile.city = city
+        profile.zipcode = zipcode
         profile.save()
         return UpdateUser(user = user)
 
@@ -713,12 +788,15 @@ class CreateCustomer(graphene.Mutation):
         mobile = graphene.String(required=True)
         gst = graphene.String(required=True)
         address = graphene.String(required=True)
+        state = graphene.String(required=True)
+        city = graphene.String(required=True)
+        addhar = graphene.String(required=True)
         email = graphene.String(required=True)
         is_new = graphene.Boolean(required=True)
     customer = graphene.Field(CustomerNode)
-    def mutate(self,info,id,name,mobile,gst,address,email,is_new):
+    def mutate(self,info,id,name,mobile,gst,address,email,is_new,state,city,addhar):
         if(is_new is True):
-            customer = Customer.objects.create(name=name,mobile=mobile,gst_number=gst,address=address,email=email,user_id = info.context.user.id)
+            customer = Customer.objects.create(name=name,city=city,state=state,addhar_no=addhar ,mobile=mobile,gst_number=gst,address=address,email=email,user_id = info.context.user.id)
             # return CreateCustomer(customer = customer)
         else:
             customer = Customer.objects.get(id = from_global_id(id)[1])
@@ -727,6 +805,9 @@ class CreateCustomer(graphene.Mutation):
             customer.gst_number = gst
             customer.email = email
             customer.address = address
+            customer.city = city
+            customer.state = state
+            customer.addhar_no = addhar
             customer.save()
         return CreateCustomer(customer = customer)
 
@@ -780,6 +861,9 @@ class Mutation(graphene.ObjectType):
     delete_product = DeleteProduct.Field()
     generate_bill = CreateBill.Field()
     update_user = UpdateUser.Field()
+    update_address = UpdateAddress.Field()
+    update_firm = UpdateFirm.Field()
+    update_personal = UpdatePersonal.Field()
     # create_user = CreateUser.Field()
     update_category = UpdateCategory.Field()
     rename_category = RenameCategory.Field()

@@ -14,8 +14,11 @@ class Profile(models.Model):
     invoice_prefix = models.CharField(max_length=50,null=True,blank=True)
     firm_name = models.CharField(max_length=100)
     GST_no = models.CharField(max_length=50)
-    TIN_no = models.CharField(max_length=40)
+    # TIN_no = models.CharField(max_length=40)
     address = models.CharField(max_length=100)
+    city = models.CharField(max_length=100,null=True,blank=True)
+    state = models.CharField(max_length=100,null=True,blank=True)
+    zipcode = models.CharField(max_length=100,null=True,blank=True)
     contact_number = models.CharField(max_length=10)
     email = models.EmailField()
     def __str__(self):
@@ -73,6 +76,11 @@ class Customer(models.Model):
     # sex = models.CharField(max_length=10)
     gst_number = models.CharField(max_length=20,blank=True,null=True)
     address = models.TextField(null=True,blank=True)
+    addhar_no = models.CharField(max_length=20,blank=True,null=True)
+    state = models.CharField(max_length=20,blank=True,null=True)
+    city = models.CharField(max_length=20,blank=True,null=True)
+
+
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     def __str__(self):
         return "{}".format(self.name)
@@ -123,29 +131,32 @@ class Purchase(models.Model):
 
 class PurchaseProduct(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
-    qty = models.IntegerField(null=True,blank=True)
-    mrp = models.FloatField(null=True,blank=True)
+    # qty = models.IntegerField(null=True,blank=True)
+    # mrp = models.FloatField(null=True,blank=True)
+    grossm = models.FloatField(null=True,blank=True)
+    less = models.FloatField(null=True,blank=True)
+    netm = models.FloatField(null=True,blank=True)
     list_price = models.FloatField(null=True,blank=True)
     cost = models.FloatField(null=True,blank=True)
     discount = models.IntegerField(null=True,blank=True)
-    purchase = models.ForeignKey(Purchase,on_delete=models.CASCADE)
+    purchase = models.ForeignKey(Purchase,on_delete=models.CASCADE,null=True,blank=True)
     def __str__(self):
         return self.product.name
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         p = Product.objects.get(id = self.product.id)
-        p.qty = p.qty + self.qty
-        p.mrp = self.mrp
+        # p.qty = p.qty + self.qty
+        # p.mrp = self.mrp
         p.price = self.list_price
         p.cost = self.cost
         p.save()
 
         purchase = Purchase.objects.get(id=self.purchase.id)
         if(purchase.total_bill):
-            purchase.total_bill = purchase.total_bill + (self.cost * self.qty)
+            purchase.total_bill = purchase.total_bill + (self.cost * self.netm)
         else:
-            purchase.total_bill = (self.cost * self.qty)
+            purchase.total_bill = (self.cost * self.netm)
         purchase.save()
 
 
@@ -173,7 +184,7 @@ class Billing(models.Model):
     paid_amount = models.FloatField(null=True,blank=True)
     outstanding = models.FloatField(null=True,blank=True)
     remarks = models.TextField(null=True,blank=True)
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    # user = models.ForeignKey(User,on_delete=models.CASCADE)
     def __str__(self):
         return self.invoice_number
 
@@ -197,10 +208,19 @@ class ParitalPayment(models.Model):
 class Sales_Product(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE,blank=True,null=True)
     product_name = models.CharField(max_length=50)
-    quantity = models.IntegerField()
     price = models.FloatField(blank=True,null=True)
-    discount = models.FloatField()
-    expiry_date = models.DateField(blank=True,null=True)
+    hsn = models.CharField(blank=True,null=True,max_length=20)
+    taga = models.CharField(blank=True,null=True,max_length=20)
+
+    # quantity = models.IntegerField()
+    grossm = models.FloatField(blank=True,null=True)
+    lessm = models.FloatField(blank=True,null=True)
+    netm = models.FloatField(blank=True,null=True)
+
+    price = models.FloatField(blank=True,null=True)
+
+    # discount = models.FloatField()
+    # expiry_date = models.DateField(blank=True,null=True)
     CGST = models.FloatField()
     SGST = models.FloatField()
     total = models.FloatField(blank=True,null=True)
@@ -208,11 +228,11 @@ class Sales_Product(models.Model):
     def __str__(self):
         return self.product_name
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        p = Product.objects.get(id = self.product.id)
-        # p.qty = p.qty - self.quantity
-        p.save()
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+    #     p = Product.objects.get(id = self.product.id)
+    #     # p.qty = p.qty - self.quantity
+    #     p.save()
 
     
 
