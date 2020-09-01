@@ -27,8 +27,8 @@ router=routers.DefaultRouter()
 router.register("purchase",PurchaseSer,basename="purchase-detail")
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("invoice/<int:pk>/",invoice),
-    path("invoice/<str:pk>/",invoice),
+    path("invoice/<int:pk>/<int:userId>",invoice),
+    path("invoice/<str:pk>/<str:userId>",invoice),
     path("",home),
     path('api/',include(router.urls)),
     path("example",example),

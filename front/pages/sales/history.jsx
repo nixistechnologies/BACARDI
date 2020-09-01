@@ -114,7 +114,7 @@ const Result = ({loading,data})=>{
                         return (<tr key={item.node.id}>
                             {/* <td>{i+1}</td> */}
                             <td>
-                                <a href={`${server}/invoice/${item.node.id}/`} target="_blank">
+                                <a href={`${server}/invoice/${item.node.id}/${item.node.user.id}`} target="_blank">
                                     {item.node.invoiceNumber}
                                 </a>
                                 </td>

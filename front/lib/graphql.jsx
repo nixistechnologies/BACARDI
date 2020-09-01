@@ -393,6 +393,9 @@ query x($slug:String!){
         billingDate
         outstanding
         paidAmount
+        user{
+          id
+        }
         customer{
           id
           name
@@ -501,6 +504,9 @@ query x($min:String!,$max:String!){
         billingDate
         outstanding
         paidAmount
+        user{
+          id
+        }
         customer{
           id
           name
@@ -532,6 +538,9 @@ mutation x($products:[MInput!],$remarks:String!,$customerId:ID!,$date:String!,$p
       id
       invoice
       invoiceNumber
+      user{
+        id
+      }
     }
   }
 }

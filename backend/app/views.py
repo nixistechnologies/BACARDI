@@ -24,15 +24,16 @@ class PurchaseSer(viewsets.ModelViewSet):
 
 
 
-def invoice(request,pk):
+def invoice(request,pk,userId):
+    # print(request)
     if(type(pk)==int):
         bill = Billing.objects.get(id=pk)
     else:
         bill = Billing.objects.get(id=from_global_id(pk)[1])
     print(bill.id)
     payble_amount = num2words(bill.net_amount, to='cardinal', lang='en_IN').replace("-"," ").capitalize()
-
-    return render(request,"invoice.html",{"bill":bill,"user":request.user,"payble_amount":payble_amount})
+    user = User.objects.get(id=from_global_id(userId)[1])
+    return render(request,"invoice.html",{"bill":bill,"user":user,"payble_amount":payble_amount})
 
 def example(request):
     return render(request,"e.html")
