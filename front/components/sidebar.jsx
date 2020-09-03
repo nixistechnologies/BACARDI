@@ -394,6 +394,33 @@ const SideBar = ({sidebar,route}) =>{
                             </li>
                         </ul>
                     </li>
+                    <li>
+                        {/* <Link href="/"> */}
+                        <div className="item">
+                            <>
+                            
+                            <a 
+                            // className={route=="/"?"active":"not"}
+                            >
+                                <div>
+                                    <span className="s-bar-icon">
+                                        <FontAwesomeIcon icon={faList} />
+                                    </span>
+                                    <span className="s-bar-text">
+                                        Ledger
+                                    </span>
+                                    
+                                </div>
+
+                            </a>
+                            </>
+                            </div>
+                        {/* </Link> */}
+                        </li>
+
+                        
+                
+                    
                     {/* <li style={{position:'fixed',bottom:'5%',width:"18.4%"}}>
                         <div className="item">
                         <a style={{color:"red"}} onClick={()=>Logout()}>

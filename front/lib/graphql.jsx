@@ -80,7 +80,9 @@ mutation x($state:String!,$city:String!,$zipcode:String!,$address:String!){
   updateAddress(state:$state,city:$city,zipcode:$zipcode,address:$address)
   {
     user{
+      id
       profile{
+        id
         state
         city
         zipcode
@@ -96,7 +98,9 @@ mutation x($firm:String!,$gst:String!){
   updateFirm(firmName:$firm,gst:$gst)
   {
     user{
+      id
       profile{
+        id
         firmName,
         GSTNo
       }
@@ -106,14 +110,50 @@ mutation x($firm:String!,$gst:String!){
 `
 
 export const getPersonalQuery = gql`
-{
+query{
   user{
+    id
     firstName
     lastName
     username
     email
     profile{
+      id
       contactNumber
+      image
+    }
+  }
+}
+`
+
+export const getBankQuery = gql`
+{
+  user{
+    id
+    bank{
+      id
+      accountNo
+      name
+      bankName
+      branch
+      ifscCode
+    }
+  }
+}
+`
+export const updateBankQuery = gql`
+mutation x($ifsc:String!,$bank:String!,$name:String!,$branch:String!,$account:String!){
+  updateBank(ifscCode:$ifsc,bankName:$bank,name:$name,branch:$branch,account:$account){
+    user{
+      id
+      bank{
+        id
+        ifscCode
+        bankName
+        name
+        branch
+        accountNo
+      }
     }
   }
 }
@@ -121,9 +161,11 @@ export const getPersonalQuery = gql`
 export const getAddressQuery = gql`
 {
   user{
+    id
     profile{
-			city
+      id
       state
+      city
       zipcode
       address
     }
@@ -134,7 +176,9 @@ export const getAddressQuery = gql`
 export const getFirmQuery = gql`
 {
   user{
+    id
     profile{
+      id
       firmName
       GSTNo
     }
@@ -603,6 +647,24 @@ export const getCateogryQuery = gql`
 export const deleteSubCategoryQuery = gql`
   mutation x($id:ID!){
     deleteSubcategory(id:$id)
+    {
+      success
+    }
+  }
+`
+
+export const deleteVendor = gql`
+  mutation x($id:String!){
+    deleteVendor(id:$id)
+    {
+      success
+    }
+  }
+`
+
+export const deleteCustomer = gql`
+  mutation x($id:String!){
+    deleteCustomer(id:$id)
     {
       success
     }

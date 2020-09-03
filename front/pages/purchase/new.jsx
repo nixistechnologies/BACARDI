@@ -133,6 +133,21 @@ const NewPurchase = () =>{
             }
         })
     }
+    const SetNetM=(e)=>{
+        console.log(e.target.value)
+        console.log(getValues("grossm"))
+        const net = (parseFloat(e.target.value)/100)*parseFloat(getValues("grossm"))
+        // console.log(net)
+        setValue([{"netm":parseFloat(getValues("grossm"))-net}])
+    }
+    const SetNetMForGrossM=(e)=>{
+        const less = getValues("less")
+        if(less){
+            const net = (parseFloat(less)/100) * parseFloat(e.target.value)
+            
+            setValue([{"netm":parseFloat(e.target.value)-net}])
+        }
+    }
     
     return <>
     <SnackbarProvider>
@@ -289,15 +304,15 @@ const NewPurchase = () =>{
                         <label className="label">Gross(mtr)</label>
                         <input type="hidden" name="productId" ref={register}/>
                         <input className="input is-small" ref={register}
-                        type="text" name="grossm"  placeholder="Gross" required/>
+                        type="text" name="grossm" onChange={(e)=>SetNetMForGrossM(e)} placeholder="Gross" required/>
                     </div>
                     <div className="column">
                         <label className="label">Less</label>
-                        <input type="text" placeholder="Less" ref={register} name="less" className="input is-small" />
+                        <input type="text" placeholder="Less" ref={register} name="less" onChange={(e)=>SetNetM(e)} className="input is-small" required/>
                     </div>
                     <div className="column">
                         <label className="label">Net(mtr)</label>
-                        <input type="text" placeholder="Net" ref={register} name="netm" className="input is-small" />
+                        <input type="text" placeholder="Net" ref={register} name="netm" className="input is-small" disabled/>
                     </div>
                     <div className="column">
                         <label className="label">List Price</label>

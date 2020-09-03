@@ -1,12 +1,51 @@
 import {useForm} from 'react-hook-form'
-import { getFirmQuery } from '../../lib/graphql';
+import { getFirmQuery,updateFirmQuery } from '../../lib/graphql';
 import { TableLoading } from '../skeleton';
-import { useQuery } from 'react-apollo';
+import { useQuery , useMutation} from 'react-apollo';
+import { useState } from 'react';
 
-
-const FirmInfo = ({isEdit,setIsEdit})=>{
+const FirmInfo = ()=>{
     const {data,loading} = useQuery(getFirmQuery)
+    const [isEdit, setIsEdit] = useState(false)
     const { register, handleSubmit,setValue } = useForm({});
+    const [updateFirm,{data:personalUpdateData,loading:pDataLoading}] = useMutation(updateFirmQuery)
+    
+
+    const submitFirm = data =>{
+        if(isEdit){
+            updateFirm({
+                variables:{
+                    "gst": data.gst,
+                    "firm": data.firm,
+                    // "name": data.name,
+                    // "branch": data.branch,
+                    // "account": data.account,
+                },
+                optimisticResponse:true,
+                update:(cache,{data})=>{
+                    if(data!=true){
+                        
+                        const existingCache = cache.readQuery({query:getFirmQuery})
+                        existingCache.user.profile = data.updateFirm.user.profile
+                        
+                        // console.log(existingCache)
+
+                        cache.writeQuery({
+                            query:getFirmQuery,
+                            data:existingCache
+                        })
+
+                        setIsEdit(false)
+                        
+                    }
+                }
+            })
+            // setIsEdit(false)
+        }
+        else{
+            setIsEdit(true)
+        }
+    }
 
     if(loading || data==undefined){
         return <TableLoading />
@@ -16,7 +55,7 @@ const FirmInfo = ({isEdit,setIsEdit})=>{
 
     <div>
         <form 
-        //onSubmit={handleSubmit(submitFirm)}
+        onSubmit={handleSubmit(submitFirm)}
         >
             <div className="out">
                 <div className="left-1">
@@ -63,7 +102,7 @@ const FirmInfo = ({isEdit,setIsEdit})=>{
                 </div>
             </div>
             <div className="out">
-                <button type="submit" className={true?"button is-primary is-small":"button is-primary is-small is-loading"} 
+                <button type="submit" className={pDataLoading!=true?"button is-primary is-small":"button is-primary is-small is-loading"} 
                 >
                 {isEdit?"Update":"Edit"}
                 </button>

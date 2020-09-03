@@ -99,7 +99,7 @@ const Result = ({loading,data})=>{
             <table className="table is-fullwidth is-hoverable is-bordered">
                 <thead>
                     <tr>
-                        {/* <th>SN.</th> */}
+                        <th>SN.</th>
                         <th>Invoice Number</th>
                         <th>Date</th>
                         <th>Name</th>
@@ -112,7 +112,7 @@ const Result = ({loading,data})=>{
                 <tbody>
                     {data.map((item,i)=>{
                         return (<tr key={item.node.id}>
-                            {/* <td>{i+1}</td> */}
+                            <td>{i+1}</td>
                             <td>
                                 <a href={`${server}/invoice/${item.node.id}/${item.node.user.id}`} target="_blank">
                                     {item.node.invoiceNumber}

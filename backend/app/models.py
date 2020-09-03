@@ -2,11 +2,22 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_save,post_save
 from django.dispatch import receiver
-from django.contrib.postgres.fields import JSONField
+# from django.contrib.postgres.fields import JSONField
 from django.template.defaultfilters import slugify
 
 
 # Create your models here.
+
+class Bank(models.Model):
+    account_no = models.CharField(max_length=20,null=True,blank=True)
+    name = models.CharField(max_length=20,null=True,blank=True)
+    bank_name = models.CharField(max_length=20,null=True,blank=True)
+    branch = models.CharField(max_length=20,null=True,blank=True)
+    ifsc_code = models.CharField(max_length=20,null=True,blank=True)
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    def __str__(self):
+        return self.name
+    
 
 class Profile(models.Model):
     image = models.ImageField(upload_to="profile/",null=True,blank=True)
@@ -65,7 +76,8 @@ class Product(models.Model):
     less = models.FloatField(blank=True,null=True)
     taga = models.FloatField(blank=True,null=True)
     subcategory = models.ForeignKey(SubCategory,on_delete=models.CASCADE,null=True,blank=True)
-    data = JSONField(null=True,blank=True)
+    data = models.TextField(null=True,blank=True)
+    created_date = models.DateTimeField(auto_now_add=True,blank=True,null=True)
     def __str__(self):
         return self.name
 
@@ -119,7 +131,7 @@ class Vendor(models.Model):
 class Purchase(models.Model):
     vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE)
     invoice_date = models.DateField()
-    date = models.DateField(auto_now_add=True,blank=True)
+    created_date = models.DateTimeField(auto_now_add=True,blank=True)
     invoice_number = models.CharField(max_length=50)
     total_bill = models.FloatField(null=True,blank=True)
     invoice_file = models.FileField(upload_to="purchase_invoice/",blank=True,null=True)
@@ -127,6 +139,10 @@ class Purchase(models.Model):
     
     def __str__(self):
         return self.vendor.name
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
     
 
 class PurchaseProduct(models.Model):
@@ -146,7 +162,8 @@ class PurchaseProduct(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         p = Product.objects.get(id = self.product.id)
-        # p.qty = p.qty + self.qty
+        p.grossm = p.grossm + self.grossm
+        p.netm =  p.netm + self.netm
         # p.mrp = self.mrp
         p.price = self.list_price
         p.cost = self.cost
@@ -184,6 +201,7 @@ class Billing(models.Model):
     paid_amount = models.FloatField(null=True,blank=True)
     outstanding = models.FloatField(null=True,blank=True)
     remarks = models.TextField(null=True,blank=True)
+    created_date = models.DateTimeField(auto_now_add=True,blank=True,null=True)
     # user = models.ForeignKey(User,on_delete=models.CASCADE)
     def __str__(self):
         return self.invoice_number
@@ -206,7 +224,7 @@ class ParitalPayment(models.Model):
         p.save()
 
 class Sales_Product(models.Model):
-    product = models.ForeignKey(Product,on_delete=models.CASCADE,blank=True,null=True)
+    product = models.ForeignKey(Product,on_delete=models.SET_NULL,blank=True,null=True)
     product_name = models.CharField(max_length=50)
     price = models.FloatField(blank=True,null=True)
     hsn = models.CharField(blank=True,null=True,max_length=20)
@@ -228,11 +246,12 @@ class Sales_Product(models.Model):
     def __str__(self):
         return self.product_name
 
-    # def save(self, *args, **kwargs):
-    #     super().save(*args, **kwargs)
-    #     p = Product.objects.get(id = self.product.id)
-    #     # p.qty = p.qty - self.quantity
-    #     p.save()
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        p = Product.objects.get(id = self.product.id)
+        # p.grossm = p.grossm - self.grossm
+        p.netm = p.netm - self.grossm
+        p.save()
 
     
 

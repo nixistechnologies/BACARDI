@@ -31,6 +31,11 @@ class Dashboard(graphene.ObjectType):
         return parent['purchase']
 
 
+class BankNode(DjangoObjectType):
+    class Meta:
+        model = Bank
+        filter_field=()
+        interfaces = (relay.Node,)
 
 class UserNode(DjangoObjectType):
     class Meta:
@@ -632,6 +637,27 @@ class UpdateAddress(graphene.Mutation):
         profile.save()
         return UpdateAddress(user=user)
 
+class UpdateBank(graphene.Mutation):
+    class Arguments:
+        account = graphene.String(required=True)
+        # bank = graphene.String(required=True)
+        name = graphene.String(required=True)
+        bank_name = graphene.String(required=True)
+        branch = graphene.String(required=True)
+        ifsc_code = graphene.String(required=True)
+    user = graphene.Field(UserNode)
+    def mutate(self,info,account,name,bank_name,branch,ifsc_code):
+        bank = Bank.objects.get(user_id = info.context.user.id)
+        bank.account_no = account
+        bank.name = name
+        bank.branch = branch
+        bank.bank_name = bank_name
+        bank.ifsc_code = ifsc_code
+        bank.save()
+        return UpdateBank(user = info.context.user)
+
+
+
 
 class UpdateUser(graphene.Mutation):
     class Arguments:
@@ -822,6 +848,22 @@ class CreateCategory(graphene.Mutation):
         category = Category.objects.create(name=name,user_id = info.context.user.id)
         return CreateCategory(category = category)
 
+class DeleteCustomer(graphene.Mutation):
+    class Arguments:
+        id = graphene.String(required=True)
+    success = graphene.Boolean()
+    def mutate(self,info,id):
+        Customer.objects.get(id=from_global_id(id)[1]).delete()
+        return DeleteCustomer(success=True)
+
+class DeleteVendor(graphene.Mutation):
+    class Arguments:
+        id = graphene.String(required=True)
+    success = graphene.Boolean()
+    def mutate(self,info,id):
+        Vendor.objects.get(id=from_global_id(id)[1]).delete()
+        return DeleteVendor(success=True)
+
 class DeleteProduct(graphene.Mutation):
     class Arguments:
         id = graphene.String(required=True)
@@ -859,7 +901,10 @@ class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
     create_product = CreateProduct.Field()
     delete_product = DeleteProduct.Field()
+    delete_customer = DeleteCustomer.Field()
+    delete_vendor = DeleteVendor.Field()
     generate_bill = CreateBill.Field()
+    update_bank = UpdateBank.Field()
     update_user = UpdateUser.Field()
     update_address = UpdateAddress.Field()
     update_firm = UpdateFirm.Field()
@@ -896,6 +941,7 @@ class Query(graphene.AbstractType):
     purchases = DjangoFilterConnectionField(PurchaseNode,slug=graphene.String())
     purchaseProduct = DjangoFilterConnectionField(PurchaseProductNode,purchaseId=graphene.ID())
     dashboard = graphene.Field(Dashboard)
+    # ledgers = graphene.
 
 # 9899200257
 
@@ -962,12 +1008,12 @@ class Query(graphene.AbstractType):
         
     def resolve_purchases(self,info,slug,**kwargs):
         if(not len(slug)):
-            return Purchase.objects.all()
+            return Purchase.objects.all().order_by("-id")
 
         if(Purchase.objects.filter(invoice_number__iexact=slug)):
-            return Purchase.objects.filter(invoice_number__iexact=slug)
+            return Purchase.objects.filter(invoice_number__iexact=slug).order_by("-id")
         
-        return Purchase.objects.filter(vendor__name__iexact=slug)
+        return Purchase.objects.filter(vendor__name__iexact=slug).order_by("-id")
 
         
         # else if(Billing.objects.filter(patient__name__iexact="aman"))

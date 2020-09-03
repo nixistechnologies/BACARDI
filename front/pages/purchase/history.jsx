@@ -62,7 +62,7 @@ const Modal = ({active,setActive,loading,item,info})=>{
                             <table className="table is-fullwidth is-hoverable is-bordered">
                                 <thead>
                                     <tr>
-                                        {/* <th>SN.</th> */}
+                                        <th>SN.</th>
                                         <th>Name</th>
                                         <th>Gross(mtr)</th>
                                         <th>Less</th>
@@ -73,9 +73,10 @@ const Modal = ({active,setActive,loading,item,info})=>{
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {item.map((i)=>{
+                                    {item.map((i,sn)=>{
                                         return (
                                             <tr key={i.node.id}>
+                                            <td>{sn+1}</td>
                                             <td>{i.node.product.name}</td>
                                             <td>{i.node.grossm}</td>
                                             <td>{i.node.less}</td>
@@ -146,7 +147,7 @@ const Result = ({loading,data})=>{
             <table className="table is-fullwidth is-hoverable is-bordered">
                 <thead>
                     <tr>
-                        {/* <th>SN.</th> */}
+                        <th>SN.</th>
                         <th>Date</th>
                         <th>Vendor</th>
                         <th>Company</th>
@@ -159,7 +160,7 @@ const Result = ({loading,data})=>{
                 <tbody>
                     {data.map((item,i)=>{
                         return (<tr key={item.node.id}>
-                            {/* <td>{i+1}</td> */}
+                            <td>{i+1}</td>
                             {/* <td>
                                 <a href={`${server}/media/${item.node.invoice}`} target="_blank">
                                     {item.node.invoiceNumber}

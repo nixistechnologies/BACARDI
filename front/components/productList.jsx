@@ -50,7 +50,7 @@ const TableView=({data,mloading})=>{
     deleteProduct({variables:{id:id},
     optimisticResponse:true,
     update:(cache,{data})=>{
-      const existCache = cache.readQuery({query:getAllProductQuery})
+      const existCache = cache.readQuery({query:getAllProductQuery,variables:{"search":""}})
       // existCache.allProducts.edges.push({"node":data.createProduct.product,"__typename":"ProductNodeEdge"})
       // existingCache.categories.edges.push({"node":data.createCategory.category,"__typename":"CategoryNodeEdge"})
       console.log(existCache)
@@ -60,6 +60,7 @@ const TableView=({data,mloading})=>{
       console.log(c)
       cache.writeQuery({
         query:getAllProductQuery,
+        variables:{"search":""},
         data:c
       })
       setdelActive("")
@@ -97,11 +98,11 @@ const TableView=({data,mloading})=>{
       
       {/* <h3>Add</h3> */}
       {/* <FontAwesomeIcon icon={faPlusCircle} size="2x"/> */}
-      <div>
+      {/* <div>
         <Link href="/category">
           <a className="button is-rounded is-small is-bold is-primary" style={{fontWeight:"bold"}}>Add category</a>
         </Link>
-      </div>
+      </div> */}
       <div style={{marginLeft:"10px"}}>
         <Link href="products/create">
           <a className="button is-rounded is-small is-bold is-primary" style={{fontWeight:"bold"}}>Add product</a>
@@ -113,6 +114,7 @@ const TableView=({data,mloading})=>{
      <table className="table is-fullwidth is-hoverable is-bordered">
        <thead>
        <tr>
+         <th>SN.</th>
          <th className="w30">Name</th>
          <th className="w10">Taga</th>
          <th className="w10">List</th>
@@ -125,7 +127,7 @@ const TableView=({data,mloading})=>{
          </tr>
        </thead>
         <tbody>
-          {data.allProducts.edges.map((prd)=>{
+          {data.allProducts.edges.map((prd,i)=>{
             return (
             // <tr>
             //   <td>{prd.node.name}</td>
@@ -138,6 +140,7 @@ const TableView=({data,mloading})=>{
 
 
             <tr key={prd.node.id} className="data-item" style={{cursor:'pointer'}}>
+                  <td>{i+1}</td>
                   <td>
                     <div className="_heading">
                       {prd.node.name}

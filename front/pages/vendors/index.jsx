@@ -1,16 +1,43 @@
 import Layout from '../../components/layout'
-import {allVendorQuery} from '../../lib/graphql'
+import {allVendorQuery, deleteVendor} from '../../lib/graphql'
 import {TableLoading} from '../../components/skeleton'
 import { useState} from 'react'
 import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
-import {faPen, faSearch, faAngleDown,faArrowDown, faArrowUp,faTimes, faEllipsisV,faEllipsisH} from '@fortawesome/free-solid-svg-icons'
-import {useQuery, useLazyQuery} from '@apollo/react-hooks'
+import {faPen, faSearch, faAngleDown,faArrowDown, faArrowUp,faTimes, faEllipsisV,faEllipsisH, faTrash} from '@fortawesome/free-solid-svg-icons'
+import {faTrashAlt} from '@fortawesome/free-regular-svg-icons'
+import {useQuery, useLazyQuery,useMutation} from '@apollo/react-hooks'
 import Modal from '../../components/vendorModel'
 import { useEffect } from 'react'
 
 const Records = ({items,getVendor,search,setSearch}) =>{
     const [active,setActive] = useState("")
     const [info,setInfo] = useState({})
+    // const [info,setInfo] = useState({})
+    const [delactive,setdelActive] = useState()
+    const [id,setId] = useState("")
+    const [deleteC,{data,loading}] = useMutation(deleteVendor)
+
+    const deleteFromServer=(id)=>{
+        console.log(id)
+        deleteC(
+            {
+                variables:{"id":id},
+                optimisticResponse:true,
+                update:(cache,{data})=>{
+                    const existingCache = cache.readQuery({query:allVendorQuery,variables:{"search":""}})
+                    console.log(existingCache)
+                    const nCache = existingCache.vendors.edges.filter((e)=>e.node.id!=id)
+                    console.log(nCache)
+                    setdelActive("")
+                    const c ={"vendors":{"edges":nCache,"__typename":"VendorNodeEdge"}}
+                    cache.writeQuery({
+                        query:allVendorQuery,
+                        variables:{"search":""},
+                        data:c
+                      })
+                }
+        })
+    }
     return (
         <>
         <Modal active={active} setActive={setActive} isNew={false} info={info} />
@@ -31,6 +58,7 @@ const Records = ({items,getVendor,search,setSearch}) =>{
         <table className="table is-fullwidth is-hoverable is-bordered">
             <thead>
                 <tr>
+                    <th>SN.</th>
                     <th className="_w20" >
                         {/* <div> */}
                             <span>Name</span>
@@ -48,15 +76,16 @@ const Records = ({items,getVendor,search,setSearch}) =>{
                     <th className="_w10">Mobile</th>
                     {/* <th className="_w10">GST</th> */}
                     
-                    <th className="_w5"></th>
+                    <th className="_w5" colSpan={2}></th>
                     {/* <th className="w5"></th> */}
                     {/* <th className="w5"></th> */}
                 </tr>
             </thead>
             <tbody>
-            {items.map((e)=>{
+            {items.map((e,i)=>{
                 return(
                     <tr key={e.node.id}>
+                        <td>{i+1}</td>
                         <td className="_heading _w30">
                             {/* <a> */}
                                 {e.node.name}
@@ -93,13 +122,11 @@ const Records = ({items,getVendor,search,setSearch}) =>{
                             onClick={()=>{setActive("is-active"),setInfo({"id":e.node.id,"name":e.node.name,"address":e.node.address,"city":e.node.city.name,"cityId":e.node.city.id,"stateId":e.node.state.id, "state":e.node.state.name,"zipCode":e.node.zipCode,"gst":e.node.gst,"email":e.node.email,"mobile":e.node.mobile,"company":e.node.company}) }}
                         >
                             <FontAwesomeIcon icon={faPen} color="#00d1b2" /> 
-                            {/* <div style={{zIndex:1001,position:'absolute'}}>
-                            
-                            <div className="s_menu" role="menu" style={{position:'absolute',background:'white',padding:'5px 0',boxShadow:"0 2px 10px 0 rgba(0,0,0,0.2)"}} tabIndex={-1}>
-                                <div className="s_menuitem" role="menuitem">Edt</div>
-                                <div className="s_menuitem" role="menuitem">Delete</div>
-                            </div>
-                            </div>                        */}
+                        </td>
+                        <td
+                            onClick={()=>{setInfo({"id":e.node.id,"name":e.node.name}),setdelActive("is-active")}}
+                        >
+                            <FontAwesomeIcon icon={faTrashAlt} color={"red"} />
                         </td>
                         
                     </tr>
@@ -108,6 +135,23 @@ const Records = ({items,getVendor,search,setSearch}) =>{
                     })}
             </tbody>
         </table>
+        <div className={`modal ${delactive}`} >
+            <div className="modal-background" onClick={()=>setdelActive("")}></div>
+                <div className="modal-content">
+                    <div className="box" style={{width:"400px",margin:"auto"}}>
+                        <h1 className="model-title title">Do you want to delete <b style={{textTransform:'uppercase'}}>{info.name}</b> ?</h1>
+                        <div className="columns">
+                            <div className="column" onClick={()=>deleteFromServer(info.id)}>
+                                <button className={`button is-danger is-small ${loading==true?"is-loading":"not"}`} style={{width:"100%"}}>Delete</button>
+                            </div>
+                            <div className="column">
+                                <button className="button is-primary is-small" style={{width:"100%"}} onClick={()=>setdelActive("")}>Cancel</button>
+                            </div>
+                            </div>
+                        </div>
+                    </div>                
+                <button className="modal-close is-large" aria-label="close"></button>
+            </div>
         </>
     )
 

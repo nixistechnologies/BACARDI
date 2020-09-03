@@ -1,6 +1,6 @@
 import Layout from '../components/layout'
 import {FullPageLoading} from '../components/skeleton'
-import {getAllCustomersQuery,createOrUpdateCustomerQuery} from '../lib/graphql'
+import {getAllCustomersQuery,createOrUpdateCustomerQuery, deleteCustomer} from '../lib/graphql'
 import {useQuery,useMutation, useLazyQuery} from '@apollo/react-hooks'
 
 import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome'
@@ -237,7 +237,35 @@ const Modal = ({active,setActive,isNew, info=null})=>{
 const CRecords = ({items}) =>{
     const [active,setActive] = useState()
     const [info,setInfo] = useState({})
+    const [delactive,setdelActive] = useState()
+    const [id,setId] = useState("")
+    const [deleteC,{data,loading}] = useMutation(deleteCustomer)
     
+
+    const deleteFromServer=(id)=>{
+        console.log(id)
+        deleteC(
+            {
+                variables:{"id":id},
+                optimisticResponse:true,
+                update:(cache,{data})=>{
+                    const existingCache = cache.readQuery({query:getAllCustomersQuery,variables:{"search":""}})
+                    console.log(existingCache)
+                    const nCache = existingCache.customers.edges.filter((e)=>e.node.id!=id)
+                    console.log(nCache)
+                    setdelActive("")
+                    const c ={"customers":{"edges":nCache,"__typename":"CustomerNodeEdge"}}
+                    cache.writeQuery({
+                        query:getAllCustomersQuery,
+                        variables:{"search":""},
+                        data:c
+                      })
+                }
+        })
+    }
+
+
+
     return(
         <>
         <Modal active={active} setActive={setActive} isNew={false} info={info} />
@@ -250,23 +278,25 @@ const CRecords = ({items}) =>{
         <table className="table is-fullwidth is-hoverable is-bordered">
                 <thead>
                     <tr>
+                        <th>SN.</th>
                         <th className="_w20" >Name</th>
                         <th className="_w20">Address</th>
                         <th className="_w10">Email</th>
                         <th className="_w10">Mobile</th>
                         <th className="_w10">GST</th>
                         <th className="_w10">Aadhar</th>
-                        <th className="_w10">State</th>
+                        {/* <th className="_w10">State</th> */}
                         <th className="_w10">City</th>
                         
-                        <th className="_w5"></th>
+                        <th className="_w5" colSpan={2}></th>
                         {/* <th className="w5"></th> */}
                         {/* <th className="w5"></th> */}
                     </tr>
                     </thead>
                     <tbody>
-                    {items.map((e)=>{
+                    {items.map((e,i)=>{
                         return(<tr key={e.node.id}>
+                            <td>{i+1}</td>
                             <td className="_heading _w30">
                                 {/* <a> */}
                                     {e.node.name}
@@ -291,9 +321,9 @@ const CRecords = ({items}) =>{
                             <td>
                                 {e.node.addharNo}
                             </td>
-                            <td>
+                            {/* <td>
                                 {e.node.state}
-                            </td>
+                            </td> */}
                             <td>
                                 {e.node.city}
                             </td>
@@ -308,11 +338,11 @@ const CRecords = ({items}) =>{
                             >
                                 <FontAwesomeIcon icon={faPen} color="#00d1b2" />
                             </td>
-                            {/* <td 
-                            // onClick={()=>{setdelActive("is-active"),setName(e.node.name),setId(e.node.id)}}
+                            <td
+                                onClick={()=>{setdelActive("is-active"),setId(e.node.id)}}
                             >
                                 <FontAwesomeIcon icon={faTrashAlt} color="red"/>
-                            </td> */}
+                            </td>
 
                             {/*                                                         
                                 <td className="hover">
@@ -327,6 +357,25 @@ const CRecords = ({items}) =>{
                     
             </table>
             }
+
+
+            <div className={`modal ${delactive}`} >
+            <div className="modal-background" onClick={()=>setdelActive("")}></div>
+                <div className="modal-content">
+                    <div className="box" style={{width:"400px",margin:"auto"}}>
+                        <h1 className="model-title title">Do you want to delete <b style={{textTransform:'uppercase'}}>{info.name}</b> ?</h1>
+                        <div className="columns">
+                            <div className="column" onClick={()=>deleteFromServer(id)}>
+                                <button className={`button is-danger is-small ${loading==true?"is-loading":"not"}`} style={{width:"100%"}}>Delete</button>
+                            </div>
+                            <div className="column">
+                                <button className="button is-primary is-small" style={{width:"100%"}} onClick={()=>setdelActive("")}>Cancel</button>
+                            </div>
+                            </div>
+                        </div>
+                    </div>                
+                <button className="modal-close is-large" aria-label="close"></button>
+            </div>
             </>
     )
 }

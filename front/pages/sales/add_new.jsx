@@ -198,7 +198,7 @@ const Billingform =() =>{
         
         // setTamount( tamount+(getValues("price") * getValues("qty")??1) - ((getValues("price") * getValues("qty")??1)*getValues("discount")/100))
         
-        setTamount(tamount+parseFloat(getValues("price")))
+        setTamount(tamount+(parseFloat(getValues("price"))*parseFloat(getValues("net"))))
 
         setPname("")
         setProduct({name:"Select Product"})
@@ -206,11 +206,11 @@ const Billingform =() =>{
         
         setValue([
             // {"medicine":""},
-            {"qty":""},
+            {"less":""},
+            {"grossm":""},
+            {"net":""},
             {"price":""},
-            {"expiry":""},
-            {"discount":""},
-            {"pgst":""}
+            // {"pgst":""}
         ])
     }
 
@@ -273,9 +273,21 @@ const Billingform =() =>{
         ])
 
     }
-    // console.log(mlist)
-    // console.log(billstore)
-
+    const SetNetM=(e)=>{
+        console.log(e.target.value)
+        console.log(getValues("grossm"))
+        const net = (parseFloat(e.target.value)/100)*parseFloat(getValues("grossm"))
+        console.log(net)
+        setValue([{"net":parseFloat(getValues("grossm"))-net}])
+    }
+    const SetNetMForGrossM=(e)=>{
+        const less = getValues("less")
+        if(less){
+            const net = (parseFloat(less)/100) * parseFloat(e.target.value)
+            
+            setValue([{"net":parseFloat(e.target.value)-net}])
+        }
+    }
     
 
     return (
@@ -594,6 +606,7 @@ const Billingform =() =>{
                         <input type="hidden" name="id" ref={register}/>
                         <input className="input is-small" ref={register}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
+                        onChange={(e)=>SetNetMForGrossM(e)}
                         type="text" name="grossm" placeholder="Gross(mtr)" required/>
                     </div>
                     <div className="column is-1">
@@ -601,14 +614,14 @@ const Billingform =() =>{
                         <input type="hidden" name="id" ref={register}/>
                         <input className="input is-small" ref={register}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
-                        type="text" name="less" placeholder="Less" required/>
+                        type="text" name="less" placeholder="Less" onChange={(e)=>SetNetM(e)} required/>
                     </div>
                     <div className="column">
                         <label className="label">Net(mtr)</label>
                         <input type="hidden" name="id" ref={register}/>
                         <input className="input is-small" ref={register}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
-                        type="text" name="net" placeholder="Net(mtr)" required/>
+                        type="text" name="net" placeholder="Net(mtr)" required disabled/>
                     </div>
                     <input type="hidden" name="pgst" ref={register} />
                     <div className="column">
@@ -739,7 +752,7 @@ const Billingform =() =>{
                 </>
                 :
                     <>
-                    <a href={`${server}/invoice/${billData.generateBill.bill.id}/`} target="_blank" className="button is-primary is-small" >Bill</a>
+                    <a href={`${server}/invoice/${billData.generateBill.bill.id}/${billData.generateBill.bill.user.id}`} target="_blank" className="button is-primary is-small" >View or Print</a>
                     <a style={{marginLeft:'30px'}} className="button is-small" onClick={()=>reset()}>Reset</a>
                     </>
                 }

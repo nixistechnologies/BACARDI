@@ -5,10 +5,12 @@ import { useState, useEffect } from 'react';
 import {useForm} from 'react-hook-form'
 import { TableLoading } from './skeleton';
 import { useSnackbar } from 'react-simple-snackbar'
+import {useRouter} from 'next/router'
 // import VendorModel from '../components/vendorModel'
 
 
 function X({productId=null,name=null,purchase=null,setActive=null }){
+    const router = useRouter()
     const [openSnackbar, closeSnackbar] = useSnackbar({position:"top-center",style:{zIndex:"999", marginTop:"50px"}})
     const {data:single,loading:sLoading} = useQuery(getProductByIdQuery,{variables:{id:productId}})
     const {data,loading:mainLoading} = useQuery(allCategory,{variables:{"search":""}})
@@ -65,7 +67,7 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                 if(data!=true){
                     console.log(data)
                     try{
-                        const existCache = cache.readQuery({query:getAllProductQuery})
+                        const existCache = cache.readQuery({query:getAllProductQuery,variables:{"search":""}})
                         console.log(existCache)
                         
                         if(productId===null){
@@ -76,7 +78,7 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                             {
                                 if(existCache.allProducts.edges[i].node.id == productId)
                                 {
-                                    console.log("matches")
+                                    // console.log("matches")
                                     existCache.allProducts.edges[i].node.name = data.createProduct.product.name
                                     existCache.allProducts.edges[i].node.taga = data.createProduct.product.taga
                                     existCache.allProducts.edges[i].node.price = data.createProduct.product.price
@@ -87,6 +89,7 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                         }
                         cache.writeQuery({
                             query:getAllProductQuery,
+                            variables:{"search":""},
                             data:existCache
                         })
                         
@@ -99,6 +102,7 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                         openSnackbar("Product has been created successfully")
                     }
                     else{
+                        router.back()
                         openSnackbar("Product has been updated successfully")
                     }
                          
@@ -142,6 +146,22 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
     // console.log(purchase)
 
     // console.log(setActive)
+    // console.log(router)
+    const SetNetM=(e)=>{
+        console.log(e.target.value)
+        console.log(getValues("grossm"))
+        const net = (parseFloat(e.target.value)/100)*parseFloat(getValues("grossm"))
+        console.log(net)
+        setValue([{"netm":parseFloat(getValues("grossm"))-net}])
+    }
+    const SetNetMForGrossM=(e)=>{
+        const less = getValues("less")
+        if(less){
+            const net = (parseFloat(less)/100) * parseFloat(e.target.value)
+            
+            setValue([{"netm":parseFloat(e.target.value)-net}])
+        }
+    }
     return(
         <>
             
@@ -300,6 +320,7 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                     <label className="label">Gross Meter</label>
                     <input className="input is-small"  ref={register}
                     defaultValue={productId!=null?single.productById.grossm:""}
+                    onChange={(e)=>SetNetMForGrossM(e)}
                     type="text" name="grossm"  placeholder="Gross Meter" required/>
                 </div>                
                 
@@ -307,6 +328,7 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                     <label className="label">Less(%)</label>
                     <input className="input is-small"  ref={register}
                     defaultValue={productId!=null?single.productById.less:""}
+                    onChange={(e)=>SetNetM(e)}
                     type="text" name="less"  placeholder="Less" required/>
                 </div>
                 
@@ -315,7 +337,7 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                     <label className="label">Net Meter</label>
                     <input className="input is-small"  ref={register}
                     defaultValue={productId!=null?single.productById.netm:""}
-                    type="text" name="netm"  placeholder="Next meter" required />
+                    type="text" name="netm"  placeholder="Next meter" required disabled/>
                 </div>
                 
             </div> 
@@ -368,7 +390,13 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                             {/* Create */}
                         {/* {isNew?"CREATE":"UPDATE"} */}
                     </button>
+
+                    <button className="button is-small" onClick={()=>router.back()} style={{marginLeft:'20px'}}>Cancel</button>
+
                 </div>
+                {/* <div>
+                    
+                </div> */}
             </div>
             </div>
             
