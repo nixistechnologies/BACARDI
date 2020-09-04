@@ -1,7 +1,7 @@
 import Layout from "../../components/layout"
 import {useForm} from 'react-hook-form'
 import { useQuery,useLazyQuery, useMutation } from '@apollo/react-hooks'
-import { getAllPatient,productSuggetionQuery, customerSuggestion, getAllCustomersQuery,generateBillQuery } from "../../lib/graphql";
+import { getAllPatient,productSuggetionQuery, customerSuggestion, getAllCustomersQuery,generateBillQuery,getLedgersQuery } from "../../lib/graphql";
 import { useDispatch, useSelector } from 'react-redux'
 import {useState, useEffect} from 'react'
 import React from 'react'
@@ -165,7 +165,40 @@ const Billingform =() =>{
             "payment":payment,
             "products":mlist,
             // "paid":getValues("paid") === ""?tamount:getValues("paid")
-        }})
+        },optimisticResponse:true,
+        update:(cache,{data})=>{
+            if(data!=true){
+                console.log(data)
+                // data.generateBill.ledger
+                try{
+                    const existingCache = cache.readQuery({query:getLedgersQuery,variables:{"search":""}})
+                    console.log(existingCache)
+                    existingCache.ledgers.edges = [{"node":data.generateBill.ledger,"__typename":"LedgerNodeEdge"}].concat(existingCache.ledgers.edges)
+                    console.log(existingCache)
+                    cache.writeQuery({
+                        query:getLedgersQuery,
+                        variables:{"search":""},
+                        data:existingCache
+                    })
+                }
+                catch(e){
+                    console.log(e)
+                }
+                
+                
+                
+                // console.log(existingCache)
+                // existingCache.ledgers.edges.push({"__typename":"LedgerNodeEdge","node":{"id":"rendom","sale":data.bill}})
+                // cache.writeQuery({
+                //     query:getLedgersQuery,
+                //     variables:{"search":""},
+                //     data:existingCache
+                // })
+            }
+
+        }
+    
+    })
 
         // dispatch(generateBill(name,age,gender,date,gst,payment,mlist))
     }
@@ -261,6 +294,7 @@ const Billingform =() =>{
         dispatch(clearBill())
         setCname("")
         setPname("")
+        // billData = undefined
         setValue([
             {"mobile":""},
             {"address":""},

@@ -131,7 +131,7 @@ class Vendor(models.Model):
 class Purchase(models.Model):
     vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE)
     invoice_date = models.DateField()
-    created_date = models.DateTimeField(auto_now_add=True,blank=True)
+    created_date = models.DateTimeField(auto_now_add=True,blank=True,null=True)
     invoice_number = models.CharField(max_length=50)
     total_bill = models.FloatField(null=True,blank=True)
     invoice_file = models.FileField(upload_to="purchase_invoice/",blank=True,null=True)
@@ -253,6 +253,19 @@ class Sales_Product(models.Model):
         p.netm = p.netm - self.grossm
         p.save()
 
+    
+class Ledgers(models.Model):
+    sale = models.OneToOneField(Billing,on_delete=models.CASCADE,blank=True,null=True)
+    purchase = models.OneToOneField(Purchase,on_delete=models.CASCADE,blank=True,null=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+
+
+    def __str__(self):
+        # return self.name
+        if(self.sale):
+            return self.sale.invoice_number
+        else:
+            return self.purchase.invoice_number
     
 
     

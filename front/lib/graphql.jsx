@@ -141,6 +141,43 @@ export const getBankQuery = gql`
   }
 }
 `
+
+export const getLedgersQuery = gql`
+query x($search:String!){
+  ledgers(search:$search,first:10)
+   {
+     edges{
+       node{
+         id
+         sale{
+           id
+           invoiceNumber
+           billingDate
+           invoice
+           netAmount
+           user{
+            id
+            }
+           customer{
+             name
+           }
+         }        
+         purchase{
+           id
+           invoiceFile
+           createdDate
+           invoiceNumber
+           totalBill
+           vendor{
+             name
+           }
+         }
+       }
+     }
+   }
+ }
+`
+
 export const updateBankQuery = gql`
 mutation x($ifsc:String!,$bank:String!,$name:String!,$branch:String!,$account:String!){
   updateBank(ifscCode:$ifsc,bankName:$bank,name:$name,branch:$branch,account:$account){
@@ -326,7 +363,6 @@ export const addPurchaseQuery = gql`
         id
         invoiceNumber
         invoiceDate
-        date
         vendor{
           name
           company
@@ -582,7 +618,34 @@ mutation x($products:[MInput!],$remarks:String!,$customerId:ID!,$date:String!,$p
       id
       invoice
       invoiceNumber
+      billingDate
       user{
+        id
+      }
+      netAmount
+      paymentMode
+      customer{
+        id
+        name
+      }
+    }
+    ledger{
+      id
+      sale{
+        id
+        invoiceNumber
+        billingDate
+        invoice
+        netAmount
+        user{
+          id
+          }
+        customer{
+          id
+         name
+        }
+      }
+      purchase{
         id
       }
     }

@@ -388,13 +388,7 @@ const Customers = () =>{
     const [searchData,{data:udata,loading:uloading}] = useLazyQuery(getAllCustomersQuery)
     
     useEffect(()=>{
-        // console.log(text)
-        // if(text.length>1){
             searchData({variables:{"search":text}})
-            // data = udata
-            // loading = uloading
-
-        // }
     },[text])
     
     return(

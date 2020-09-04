@@ -28,7 +28,7 @@ const Personal = () =>{
                     update:(cache,{data})=>{
                         if(data!=true){
                             const existingCache = cache.readQuery({query:getBankQuery})
-                            existingCache.user.bank = data.updatePersonal.user.bank                            
+                            existingCache.user.bank = data.updateBank.user.bank                            
                             cache.writeQuery({
                                 query:getBankQuery,
                                 data:existingCache
@@ -127,7 +127,7 @@ const Personal = () =>{
 
 
             <div className="out">
-                <button type="submit" className={true?"button is-primary is-small":"button is-primary is-small is-loading"} 
+                <button type="submit" className={pDataLoading!=true?"button is-primary is-small":"button is-primary is-small is-loading"} 
                 >
                 {isEdit?"Update":"Edit"}
                 </button>

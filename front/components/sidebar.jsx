@@ -1,6 +1,6 @@
 import  {FontAwesomeIcon,}  from '@fortawesome/react-fontawesome'
 // import { faTrashAlt,faEdit, faHospital, faBuilding } from '@fortawesome/free-regular-svg-icons'
-import {faAngleRight, faChartBar,faMale, faUserTie,faThList, faHome, faUser, faUsers, faShippingFast, faPlus, faHistory, faSmile, faCog, faSignOutAlt, faList} from '@fortawesome/free-solid-svg-icons'
+import {faAngleRight, faChartBar,faMale, faUserTie,faThList, faHome, faUser, faUsers, faShippingFast, faPlus, faHistory, faSmile, faCog, faSignOutAlt, faList, faPiggyBank} from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import Cookie from "js-cookie";
 import $ from 'jquery'
@@ -395,12 +395,12 @@ const SideBar = ({sidebar,route}) =>{
                         </ul>
                     </li>
                     <li>
-                        {/* <Link href="/"> */}
+                        <Link href="/ledger">
                         <div className="item">
                             <>
                             
                             <a 
-                            // className={route=="/"?"active":"not"}
+                            className={route.startsWith("/ledger")?"active":"not"}
                             >
                                 <div>
                                     <span className="s-bar-icon">
@@ -415,8 +415,32 @@ const SideBar = ({sidebar,route}) =>{
                             </a>
                             </>
                             </div>
-                        {/* </Link> */}
-                        </li>
+                        </Link>
+                    </li>
+
+                    <li>
+                        <Link href="/bank">
+                        <div className="item">
+                            <>
+                            
+                            <a 
+                            className={route.startsWith("/bank")?"active":"not"}
+                            >
+                                <div>
+                                    <span className="s-bar-icon">
+                                        <FontAwesomeIcon icon={faPiggyBank} />
+                                    </span>
+                                    <span className="s-bar-text">
+                                        Bank
+                                    </span>
+                                    
+                                </div>
+
+                            </a>
+                            </>
+                            </div>
+                        </Link>
+                    </li>
 
                         
                 

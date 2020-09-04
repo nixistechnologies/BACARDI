@@ -34,8 +34,15 @@ class Dashboard(graphene.ObjectType):
 class BankNode(DjangoObjectType):
     class Meta:
         model = Bank
-        filter_field=()
+        filter_fields=()
         interfaces = (relay.Node,)
+
+class LedgerNode(DjangoObjectType):
+    class Meta:
+        model = Ledgers
+        filter_fields=()
+        interfaces = (relay.Node,)
+
 
 class UserNode(DjangoObjectType):
     class Meta:
@@ -346,6 +353,7 @@ class AddPurchase(graphene.Mutation):
                 discount = i.discount,
                 purchase_id = purchase.id
             )
+        Ledgers.objects.create(purchase_id = purchase.id,user_id = info.context.user.id)
         # purchase = Purchase.objects.get(id=7)
         return AddPurchase(purchase = purchase)
 
@@ -511,6 +519,7 @@ class CreateBill(graphene.Mutation):
         # gst = graphene.Float(required = True)
         products = graphene.List(MInput)
     bill = graphene.Field(BillingNode)
+    ledger = graphene.Field(LedgerNode)
     def mutate(self,info,payment_mode,billing_date,products,customerId,remarks):
         # print(products[0])
         # user_id = from_global_id(user_id)[1]
@@ -526,7 +535,7 @@ class CreateBill(graphene.Mutation):
 
 
         bill = Billing.objects.create( 
-            user_id=1,invoice_number="INV#{}".format(user_id),customer_id=user_id,payment_mode=payment_mode,billing_date=datetime.datetime.strptime(billing_date,"%Y-%m-%d")
+            user_id=info.context.user.id,invoice_number="INV#{}".format(user_id),customer_id=user_id,payment_mode=payment_mode,billing_date=datetime.datetime.strptime(billing_date,"%Y-%m-%d")
             )
         print(bill)
         bill.invoice_number = "INV#{}-{}".format(bill.id,user_id)
@@ -575,10 +584,11 @@ class CreateBill(graphene.Mutation):
         # print(pdfname)
         # with open(pdfname,'rb') as pdf:
         #    bill.invoice.save(pdfname,File(pdf),save=True)
+        led = Ledgers.objects.create(sale_id = bill.id,user_id = info.context.user.id)
         bill.save()
         # ParitalPayment.objects.create(paid=payment,outstanding=total-payment,bill_id = bill.id)
         # os.remove(pdfname)
-        return CreateBill(bill=bill)
+        return CreateBill(bill=bill,ledger=led)
 
 
 
@@ -941,11 +951,16 @@ class Query(graphene.AbstractType):
     purchases = DjangoFilterConnectionField(PurchaseNode,slug=graphene.String())
     purchaseProduct = DjangoFilterConnectionField(PurchaseProductNode,purchaseId=graphene.ID())
     dashboard = graphene.Field(Dashboard)
+    ledgers = DjangoFilterConnectionField(LedgerNode,search=graphene.String())
     # ledgers = graphene.
 
 # 9899200257
 
 
+    def resolve_ledgers(self,info,search,**kwargs):
+
+        # return Ledgers.objects.filter(user_id=info.context.user.id).order_by("-id")
+        return Ledgers.objects.filter(Q(sale__customer__name__icontains=search) |Q(purchase__vendor__name__icontains=search) | Q(sale__invoice_number__icontains=search) |Q(purchase__invoice_number__icontains=search) | Q(sale__net_amount__icontains=search) |Q(purchase__total_bill__icontains=search)).order_by("-id")
     def resolve_dashboard(self,info):
         sales=0
         
