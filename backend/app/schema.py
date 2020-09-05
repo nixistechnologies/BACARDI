@@ -31,6 +31,9 @@ class Dashboard(graphene.ObjectType):
         return parent['purchase']
 
 
+# class LedgerCustom(graphene.ObjectType):
+
+
 class BankNode(DjangoObjectType):
     class Meta:
         model = Bank
@@ -170,10 +173,28 @@ class BillingNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
 class CustomerNode(DjangoObjectType):
+    sales = graphene.Float()
+    
+    
+    paid = graphene.Float()
+    outstanding = graphene.Float()
+
+
+
+    # purchase = graphene.Int()
     class Meta:
         model = Customer
         filter_fields=()
         interfaces = (relay.Node,)
+    def resolve_sales(self,info):
+        return sum([i.net_amount for i in Customer.objects.get(id=self.id).billing_set.all()])
+    
+    def resolve_paid(self,info):
+        return sum([i.paid for i in Customer.objects.get(id=self.id).paritalpayment_set.all()])
+    def resolve_outstanding(self,info):
+        return sum([i.outstanding for i in Customer.objects.get(id=self.id).paritalpayment_set.all()])
+
+    
 class Sales_ProductNode(DjangoObjectType):
     class Meta:
         model = Sales_Product
@@ -933,6 +954,7 @@ class Mutation(graphene.ObjectType):
 
 class Query(graphene.AbstractType):
     customers = DjangoFilterConnectionField(CustomerNode,search=graphene.String())
+    customer = graphene.Field(CustomerNode,id=graphene.ID())
     all_products = DjangoFilterConnectionField(ProductNode,search=graphene.String())
     product_by_id = graphene.Field(ProductNode,id=graphene.ID())
     product_suggestion = graphene.List(ProductNode,suggestion=graphene.String())
@@ -952,15 +974,19 @@ class Query(graphene.AbstractType):
     purchaseProduct = DjangoFilterConnectionField(PurchaseProductNode,purchaseId=graphene.ID())
     dashboard = graphene.Field(Dashboard)
     ledgers = DjangoFilterConnectionField(LedgerNode,search=graphene.String())
+    bank_by_customer = DjangoFilterConnectionField(CustomerNode,search=graphene.String())
     # ledgers = graphene.
 
 # 9899200257
+
+    def resolve_bank_by_customer(self,info,search,**kwargs):
+        return Customer.objects.all()
 
 
     def resolve_ledgers(self,info,search,**kwargs):
 
         # return Ledgers.objects.filter(user_id=info.context.user.id).order_by("-id")
-        return Ledgers.objects.filter(Q(sale__customer__name__icontains=search) |Q(purchase__vendor__name__icontains=search) | Q(sale__invoice_number__icontains=search) |Q(purchase__invoice_number__icontains=search) | Q(sale__net_amount__icontains=search) |Q(purchase__total_bill__icontains=search)).order_by("-id")
+        return Ledgers.objects.filter(Q(sale__customer__company__icontains=search) |Q(purchase__vendor__name__icontains=search) | Q(sale__invoice_number__icontains=search) |Q(purchase__invoice_number__icontains=search) | Q(sale__net_amount__icontains=search) |Q(purchase__total_bill__icontains=search)).order_by("-id")
     def resolve_dashboard(self,info):
         sales=0
         
@@ -989,6 +1015,9 @@ class Query(graphene.AbstractType):
     def resolve_vendors(self,info,search,**kwargs):
         return Vendor.objects.filter(Q(name__icontains=search) | Q(company__icontains=search) | Q(email__icontains=search) | Q(city__name__icontains=search) | Q(state__name__icontains=search) | Q(mobile__icontains=search)) 
         # return Vendor.objects.filter(user_id = info.context.user.id)
+
+    def resolve_customer(self,info,id):
+        return Customer.objects.get(id=from_global_id(id)[1])
 
     def resolve_customers(self,info,search,**kwargs):
         return Customer.objects.filter(Q(name__icontains=search) | Q(email__icontains=search) | Q(mobile__icontains=search) | Q(gst_number__icontains=search) | Q(address__icontains=search)).filter(user_id=info.context.user.id)

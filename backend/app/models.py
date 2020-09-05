@@ -4,6 +4,7 @@ from django.db.models.signals import pre_save,post_save
 from django.dispatch import receiver
 # from django.contrib.postgres.fields import JSONField
 from django.template.defaultfilters import slugify
+from datetime import datetime
 
 
 # Create your models here.
@@ -91,11 +92,13 @@ class Customer(models.Model):
     addhar_no = models.CharField(max_length=20,blank=True,null=True)
     state = models.CharField(max_length=20,blank=True,null=True)
     city = models.CharField(max_length=20,blank=True,null=True)
+    company = models.CharField(max_length=20,blank=True,null=True)
+    zipcode = models.CharField(max_length=6,blank=True,null=True)
 
 
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     def __str__(self):
-        return "{}".format(self.name)
+        return "{} : {}".format(self.company, self.name)
 
 class State(models.Model):
     name = models.CharField(max_length=50,blank=True,null=True)
@@ -131,7 +134,7 @@ class Vendor(models.Model):
 class Purchase(models.Model):
     vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE)
     invoice_date = models.DateField()
-    created_date = models.DateTimeField(auto_now_add=True,blank=True,null=True)
+    created_date = models.DateField(auto_now_add=True,blank=True,null=True)
     invoice_number = models.CharField(max_length=50)
     total_bill = models.FloatField(null=True,blank=True)
     invoice_file = models.FileField(upload_to="purchase_invoice/",blank=True,null=True)
@@ -198,7 +201,7 @@ class Billing(models.Model):
     sgst = models.FloatField(null=True,blank=True)
     invoice = models.FileField(upload_to="invoices/",blank=True,null=True)
     net_amount = models.FloatField(null=True,blank=True)
-    paid_amount = models.FloatField(null=True,blank=True)
+    paid_amount = models.FloatField(null=True,blank=True,default=0)
     outstanding = models.FloatField(null=True,blank=True)
     remarks = models.TextField(null=True,blank=True)
     created_date = models.DateTimeField(auto_now_add=True,blank=True,null=True)
@@ -207,21 +210,21 @@ class Billing(models.Model):
         return self.invoice_number
 
 class ParitalPayment(models.Model):
-    date = models.DateField(auto_now_add=True,blank=True)
-    paid = models.FloatField(blank=True,null=True)
-    outstanding = models.FloatField(blank=True,null=True)
-    bill = models.ForeignKey(Billing,on_delete=models.CASCADE)
+    date = models.DateField(default=datetime.now,null=True)
+    paid = models.FloatField(default=0,blank=True,null=True)
+    outstanding = models.FloatField(default=0, blank=True,null=True)
+    customer = models.ForeignKey(Customer,on_delete=models.CASCADE,null=True,blank=True)
 
     def __str__(self):
         return str(self.paid)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        p = Billing.objects.get(id = self.bill.id)
-        p.paid_amount = self.paid
-        p.outstanding = self.outstanding
+        # p = Billing.objects.get(id = self.bill.id)
+        # p.paid_amount = self.paid
+        # p.outstanding = self.outstanding
         # p.qty = p.qty - self.quantity
-        p.save()
+        # p.save()
 
 class Sales_Product(models.Model):
     product = models.ForeignKey(Product,on_delete=models.SET_NULL,blank=True,null=True)

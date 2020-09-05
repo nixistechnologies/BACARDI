@@ -142,6 +142,42 @@ export const getBankQuery = gql`
 }
 `
 
+export const bankDetailQuery = gql`
+query x($id:ID!){
+  customer(id:$id,){
+    id
+    company
+    paritalpaymentSet{
+      edges{
+        node{
+          id
+          paid
+          outstanding
+          date
+        }
+      }
+    }
+  }
+}
+`
+
+export const BankByCustomerQuery = gql`
+query{
+  customers(search:""){
+    edges{
+      node{
+        sales
+        outstanding
+        paid
+        id
+        name
+        company
+      }
+    }
+  }
+}
+`
+
 export const getLedgersQuery = gql`
 query x($search:String!){
   ledgers(search:$search,first:10)
@@ -159,7 +195,9 @@ query x($search:String!){
             id
             }
            customer{
+             id
              name
+             company
            }
          }        
          purchase{
@@ -169,6 +207,8 @@ query x($search:String!){
            invoiceNumber
            totalBill
            vendor{
+             id
+             company
              name
            }
          }
