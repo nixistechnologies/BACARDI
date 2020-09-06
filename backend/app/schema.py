@@ -1017,7 +1017,7 @@ class Query(graphene.AbstractType):
     def resolve_last_number(self,info,id):
         print(id)
         if(id):
-            if(Billing.objects.filter(id=id)):
+            if(Billing.objects.filter(invoice_number=id)):
                 return {"exist":True,"last_number":0}
             else:
                 return {"exist":False,"last_number":0}
