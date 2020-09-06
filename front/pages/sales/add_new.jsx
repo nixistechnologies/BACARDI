@@ -1,7 +1,7 @@
 import Layout from "../../components/layout"
 import {useForm} from 'react-hook-form'
 import { useQuery,useLazyQuery, useMutation } from '@apollo/react-hooks'
-import { getAllPatient,productSuggetionQuery, customerSuggestion, getAllCustomersQuery,generateBillQuery,getLedgersQuery } from "../../lib/graphql";
+import { getAllPatient,productSuggetionQuery,lastBillNumber, customerSuggestion, getAllCustomersQuery,generateBillQuery,getLedgersQuery } from "../../lib/graphql";
 import { useDispatch, useSelector } from 'react-redux'
 import {useState, useEffect} from 'react'
 import React from 'react'
@@ -12,6 +12,10 @@ import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { generateBill,clearBill } from "../../redux_function/actions";
 import { server } from "../../lib/settings";
 import {BillPageLoading} from '../../components/skeleton'
+import SnackbarProvider,{useSnackbar} from 'react-simple-snackbar'
+// import VendorModel from '../../components/vendorModel'
+import ProductForm from '../../components/productForm'
+import CustomerForm from '../../components/customerForm'
 // import SelectSearch from 'react-select-search';
 // import { useSelect } from 'react-select-search';
 import $ from 'jquery'
@@ -50,9 +54,48 @@ const ref = React.createRef();
     
 // }
 
+
+
+
+const Modal =({active,setActive}) =>{
+    return <>
+
+<div className={`modal ${active}`} >
+    <style jsx>{`
+    .column{
+        padding:0;
+        margin-bottom:10px;
+        padding-right:5px;
+        padding-left:5px;
+    }
+    .modal-content, .modal-card {
+        margin: 0 auto;
+        width:60%;
+            // width: 540px;
+        }
+
+    `}
+
+    </style>
+
+    <div className="modal-background"  onClick={()=>setActive("")}></div>
+    <div className="modal-content">
+        <div className="box">
+            <h1 className="model-title title">Create new product</h1>
+            <ProductForm purchase={true} setActive={setActive} />
+        </div>
+    </div>
+
+</div>
+
+    </>
+}
+
 const Billingform =() =>{
     const [qlabel,setQlabel] = useState("")
     const [mlist,setMlist] = useState([])
+    const [Pactive,setPactive] = useState("")
+    const [Cactive,setCactive] = useState("")
     const [list,setList] = useState([])
     const [active,setActive] = useState("modal")
     const [cname,setCname] = useState("")
@@ -77,6 +120,8 @@ const Billingform =() =>{
 
     const { register, handleSubmit,setValue,getValues,errors } = useForm();
     const {loading,error,data} = useQuery(getAllCustomersQuery)
+    const {data:lastNumber,loading:numberLoading} = useQuery(lastBillNumber,{variables:{"id":""}, fetchPolicy:"network-only"})
+    const [CheckExisted,{data:isExisted,loading:isExistedLoading}] = useLazyQuery(lastBillNumber,{fetchPolicy:"network-only"})
     // const product = useSelector(state => state.products);
     const billstore = useSelector(state => state.bills);
     const [tamount,setTamount] = useState(0)
@@ -93,7 +138,6 @@ const Billingform =() =>{
         $("#customer_dropdown").click(()=>{
             console.log("XX")
         })
-        
         // $(document).on("click",(e)=>{
         //     // if($("customer_dropdown").click(()=>{
         //         console.log(e)
@@ -105,9 +149,14 @@ const Billingform =() =>{
         // })
         
     })
+    useEffect(()=>{
+        cSuggestion({variables:{suggestion:""}})
+        pSuggestion({variables:{suggestion:""}})
+    },[])
     
-    if(loading)
+    if(loading || numberLoading)
         return <div><BillPageLoading/></div>
+    console.log(lastNumber.lastNumber.lastNumber)
     const selectOption=(e)=>{
         // const f = data.customers.edges.filter(t=>(t.node.id===e.target.value))[0]
         // if(f!=undefined)
@@ -117,8 +166,8 @@ const Billingform =() =>{
         //     setValue([{"mobile":""},{"address":""},{"customerId":""}])   
         // }
         setDropdown1("")
-        setCname(e.name)
-        setValue([{"mobile":e.mobile},{"address":e.address},{"customerId":e.id},{"name":e.name}])
+        setCname(e.node.name)
+        setValue([{"mobile":e.node.mobile},{"address":e.node.address},{"customerId":e.node.id},{"name":e.node.name}])
 
         
     }
@@ -137,20 +186,20 @@ const Billingform =() =>{
     }
 
     const showCustomer=(e)=>{
-        if(e.target.value.length>0)
-        {
+        // if(e.target.value.length>0)
+        // {
             cSuggestion({variables:{suggestion:e.target.value}})
-        }
+        // }
     }
 
     const showProduct =(e)=>{
-        if(e.target.value.length>0)
-        {
+        // if(e.target.value.length>0)
+        // {
             pSuggestion({variables:{suggestion:e.target.value}})
-        }
+        // }
     }
 
-    const BillToServer=(customerId,date,payment,remarks,mlist)=>{
+    const BillToServer=(customerId,date,payment,remarks,mlist,invoice_number)=>{
         // console.log(errors)
         console.log(customerId)
         console.log(date)
@@ -162,7 +211,8 @@ const Billingform =() =>{
             "customerId":customerId,
             "remarks":remarks,
             "date":date,
-            "payment":payment,
+            "payment":"Cash",
+            "invoice_number":invoice_number,
             "products":mlist,
             // "paid":getValues("paid") === ""?tamount:getValues("paid")
         },optimisticResponse:true,
@@ -172,6 +222,7 @@ const Billingform =() =>{
                 // data.generateBill.ledger
                 try{
                     const existingCache = cache.readQuery({query:getLedgersQuery,variables:{"search":""}})
+                    // const billNumberCache = cache.readQuery({query:lastBillNumber})
                     console.log(existingCache)
                     existingCache.ledgers.edges = [{"node":data.generateBill.ledger,"__typename":"LedgerNodeEdge"}].concat(existingCache.ledgers.edges)
                     console.log(existingCache)
@@ -180,6 +231,9 @@ const Billingform =() =>{
                         variables:{"search":""},
                         data:existingCache
                     })
+                    // billNumberCache.lastNumber.lastBillNumber ++
+                    
+                    // cache.writeData
                 }
                 catch(e){
                     console.log(e)
@@ -325,9 +379,13 @@ const Billingform =() =>{
     
 
     return (
+        
+        // <VendorModel active={Vactive} setActive={setVActive} isNew={true} />
         <div 
         // onClick={()=>{dropdown1==="is-active"?setDropdown1(""):null}}
         >
+            <Modal active={Pactive} setActive={setPactive} />
+            <CustomerForm active={Cactive} setActive={setCactive} isNew={true} />
             <div className="topHeading">
                 <h2>Sales</h2>
             </div>
@@ -360,13 +418,25 @@ const Billingform =() =>{
                     padding-bottom:20px;
                     margin-bottom:-1px
                 }
+                .sep-word{
+                    margin-top:10px;
+                    // font-weight:600;
+                    font-family:nfontL
+                }
             `} </style>
             {/* <form> */}
             {/* <div>   
                 <h2 className="subtitle" style={{marginTop:"10px",fontWeight:'300'}}>User detail</h2>
             </div> */}
-            <div style={{margin:"20px 2px 5px"}}>   
-                <span className="" style={{fontSize:'22px', marginTop:"10px",fontWeight:'600'}}>User detail</span>
+        <div className="card_">
+            {/* <div style={{margin:"20px 2px 5px"}}>   
+                <span className="sep-word">User detail</span>
+            </div> */}
+            <div style={{marginBottom:"15px",display:'flex',alignItems:'center'}}>
+                <h2 style={{fontFamily:'nfontL',fontWeight:'300'}}> User detail</h2>
+                <a className="tag is-link is-light" style={{marginLeft:"20px"}} 
+                onClick={()=>setCactive("is-active")}
+                >Add Customer</a>
             </div>
             
             <div>
@@ -407,9 +477,9 @@ const Billingform =() =>{
                                     <div className="dd-list" style={{padding:"0",maxHeight:"170px"}}>
                                         {
                                         customerTemp!=null?
-                                        customerTemp.customerSuggestion.map(e=>{
+                                        customerTemp.customerSuggestion.edges.map(e=>{
                                             // return ( e.node.name.toLocaleLowerCase().startsWith(statefilter)?
-                                            return <div style={{padding:"0"}} className="d-item_" onClick={()=>{setCustomer({name:e.name}), selectOption(e), setCustomerDD(customerDD==="dd-active"?"":"dd-active") }} key={e.id} value={e.id}> <a className="dropdown-item">{e.name}</a></div>
+                                            return <div style={{padding:"0"}} className="d-item_" onClick={()=>{setCustomer({name:e.node.company}), selectOption(e), setCustomerDD(customerDD==="dd-active"?"":"dd-active") }} key={e.node.id} value={e.node.id}> <a className="dropdown-item">{e.node.company}</a></div>
                                             // :null
                                                 }
                                             ):null
@@ -504,19 +574,32 @@ const Billingform =() =>{
                 </span>
             </div> */}
 
-            <div style={{margin:"20px 2px 5px"}}>   
-                <span className="" style={{fontSize:'22px', marginTop:"10px",fontWeight:'600'}}>Billing detail</span>
-            </div>
+            {/* <div style={{margin:"20px 2px 5px"}}>   
+                <span className="sep-word">Billing detail</span>
+            </div> */}
 
 
             <div>
             
                 <div className="columns">
                     <div className="column">
-                        <label className="label">Payment Mode <span className="error_text">{errors.payment?.message}</span></label>
-                        <input className="input is-small" ref={register({required:"(this is required)"})}
-                        //  onChange={()=>setQty(qty)} value={qty} 
-                        type="text" name="payment"  placeholder="Payment Mode"/>
+                        <label className="label">Invoice Number<span className="error_text">{errors.payment?.message}</span></label>
+                        <div className={`control ${isExistedLoading==true && "is-loading"}`} >
+                            <input className={`input is-small ${isExisted !=undefined && isExisted.lastNumber.exist==true && "is-danger"}`} ref={register({required:"(this is required)"})}
+                            //  onChange={()=>setQty(qty)} value={qty} 
+                            onChange={(e)=>CheckExisted({variables:{"id":e.target.value}})}
+                            defaultValue={lastNumber.lastNumber.lastNumber}
+                            type="text" name="invoice_number"  placeholder="Invoice Number"/>
+                        </div>
+
+                        {
+                            isExisted !=undefined &&
+                            <div style={{fontSize:'0.6em',color:'red',display:`${isExisted.lastNumber.exist==true ? "block":"none"}`}}>
+                                <span>Invoice number already existed</span>
+                            </div>
+                        }
+                        
+                        
                     </div>
                     
                     {/* <div className="column">
@@ -544,11 +627,19 @@ const Billingform =() =>{
             {/* <div>   
                 <h2 className="subtitle" style={{marginTop:"10px",fontWeight:'300'}}>Products</h2>
             </div> */}
-            <div style={{margin:"20px 2px 5px"}}>   
-                <span className="" style={{fontSize:'22px', marginTop:"10px",fontWeight:'600'}}>Products detail</span>
-            </div>
-
             <div>
+                <hr className="divider" style={{height:'1px',backgroundColor:'#d9d9d9',margin:'1rem 0'}} />
+            </div>
+            
+
+            <div style={{marginBottom:"15px",display:'flex',alignItems:'center'}}>
+                <h2 style={{fontFamily:'nfontL',fontWeight:'300'}}> Product detail</h2>
+                <a className="tag is-link is-light" style={{marginLeft:"20px"}} 
+                onClick={()=>setPactive("is-active")}
+                >Add Product</a>
+            </div>
+            <div>
+        </div>
                 <form onSubmit={handleSubmit(AddRows)}>
                 <div className="columns">
                     <div className="column is-4">
@@ -648,6 +739,7 @@ const Billingform =() =>{
                         <input type="hidden" name="id" ref={register}/>
                         <input className="input is-small" ref={register}
                         // onChange={()=>setMrp(mrp)} value={mrp} 
+                        defaultValue={0}
                         type="text" name="less" placeholder="Less" onChange={(e)=>SetNetM(e)} required/>
                     </div>
                     <div className="column">
@@ -773,7 +865,7 @@ const Billingform =() =>{
                 
 
                 <a onClick={()=> 
-                    BillToServer( getValues("customerId"),getValues("date"),getValues("payment"),getValues("remarks"),mlist)
+                    BillToServer( getValues("customerId"),getValues("date"),getValues("payment"),getValues("remarks"),mlist,getValues("invoice_number"))
                 }
                 target={billstore.invoice==null?'_self':'_blank'}>
 
@@ -806,11 +898,13 @@ const Bill = () =>{
     const billstore = useSelector(state => state.bills);
     // console.log(billstore)
     return(
+        <SnackbarProvider>
         <Layout loading={billstore.loading} title="Generate Bill" >
             <div>
                 <Billingform/>
             </div>
         </Layout>
+        </SnackbarProvider>
     )
 }
 

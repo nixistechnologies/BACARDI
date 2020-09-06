@@ -137,6 +137,7 @@ input[type="radio"] {
 
 .s-bar-text{
     cursor: pointer;
+    margin-left: 5px;
 }
 
 .navbar-brand{

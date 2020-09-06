@@ -92,7 +92,7 @@ class Customer(models.Model):
     addhar_no = models.CharField(max_length=20,blank=True,null=True)
     state = models.CharField(max_length=20,blank=True,null=True)
     city = models.CharField(max_length=20,blank=True,null=True)
-    company = models.CharField(max_length=20,blank=True,null=True)
+    company = models.CharField(max_length=50,blank=True,null=True)
     zipcode = models.CharField(max_length=6,blank=True,null=True)
 
 
@@ -214,6 +214,7 @@ class ParitalPayment(models.Model):
     paid = models.FloatField(default=0,blank=True,null=True)
     outstanding = models.FloatField(default=0, blank=True,null=True)
     customer = models.ForeignKey(Customer,on_delete=models.CASCADE,null=True,blank=True)
+    vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True,blank=True)
 
     def __str__(self):
         return str(self.paid)

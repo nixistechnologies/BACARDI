@@ -67,6 +67,13 @@ class MyApp extends App<AppInitialProps> {
                     font-style: normal;
                     font-display: swap;
                   }
+                  @font-face {
+                    font-family: 'nFontL';
+                    src: url('/fonts/Nunito-Light.ttf');
+                    font-weight: bold;
+                    font-style: normal;
+                    font-display: swap;
+                  }
                 `}</style>
 
 

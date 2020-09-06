@@ -30,6 +30,13 @@ class Dashboard(graphene.ObjectType):
     def resolve_purchase(parent,info):
         return parent['purchase']
 
+class InvoiceNumber(graphene.ObjectType):
+    last_number = graphene.Int()
+    exist = graphene.Boolean()
+    def resolve_last_number(parent,info):
+        return parent["last_number"]
+    def resolve_exist(parent,info):
+        return parent["exist"]
 
 # class LedgerCustom(graphene.ObjectType):
 
@@ -174,8 +181,6 @@ class BillingNode(DjangoObjectType):
 
 class CustomerNode(DjangoObjectType):
     sales = graphene.Float()
-    
-    
     paid = graphene.Float()
     outstanding = graphene.Float()
 
@@ -212,11 +217,23 @@ class VendorFilter(FilterSet):
 
 
 class VendorNode(DjangoObjectType):
+    purchase = graphene.Float()
+    paid = graphene.Float()
+    outstanding = graphene.Float()
+
     class Meta:
         model = Vendor
         # filter_fields = ()
         filterset_class = VendorFilter
         interfaces = (relay.Node,)
+
+    def resolve_purchase(self,info):
+        return sum([i.total_bill for i in Vendor.objects.get(id=self.id).purchase_set.all()])
+    
+    def resolve_paid(self,info):
+        return sum([i.paid for i in Vendor.objects.get(id=self.id).paritalpayment_set.all()])
+    def resolve_outstanding(self,info):
+        return sum([i.outstanding for i in Vendor.objects.get(id=self.id).paritalpayment_set.all()])
 
 class StateNode(DjangoObjectType):
     class Meta:
@@ -536,12 +553,13 @@ class CreateBill(graphene.Mutation):
         # productId = graphene.ID(required = True)
         payment_mode = graphene.String(required = True)
         billing_date = graphene.String(required = True)
+        invoice_number = graphene.String(required = True)
         # payment = graphene.Float(required=True)
         # gst = graphene.Float(required = True)
         products = graphene.List(MInput)
     bill = graphene.Field(BillingNode)
     ledger = graphene.Field(LedgerNode)
-    def mutate(self,info,payment_mode,billing_date,products,customerId,remarks):
+    def mutate(self,info,payment_mode,billing_date,products,customerId,remarks,invoice_number):
         # print(products[0])
         # user_id = from_global_id(user_id)[1]
         # name = name.replace(" ({})".format(age),"")
@@ -556,10 +574,10 @@ class CreateBill(graphene.Mutation):
 
 
         bill = Billing.objects.create( 
-            user_id=info.context.user.id,invoice_number="INV#{}".format(user_id),customer_id=user_id,payment_mode=payment_mode,billing_date=datetime.datetime.strptime(billing_date,"%Y-%m-%d")
+            user_id=info.context.user.id,invoice_number=invoice_number.format(user_id),customer_id=user_id,payment_mode=payment_mode,billing_date=datetime.datetime.strptime(billing_date,"%Y-%m-%d")
             )
         print(bill)
-        bill.invoice_number = "INV#{}-{}".format(bill.id,user_id)
+        bill.invoice_number = invoice_number
 
         gross = total = discount = cgst =  0.0
 
@@ -850,10 +868,12 @@ class CreateCustomer(graphene.Mutation):
         addhar = graphene.String(required=True)
         email = graphene.String(required=True)
         is_new = graphene.Boolean(required=True)
+        zipcode = graphene.String(required=True)
+        company = graphene.String(required=True)
     customer = graphene.Field(CustomerNode)
-    def mutate(self,info,id,name,mobile,gst,address,email,is_new,state,city,addhar):
+    def mutate(self,info,id,name,mobile,gst,address,email,is_new,state,city,addhar,zipcode,company):
         if(is_new is True):
-            customer = Customer.objects.create(name=name,city=city,state=state,addhar_no=addhar ,mobile=mobile,gst_number=gst,address=address,email=email,user_id = info.context.user.id)
+            customer = Customer.objects.create(name=name,city=city,state=state,addhar_no=addhar ,mobile=mobile,gst_number=gst,address=address,email=email,user_id = info.context.user.id,company=company,zipcode=zipcode)
             # return CreateCustomer(customer = customer)
         else:
             customer = Customer.objects.get(id = from_global_id(id)[1])
@@ -865,6 +885,8 @@ class CreateCustomer(graphene.Mutation):
             customer.city = city
             customer.state = state
             customer.addhar_no = addhar
+            customer.zipcode = zipcode
+            customer.company = company
             customer.save()
         return CreateCustomer(customer = customer)
 
@@ -955,6 +977,7 @@ class Mutation(graphene.ObjectType):
 class Query(graphene.AbstractType):
     customers = DjangoFilterConnectionField(CustomerNode,search=graphene.String())
     customer = graphene.Field(CustomerNode,id=graphene.ID())
+    vendor = graphene.Field(VendorNode,id=graphene.ID())
     all_products = DjangoFilterConnectionField(ProductNode,search=graphene.String())
     product_by_id = graphene.Field(ProductNode,id=graphene.ID())
     product_suggestion = graphene.List(ProductNode,suggestion=graphene.String())
@@ -963,7 +986,7 @@ class Query(graphene.AbstractType):
     history = DjangoFilterConnectionField(BillingNode,slug=graphene.String())
     subcategoy = DjangoFilterConnectionField(SubCategoryNode,id = graphene.ID(),search=graphene.String())
     user = graphene.Field(UserNode)
-    customer_suggestion = graphene.List(CustomerNode,suggestion = graphene.String())
+    customer_suggestion = DjangoFilterConnectionField(CustomerNode,suggestion = graphene.String())
 
     categories = DjangoFilterConnectionField(CategoryNode,search=graphene.String())
     vendors = DjangoFilterConnectionField(VendorNode,search=graphene.String())
@@ -973,8 +996,11 @@ class Query(graphene.AbstractType):
     purchases = DjangoFilterConnectionField(PurchaseNode,slug=graphene.String())
     purchaseProduct = DjangoFilterConnectionField(PurchaseProductNode,purchaseId=graphene.ID())
     dashboard = graphene.Field(Dashboard)
+    last_number = graphene.Field(InvoiceNumber,id=graphene.String())
     ledgers = DjangoFilterConnectionField(LedgerNode,search=graphene.String())
     bank_by_customer = DjangoFilterConnectionField(CustomerNode,search=graphene.String())
+    # invoiceNumner = graphene
+    # bank_by_vendor = DjangoFilterConnectionField(VendorNode,search=graphene.String())
     # ledgers = graphene.
 
 # 9899200257
@@ -986,7 +1012,23 @@ class Query(graphene.AbstractType):
     def resolve_ledgers(self,info,search,**kwargs):
 
         # return Ledgers.objects.filter(user_id=info.context.user.id).order_by("-id")
-        return Ledgers.objects.filter(Q(sale__customer__company__icontains=search) |Q(purchase__vendor__name__icontains=search) | Q(sale__invoice_number__icontains=search) |Q(purchase__invoice_number__icontains=search) | Q(sale__net_amount__icontains=search) |Q(purchase__total_bill__icontains=search)).order_by("-id")
+        return Ledgers.objects.filter(Q(sale__customer__company__icontains=search) |Q(purchase__vendor__company__icontains=search) | Q(sale__invoice_number__icontains=search) |Q(purchase__invoice_number__icontains=search) | Q(sale__net_amount__icontains=search) |Q(purchase__total_bill__icontains=search)).order_by("-id")
+    
+    def resolve_last_number(self,info,id):
+        print(id)
+        if(id):
+            if(Billing.objects.filter(id=id)):
+                return {"exist":True,"last_number":0}
+            else:
+                return {"exist":False,"last_number":0}
+        else:
+            bill = Billing.objects.all()
+            if(bill):
+                return {"last_number":bill[::-1][0].id+1,"exist":False}
+            else:
+                return {"last_number":1,"exist":False}
+
+
     def resolve_dashboard(self,info):
         sales=0
         
@@ -1018,12 +1060,15 @@ class Query(graphene.AbstractType):
 
     def resolve_customer(self,info,id):
         return Customer.objects.get(id=from_global_id(id)[1])
+    
+    def resolve_vendor(self,info,id):
+        return Vendor.objects.get(id=from_global_id(id)[1])
 
     def resolve_customers(self,info,search,**kwargs):
         return Customer.objects.filter(Q(name__icontains=search) | Q(email__icontains=search) | Q(mobile__icontains=search) | Q(gst_number__icontains=search) | Q(address__icontains=search)).filter(user_id=info.context.user.id)
 
-    def resolve_customer_suggestion(self,info,suggestion):
-        return Customer.objects.filter(name__istartswith=suggestion)
+    def resolve_customer_suggestion(self,info,suggestion,**kwargs):
+        return Customer.objects.filter(company__icontains=suggestion)
     # def resolve_customers(self,info):
     #     return Customer.objects.filter(user_id=info.context.user.id)
 

@@ -13,6 +13,8 @@ query($search:String!){
         gstNumber
         state
         addharNo
+        company
+        zipcode
         city        
       }
     }
@@ -20,25 +22,39 @@ query($search:String!){
 }
 `
 
+export const lastBillNumber = gql`
+query x($id:String!){
+  lastNumber(id:$id){
+    exist
+    lastNumber
+  }
+}
+`
+
 export const customerSuggestion = gql`
 query x($suggestion:String!){
-  customerSuggestion(suggestion:$suggestion)
+  customerSuggestion(suggestion:$suggestion,first:5)
   {
-    id
-    name
-    address
-    mobile
-    email
-    state
-    city
-    addharNo    
+		edges{
+      node{
+          id
+          name
+          address
+          mobile
+          email
+          state
+          city
+          addharNo
+          company
+      }
+    }
   }
 }
 `
 
 export const createOrUpdateCustomerQuery = gql`
-mutation x($city:String!,$state:String!$addhar:String!,$name:String!,$id:String!, $mobile:String!$gst:String!,$address:String!,$email:String!,$isNew:Boolean!){
-  createCustomer(id:$id,name:$name,mobile:$mobile,gst:$gst,address:$address,email:$email,isNew:$isNew,city:$city,state:$state,addhar:$addhar)
+mutation x($city:String!,$state:String!$addhar:String!,$name:String!,$id:String!, $mobile:String!$gst:String!,$address:String!,$email:String!,$isNew:Boolean!,$zipcode:String!,$company:String!){
+  createCustomer(id:$id,name:$name,mobile:$mobile,gst:$gst,address:$address,email:$email,isNew:$isNew,city:$city,state:$state,addhar:$addhar,zipcode:$zipcode,company:$company)
   {
     customer{
       id
@@ -50,6 +66,8 @@ mutation x($city:String!,$state:String!$addhar:String!,$name:String!,$id:String!
       state
       city
       addharNo 
+      company
+      zipcode
     }
   }
 }
@@ -141,6 +159,24 @@ export const getBankQuery = gql`
   }
 }
 `
+export const bankPurchaseDetailQuery = gql`
+query x($id:ID!){
+  vendor(id:$id,){
+    id
+    company
+    paritalpaymentSet{
+      edges{
+        node{
+          id
+          paid
+          outstanding
+          date
+        }
+      }
+    }
+  }
+}
+`
 
 export const bankDetailQuery = gql`
 query x($id:ID!){
@@ -170,6 +206,23 @@ query{
         outstanding
         paid
         id
+        name
+        company
+      }
+    }
+  }
+}
+`
+export const BankByVendorQuery = gql`
+{
+  vendors(search:"")
+  {
+    edges{
+      node{
+        id
+        paid
+        outstanding
+        purchase
         name
         company
       }
@@ -453,7 +506,7 @@ query x($slug:String!){
       node{
         products
         id
-        date
+        
         invoiceDate
         invoiceNumber
         invoiceFile
@@ -651,8 +704,8 @@ mutation x($paid:Float!, $products:[MInput!],$remarks:String!,$customerId:ID!,$d
 `
 
 export const generateBillQuery = gql`
-mutation x($products:[MInput!],$remarks:String!,$customerId:ID!,$date:String!,$payment:String!){
-  generateBill(billingDate:$date,products:$products,paymentMode:$payment,customerId:$customerId,remarks:$remarks)
+mutation x($products:[MInput!],$remarks:String!,$customerId:ID!,$date:String!,$payment:String!,$invoice_number:String!){
+  generateBill(billingDate:$date,products:$products,paymentMode:$payment,customerId:$customerId,remarks:$remarks,invoiceNumber:$invoice_number)
   {
     bill{
       id

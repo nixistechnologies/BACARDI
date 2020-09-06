@@ -2,7 +2,7 @@ import Layout from '../../components/layout'
 import {vendorSuggestionQuery,productStartsWithQuery,addPurchaseQuery} from '../../lib/graphql'
 import {useLazyQuery,useMutation} from '@apollo/react-hooks'
 import CreateProduct from '../../components/productForm'
-import {useState} from 'react'
+import {useState,useEffect} from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faTrashAlt} from '@fortawesome/free-regular-svg-icons'
 import { faUpload,faAngleDown, } from '@fortawesome/free-solid-svg-icons';
@@ -67,6 +67,10 @@ const NewPurchase = () =>{
     const [addPurchase,{data:purchaseData,loading:purchaseLoading}] = useMutation(addPurchaseQuery)
     const [openSnackbar, closeSnackbar] = useSnackbar({position:"top-center",style:{zIndex:"999", marginTop:"50px"}})
 
+    useEffect(()=>{
+        getVendor({variables:{"name":""}})
+        getProduct({variables:{"name":""}})
+    },[])
 
     const AddRow = (data) =>{
         console.log(data)
@@ -164,7 +168,7 @@ const NewPurchase = () =>{
                 {/* <hr /> */}
 
                 <div style={{marginBottom:"15px",display:'flex',alignItems:'center'}}>
-                    <h2 style={{fontSize:"20px",fontWeight:'300'}}> Vendor Detail</h2>
+                    <h2 style={{fontFamily:'nfontL',fontWeight:'300'}}> Vendor Detail</h2>
                     <a className="tag is-link is-light" style={{marginLeft:"20px"}} onClick={()=>setVActive("is-active")}>Add vendor</a>
                 </div>
 
@@ -223,7 +227,7 @@ const NewPurchase = () =>{
             </div>
 
             <div style={{marginBottom:"30px"}}>
-                <h2 style={{fontSize:"20px",marginBottom:"15px",fontWeight:'300'}}> Invoice Detail</h2>
+                {/* <h2 style={{fontSize:"20px",marginBottom:"15px",fontWeight:'300'}}> Invoice Detail</h2> */}
                 {/* <hr /> */}
                 <div className="i_row" style={{display:"flex"}}>
                     <div>
@@ -259,7 +263,7 @@ const NewPurchase = () =>{
 
             <form style={{marginBottom:"30px"}} onSubmit={handleSubmit(AddRow)} encType={`multipart/form-data`}>
                 <div style={{marginBottom:"15px",display:'flex',alignItems:'center'}}>
-                    <h2 style={{fontSize:"20px",fontWeight:'300'}}> Product Detail</h2>
+                    <h2 style={{fontFamily:"nfontL",fontWeight:'300'}}> Product Detail</h2>
                     <a className="tag is-link is-light" style={{marginLeft:"20px"}} onClick={()=>setActive("is-active")}>Add Product</a>
                 </div>
                 {/* <hr /> */}

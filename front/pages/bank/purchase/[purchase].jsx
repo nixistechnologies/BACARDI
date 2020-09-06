@@ -1,8 +1,9 @@
-import Layout from '../../components/layout'
+// import Layout from '../../../components/layoutout'
+import Layout from '../../../components/layout'
 import { useRouter } from 'next/router'
 import { useQuery } from 'react-apollo'
-import { TableLoading } from '../../components/skeleton'
-import {bankDetailQuery} from '../../lib/graphql'
+import { TableLoading } from '../../../components/skeleton'
+import {bankPurchaseDetailQuery} from '../../../lib/graphql'
 
 const Records = ({items}) =>{
     return <>
@@ -54,13 +55,22 @@ const Records = ({items}) =>{
     </table>
     </>
 }
+export const NoPayment = () =>{
+    return <>
+    <div>
+        <h1 style={{fontFamily:'nfont',fontSize:'1.5em',textAlign:'center',marginTop:'15%'}}>
+            No Payment Found
+        </h1>
+    </div>
+    </>
+}
 
-const Detail=()=>{
+const PurchaseDetail=()=>{
     const router = useRouter()
     
     const {query} = router
-    const id = query.detail
-    const {data,loading} = useQuery(bankDetailQuery,{variables:{"id":id}})
+    const id = query.purchase
+    const {data,loading} = useQuery(bankPurchaseDetailQuery,{variables:{"id":id}})
     console.log(query)
     return <>
         <Layout>
@@ -86,8 +96,11 @@ const Detail=()=>{
                 {
                     loading ?
                     <TableLoading />:
+                    data.vendor.paritalpaymentSet.edges.length == 0?
+                        <NoPayment />
+                    :
                     <Records items ={
-                        data.customer.paritalpaymentSet.edges
+                        data.vendor.paritalpaymentSet.edges
                     } />
                 }
             </div>
@@ -96,4 +109,4 @@ const Detail=()=>{
     
     </>
 }
-export default Detail;
+export default PurchaseDetail;

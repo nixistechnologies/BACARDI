@@ -37,12 +37,14 @@ const Records = ({items}) =>{
                         {e.node.sales - e.node.paid}
                     </td>
                     
-                    <td>
-                        <Link href={`bank/[detail]?name=${e.node.company}`} as={`bank/${e.node.id}?name=${e.node.company}`}>
-                            <FontAwesomeIcon icon={faList} />
+                    
+                        <Link href={`bank/[sales]?name=${e.node.company}`} as={`bank/${e.node.id}?name=${e.node.company}`}>
+                            <td style={{cursor:'pointer'}}>
+                                <FontAwesomeIcon icon={faList} />
+                            </td>
                         </Link>    
                         
-                    </td>
+                    
                 </tr>
                 
                 )

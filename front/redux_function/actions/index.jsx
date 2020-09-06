@@ -281,6 +281,11 @@ export const toggle_side_bar = (s) =>({
     payload:s
 })
 
+export const change_bank_tab = (tab) =>({
+    type:"TAB_CHANGED",
+    tab:tab
+})
+
 export const createProductSucess = (product) =>({
     type:CREATE_PRODUCTS_SUCCESS,
     payload:product
