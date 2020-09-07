@@ -1,6 +1,6 @@
 import Layout from '../../components/layout'
 import { useQuery, useLazyQuery } from 'react-apollo'
-import {getLedgersQuery} from '../../lib/graphql'
+import {getLedgersQuery,getAllPaymentLedgerQuery} from '../../lib/graphql'
 import {TableLoading} from '../../components/skeleton'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons'
@@ -18,7 +18,7 @@ const Records = ({items}) =>{
                 <th className="_w20">Particulars</th>
                 
                 <th className="_w10">Type</th>
-                <th className="_w20">Invoice Number</th>
+                {/* <th className="_w20">Invoice Number</th> */}
                 <th className="_w10">Credit</th>
                 <th className="_w10">Debit</th>
                 {/* <th className="_w10">File</th> */}
@@ -32,27 +32,26 @@ const Records = ({items}) =>{
                 <tr key={e.node.id}>
                     <td>{i+1}</td>
                     <td>
-                        {
-                        e.node.sale !=null ?e.node.sale.billingDate:e.node.purchase.createdDate}
+                        {/* {e.node.sale !=null ?e.node.sale.billingDate:e.node.purchase.createdDate} */}
+                        {e.node.date}
                     </td>
                     <td className="_heading _w30">
-                            {/* {e.node.name} */}
-                            {e.node.sale !=null ?e.node.sale.customer.company:e.node.purchase.vendor.company}
+                            {e.node.customer !=null ?e.node.customer.company:e.node.vendor.company}
                     </td>
                     
                     
                     <td>
-                        {e.node.sale !=null ?"Sale":"Purchase"}
+                        {e.node.customer !=null ?"Sale":"Purchase"}
                     </td>
-                    <td>
+                    {/* <td>
                         {e.node.sale !=null ?e.node.sale.invoiceNumber:e.node.purchase.invoiceNumber}
-                    </td>
+                    </td> */}
                     
                     <td>
-                        {e.node.sale !=null && e.node.sale.netAmount}
+                        {e.node.customer !=null && e.node.paid}
                     </td>
                     <td>
-                        {e.node.sale ==null && e.node.purchase.totalBill}
+                        {e.node.vendor !=null && e.node.paid}
                     </td>
                     {/* <td>
                         <a target="_blank" href={`${server}${e.node.sale !=null ?`/invoice/${e.node.sale.id}/${e.node.sale.user.id}`:`/media/${e.node.purchase.invoiceFile}`}`}>
@@ -72,8 +71,8 @@ const Records = ({items}) =>{
 
 const Ledger = () =>{
     const [text,setText] = useState("")
-    const {data:odata,loading:oloading} = useQuery(getLedgersQuery,{variables:{"search":""}})
-    const [searchData,{data,loading}] = useLazyQuery(getLedgersQuery)
+    const {data:odata,loading:oloading} = useQuery(getAllPaymentLedgerQuery,{variables:{"search":""}})
+    const [searchData,{data,loading}] = useLazyQuery(getAllPaymentLedgerQuery)
     useEffect(()=>{
         searchData({variables:{"search":text}})
     },[text])
@@ -91,7 +90,7 @@ const Ledger = () =>{
             {
                 oloading || loading ?
                 <TableLoading />
-                :<Records items={data==undefined ? odata.ledgers.edges : data.ledgers.edges} />    
+                :<Records items={data==undefined ? odata.allPayment.edges : data.allPayment.edges} />    
             }
 
             

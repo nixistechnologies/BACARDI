@@ -22,6 +22,28 @@ query($search:String!){
 }
 `
 
+export const getAllPaymentLedgerQuery = gql`
+query x($search:String!){
+  allPayment(search:$search){
+    edges{
+      node{
+        id
+        paid
+        date
+        customer{
+          id
+          company
+        }
+        vendor{
+          id
+          company
+        }       
+      }
+    }
+  }
+}
+`
+
 export const lastBillNumber = gql`
 query x($id:String!){
   lastNumber(id:$id){
@@ -164,6 +186,8 @@ query x($id:ID!){
   vendor(id:$id,){
     id
     company
+    purchase
+    paid
     paritalpaymentSet{
       edges{
         node{
@@ -183,6 +207,8 @@ query x($id:ID!){
   customer(id:$id,){
     id
     company
+    sales
+    paid
     paritalpaymentSet{
       edges{
         node{
@@ -191,6 +217,42 @@ query x($id:ID!){
           outstanding
           date
         }
+      }
+    }
+  }
+}
+`
+
+export const addPurchasePaymentQuery = gql`
+mutation x($id:ID!,$paid:Float!,$outstanding:Float!,$date:String!){
+  addPurchasePayment(vendorId:$id,paid:$paid,outstanding:$outstanding,date:$date){
+    success
+    partial{
+      	id
+      	paid
+      	outstanding
+        date
+        vendor{
+          id
+          company
+        }
+    }
+  }
+}
+`
+
+export const addSalePaymentQuery = gql`
+mutation x($id:ID!,$paid:Float!,$outstanding:Float!,$date:String!){
+  addSalesPayment(customerId:$id,paid:$paid,outstanding:$outstanding,date:$date){
+    success
+    partial{
+      	id
+      	paid
+      	outstanding
+        date
+        customer{
+          id
+          company
       }
     }
   }
@@ -233,7 +295,7 @@ export const BankByVendorQuery = gql`
 
 export const getLedgersQuery = gql`
 query x($search:String!){
-  ledgers(search:$search,first:10)
+  ledgers(search:$search)
    {
      edges{
        node{

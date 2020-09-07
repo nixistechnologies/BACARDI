@@ -925,6 +925,33 @@ class DeleteProduct(graphene.Mutation):
         Product.objects.get(id=from_global_id(id)[1]).delete()
         return DeleteProduct(success = True)
 
+class AddPurchasePayment(graphene.Mutation):
+    class Arguments:
+        paid = graphene.Float(required=True)
+        vendor_id = graphene.ID(required=True)
+        date = graphene.String(required=True)
+        outstanding = graphene.Float(required=True)
+    success = graphene.Boolean()
+    partial = graphene.Field(PartialPaymentNode)
+    def mutate(self,info,paid,vendor_id,date,outstanding):
+        p = ParitalPayment.objects.create(vendor_id = from_global_id(vendor_id)[1],date = datetime.datetime.strptime(date,"%Y-%m-%d"),paid=paid,outstanding=outstanding)
+        # p = ParitalPayment.objects.all()[::-1][0]
+        return AddPurchasePayment(success=True,partial = p)
+
+
+class AddSalesPayment(graphene.Mutation):
+    class Arguments:
+        paid = graphene.Float(required=True)
+        customer_id = graphene.ID(required=True)
+        date = graphene.String(required=True)
+        outstanding = graphene.Float(required=True)
+    success = graphene.Boolean()
+    partial = graphene.Field(PartialPaymentNode)
+    def mutate(self,info,paid,customer_id,date,outstanding):
+        p = ParitalPayment.objects.create(customer_id = from_global_id(customer_id)[1],date = datetime.datetime.strptime(date,"%Y-%m-%d"),paid=paid,outstanding=outstanding)
+        # p = ParitalPayment.objects.all()[::-1][0]
+        return AddSalesPayment(success=True,partial = p)
+
 class CreateUser(graphene.Mutation):
     # user = graphene.Field(UserNode)
     class Arguments:
@@ -972,6 +999,8 @@ class Mutation(graphene.ObjectType):
     create_customer = CreateCustomer.Field()
     create_vendor  = CreateVendor.Field()
     add_purchase = AddPurchase.Field()
+    add_sales_payment = AddSalesPayment.Field()
+    add_purchase_payment = AddPurchasePayment.Field()
     
 
 class Query(graphene.AbstractType):
@@ -999,11 +1028,16 @@ class Query(graphene.AbstractType):
     last_number = graphene.Field(InvoiceNumber,id=graphene.String())
     ledgers = DjangoFilterConnectionField(LedgerNode,search=graphene.String())
     bank_by_customer = DjangoFilterConnectionField(CustomerNode,search=graphene.String())
+    all_payment = DjangoFilterConnectionField(PartialPaymentNode,search=graphene.String())
     # invoiceNumner = graphene
     # bank_by_vendor = DjangoFilterConnectionField(VendorNode,search=graphene.String())
     # ledgers = graphene.
 
 # 9899200257
+
+
+    def resolve_all_payment(self,info,search,**kwargs):
+        return ParitalPayment.objects.filter(Q(vendor__name__icontains=search) | Q(customer__name__icontains=search)).order_by("-id")
 
     def resolve_bank_by_customer(self,info,search,**kwargs):
         return Customer.objects.all()
