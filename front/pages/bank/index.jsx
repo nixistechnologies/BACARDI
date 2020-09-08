@@ -5,7 +5,7 @@ import { BankByCustomerQuery } from "../../lib/graphql"
 import {TableLoading} from '../../components/skeleton'
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 // import { faFileInvoice, faPaperclip } from '@fortawesome/free-solid-svg-icons'
-// import { server } from '../../lib/settings'
+import { server } from '../../lib/settings'
 import { useState,useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import {useSelector,useDispatch} from 'react-redux'
@@ -31,6 +31,9 @@ const Bank = () =>{
             <div>
                 <div className="topHeading">
                     <h2>Bank</h2>
+                    <div>
+                        <a target="_blank" href={`${server}/export/${bankTab.sale==true?"sales":"purchase"}/${text==""?"all":text}`} className="tag is-small is-rounded is-primary">Export To Excel</a>
+                    </div>
                 </div>
 
             </div>

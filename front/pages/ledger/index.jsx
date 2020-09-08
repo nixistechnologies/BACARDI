@@ -84,6 +84,9 @@ const Ledger = () =>{
             <div>
                 <div className="topHeading">
                     <h2>Ledgers</h2>
+                    <div>
+                        <a target="_blank" href={`${server}/export/${text==""?"all":text}`} className="tag is-small is-rounded is-primary">Export To Excel</a>
+                    </div>
                 </div>
 
             </div>

@@ -29,6 +29,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("invoice/<int:pk>/<int:userId>",invoice),
     path("invoice/<str:pk>/<str:userId>",invoice),
+    path("export/sales/<str:search>/",exportBankSale),
+    path("export/<str:name>/",exportToExcel),
     path("",home),
     path('api/',include(router.urls)),
     path("example",example),

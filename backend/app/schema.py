@@ -1037,7 +1037,7 @@ class Query(graphene.AbstractType):
 
 
     def resolve_all_payment(self,info,search,**kwargs):
-        return ParitalPayment.objects.filter(Q(vendor__name__icontains=search) | Q(customer__name__icontains=search)).order_by("-id")
+        return ParitalPayment.objects.filter(Q(vendor__company__icontains=search) | Q(customer__company__icontains=search)).order_by("-id")
 
     def resolve_bank_by_customer(self,info,search,**kwargs):
         return Customer.objects.all()
