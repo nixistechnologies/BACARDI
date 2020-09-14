@@ -94,11 +94,22 @@ class Customer(models.Model):
     city = models.CharField(max_length=20,blank=True,null=True)
     company = models.CharField(max_length=50,blank=True,null=True)
     zipcode = models.CharField(max_length=6,blank=True,null=True)
-
+    outstanding_add = models.BooleanField(default=0)
 
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     def __str__(self):
         return "{} : {}".format(self.company, self.name)
+
+
+
+class CSales(models.Model):
+    sales = models.FloatField(null=True,blank=True)
+    paid = models.FloatField(null=True,blank=True)
+    customer = models.OneToOneField(Customer,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    def __str__(self):
+        return "{} | {}".format(self.customer.name,self.sales)
+    
 
 class State(models.Model):
     name = models.CharField(max_length=50,blank=True,null=True)
@@ -124,12 +135,21 @@ class Vendor(models.Model):
     city = models.ForeignKey(City,on_delete=models.CASCADE,blank=True,null=True)
     zip_code = models.CharField(max_length=10,blank=True,null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
+    outstanding_add = models.BooleanField(default=0)
 
     
     def __str__(self):
         return self.name
 
-    
+
+class VPurchase(models.Model):
+    purchase = models.FloatField(null=True,blank=True)
+    paid = models.FloatField(null=True,blank=True)
+    vendor = models.OneToOneField(Vendor,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    def __str__(self):
+        return "{} | {}".format(self.vendor.name,self.purchase)
+
 
 class Purchase(models.Model):
     vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE)
@@ -190,7 +210,8 @@ class PurchaseProduct(models.Model):
 
 class Billing(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
-    invoice_number = models.CharField(max_length=20)
+    invoice_number = models.CharField(max_length=20,blank=True,null=True)
+    invoice_number_instant = models.CharField(max_length=20,blank=True,null=True)
     customer = models.ForeignKey(Customer,on_delete = models.CASCADE)
     # medicine = models. (Medicine,on_delete=models.CASCADE)
     payment_mode = models.CharField(max_length=100)
@@ -205,22 +226,48 @@ class Billing(models.Model):
     outstanding = models.FloatField(null=True,blank=True)
     remarks = models.TextField(null=True,blank=True)
     created_date = models.DateTimeField(auto_now_add=True,blank=True,null=True)
+    is_instant = models.BooleanField(default=0,null=True,blank=True)
     # user = models.ForeignKey(User,on_delete=models.CASCADE)
     def __str__(self):
-        return self.invoice_number
+        return "{} : {}".format(self.invoice_number if self.invoice_number else self.invoice_number_instant,"Instant" if self.is_instant else "")
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        csales = CSales.objects.filter(customer_id=self.customer.id)
+        if csales :
+            csales[0].sales = self.net_amount
+            csales[0].save()
+        else:
+            CSales.objects.create(customer_id=self.customer.id,sales = self.net_amount)
+
+        super(Billing,self).save()
 
 class ParitalPayment(models.Model):
     date = models.DateField(default=datetime.now,null=True)
     paid = models.FloatField(default=0,blank=True,null=True)
+    mode = models.CharField(max_length=30, blank=True,null=True)
     outstanding = models.FloatField(default=0, blank=True,null=True)
     customer = models.ForeignKey(Customer,on_delete=models.CASCADE,null=True,blank=True)
     vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True,blank=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
 
     def __str__(self):
-        return str(self.paid)
+        if(self.customer):
+            return "{}|{}".format(self.customer.company, self.paid)
+        else:
+            return "{}|{}".format(self.vendor.company, self.paid)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+        if(self.customer):
+            csales = CSales.objects.filter(customer_id=self.customer.id)
+            if(csales):        
+                csales[0].paid = self.paid + csales[0].paid if csales[0].paid else self.paid
+                csales[0].save()
+            else:
+                CSales.objects.create(customer_id=self.customer.id,sales=self.paid)
+        super(ParitalPayment,self).save()
+
         # p = Billing.objects.get(id = self.bill.id)
         # p.paid_amount = self.paid
         # p.outstanding = self.outstanding
@@ -255,8 +302,10 @@ class Sales_Product(models.Model):
         p = Product.objects.get(id = self.product.id)
         # p.grossm = p.grossm - self.grossm
         p.netm = p.netm - self.grossm
+        self.hsn = p.hsn
         p.save()
-
+        super(Sales_Product,self).save()
+        # super().save(*args, **kwargs)
     
 class Ledgers(models.Model):
     sale = models.OneToOneField(Billing,on_delete=models.CASCADE,blank=True,null=True)

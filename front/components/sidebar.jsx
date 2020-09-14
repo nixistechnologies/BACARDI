@@ -1,6 +1,6 @@
 import  {FontAwesomeIcon,}  from '@fortawesome/react-fontawesome'
 // import { faTrashAlt,faEdit, faHospital, faBuilding } from '@fortawesome/free-regular-svg-icons'
-import {faAngleRight, faChartBar,faMale, faUserTie,faThList, faHome, faUser, faUsers, faShippingFast, faPlus, faHistory, faSmile, faCog, faSignOutAlt, faList, faPiggyBank} from '@fortawesome/free-solid-svg-icons'
+import {faAngleRight, faChartBar,faMale, faUserTie,faThList, faHome, faUser, faUsers,faArchive, faShippingFast, faPlus, faList, faSmile, faCog, faSignOutAlt, faPiggyBank, faTachometerAlt, faCartPlus, faShoppingCart, faLuggageCart} from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import Cookie from "js-cookie";
 import $ from 'jquery'
@@ -109,7 +109,7 @@ const SideBar = ({sidebar,route}) =>{
                             <a className={route=="/"?"active":"not"}>
                                 <div>
                                     <span className="s-bar-icon">
-                                        <FontAwesomeIcon icon={faHome} />
+                                        <FontAwesomeIcon icon={faTachometerAlt} />
                                     </span>
                                     <span className="s-bar-text">
                                         Dashboard
@@ -166,7 +166,7 @@ const SideBar = ({sidebar,route}) =>{
                                 <a>
                                     <div>
                                         <span className="s-bar-icon">
-                                            <FontAwesomeIcon icon={faUserTie} />
+                                            <FontAwesomeIcon icon={faArchive} />
                                         </span>
                                         <span className="s-bar-text" style={{width:'100%'}}>
                                             Products
@@ -222,62 +222,6 @@ const SideBar = ({sidebar,route}) =>{
                             </li>
                         </ul>
                     </li>
-                    
-                    <li>
-                        <div className="item" onClick={(e)=>Toggle(e)}>
-                            <a>
-                                <div >
-                                    <span className="s-bar-icon">
-                                        <FontAwesomeIcon icon={faShippingFast} />
-                                    </span>
-                                    <span className="s-bar-text" style={{width:'100%'}}>
-                                        Sales
-                                    </span>
-                                    <span className="rr-icon" style={{float:"right"}}>
-                                        <FontAwesomeIcon icon={faAngleRight}/>
-                                    </span>
-                                    
-                                </div>
-                            </a>
-                        </div>
-                        
-                        <ul className="child_" style={{display:route.startsWith("/sales")?"inherit":"none"}}>
-                            <li className="is-active">
-                            <Link href="/sales/add_new">
-                                <div className="item">
-                                    <a className={route.startsWith("/sales/add_new")?"active":"not"}>
-                                        <div>
-                                            <span className="s-bar-icon">
-                                                <FontAwesomeIcon icon={faPlus} />
-                                            </span>
-                                            <span className="s-bar-text">
-                                                Add
-                                            </span>
-                                            
-                                        </div>
-                                    </a>
-                                </div>
-                            </Link>
-                                </li>
-                            <li>
-                                <Link href="/sales/history">
-                                    <div className="item">
-                                        <a className={route.startsWith("/sales/history")?"active":"not"}>
-                                            <div>
-                                                <span className="s-bar-icon">
-                                                    <FontAwesomeIcon icon={faHistory} />
-                                                </span>
-                                                <span className="s-bar-text">
-                                                    All Sales
-                                                </span> 
-                                            </div>
-                                        </a>
-                                    </div>
-                                </Link>
-                                </li>
-                                
-                        </ul>
-                    </li>
 
 
                     <li>
@@ -285,7 +229,7 @@ const SideBar = ({sidebar,route}) =>{
                             <a>
                                 <div >
                                     <span className="s-bar-icon">
-                                        <FontAwesomeIcon icon={faShippingFast} />
+                                        <FontAwesomeIcon icon={faShoppingCart} />
                                     </span>
                                     <span className="s-bar-text" style={{width:'100%'}}>
                                         Instant Sales
@@ -322,7 +266,7 @@ const SideBar = ({sidebar,route}) =>{
                                         <a className={route.startsWith("/isales/history")?"active":"not"}>
                                             <div>
                                                 <span className="s-bar-icon">
-                                                    <FontAwesomeIcon icon={faHistory} />
+                                                    <FontAwesomeIcon icon={faList} />
                                                 </span>
                                                 <span className="s-bar-text">
                                                     All Sales
@@ -336,13 +280,72 @@ const SideBar = ({sidebar,route}) =>{
                         </ul>
                     </li>
 
+                    
+                    <li>
+                        <div className="item" onClick={(e)=>Toggle(e)}>
+                            <a>
+                                <div >
+                                    <span className="s-bar-icon">
+                                        <FontAwesomeIcon icon={faCartPlus} />
+                                    </span>
+                                    <span className="s-bar-text" style={{width:'100%'}}>
+                                        Sales
+                                    </span>
+                                    <span className="rr-icon" style={{float:"right"}}>
+                                        <FontAwesomeIcon icon={faAngleRight}/>
+                                    </span>
+                                    
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <ul className="child_" style={{display:route.startsWith("/sales")?"inherit":"none"}}>
+                            <li className="is-active">
+                            <Link href="/sales/add_new">
+                                <div className="item">
+                                    <a className={route.startsWith("/sales/add_new")?"active":"not"}>
+                                        <div>
+                                            <span className="s-bar-icon">
+                                                <FontAwesomeIcon icon={faPlus} />
+                                            </span>
+                                            <span className="s-bar-text">
+                                                Add
+                                            </span>
+                                            
+                                        </div>
+                                    </a>
+                                </div>
+                            </Link>
+                                </li>
+                            <li>
+                                <Link href="/sales/history">
+                                    <div className="item">
+                                        <a className={route.startsWith("/sales/history")?"active":"not"}>
+                                            <div>
+                                                <span className="s-bar-icon">
+                                                    <FontAwesomeIcon icon={faList} />
+                                                </span>
+                                                <span className="s-bar-text">
+                                                    All Sales
+                                                </span> 
+                                            </div>
+                                        </a>
+                                    </div>
+                                </Link>
+                                </li>
+                                
+                        </ul>
+                    </li>
+
+
+                    
 
                     <li>
                         <div className="item" onClick={(e)=>Toggle(e)}>
                             <a>
                                 <div >
                                     <span className="s-bar-icon">
-                                        <FontAwesomeIcon icon={faShippingFast} />
+                                        <FontAwesomeIcon icon={faLuggageCart} />
                                     </span>
                                     <span className="s-bar-text" style={{width:'100%'}}>
                                         Purchase
@@ -380,7 +383,7 @@ const SideBar = ({sidebar,route}) =>{
                                         <a className={route.startsWith("/purchase/history")?"active":"not"}>
                                             <div>
                                                 <span className="s-bar-icon">
-                                                    <FontAwesomeIcon icon={faHistory} />
+                                                    <FontAwesomeIcon icon={faList} />
                                                 </span>
                                                 <span className="s-bar-text">
                                                     All Purchase
@@ -404,7 +407,7 @@ const SideBar = ({sidebar,route}) =>{
                             >
                                 <div>
                                     <span className="s-bar-icon">
-                                        <FontAwesomeIcon icon={faList} />
+                                        <FontAwesomeIcon icon={faChartBar} />
                                     </span>
                                     <span className="s-bar-text">
                                         Ledger
@@ -588,7 +591,7 @@ const SideBar = ({sidebar,route}) =>{
             //                     <Link href="/history">
             //                         <div className="inner_block">
             //                             <div>
-            //                                 <FontAwesomeIcon icon={faHistory} className="icon_"/>
+            //                                 <FontAwesomeIcon icon={faList} className="icon_"/>
             //                             </div>
                                         
             //                             <h1 className="label">History</h1>

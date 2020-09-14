@@ -61,10 +61,16 @@ class Layout extends React.Component{
             <ApolloProvider client={client}>
             <ApolloHooksProvider client={client}>
             <div>
+                
                 <Head>
                     <title>{title}</title>
                     <meta charSet="utf-8" />
                     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+                    {/* <style jsx>{`
+                        body{
+                            background-color: #EDEDEE !important;
+                        }
+                        `}</style> */}
                 </Head>
 
                 {login===true?

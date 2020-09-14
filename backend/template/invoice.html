@@ -107,7 +107,7 @@
 	<body>
 		<div class="bill_container">
 			<h4>TAX INVOICE</h4>
-			<p class="gst_no">07CID523661K1Z1</p>
+			<p class="gst_no">{{user.profile.GST_no}}</p>
 			<div class="comp_info">
 				<h3 class="comp_name" style="text-transform: uppercase;">{{user.profile.firm_name}}</h3>
 				<p class="addr_1">{{user.profile.address}}</p>
@@ -170,14 +170,14 @@
 				        			<td>Address : {{bill.customer.address}}</td>
 				        		</tr>
 				        		<tr>
-				        			<td>State : </td>
-				        			<td>State Code : </td>
+				        			<td>State : {{bill.customer.state}}</td>
+									<td>City : {{bill.customer.city}}</td>
 				        		</tr>
 				        		<tr>
-				        			<td>GSTIN NO. : </td>
+				        			<td>GSTIN NO. : {{bill.customer.gst_number}} </td>
 				        		</tr>
 				        		<tr>
-				        			<td>AADHAR NO. : </td>
+				        			<td>AADHAR NO. : {{bill.customer.addhar_no}}</td>
 				        		</tr>
 				        	</table>
 				        </td>			        
@@ -190,14 +190,14 @@
 				        			<td>Address : {{bill.customer.address}}</td>
 				        		</tr>
 				        		<tr>
-				        			<td>State : </td>
-				        			<td>State Code : </td>
+				        			<td>State : {{bill.customer.state}}</td>
+				        			<td>City : {{bill.customer.city}}</td>
 				        		</tr>
 				        		<tr>
-				        			<td>GSTIN NO. : </td>
+				        			<td>GSTIN NO. : {{bill.customer.gst_number}} </td>
 				        		</tr>
 				        		<tr>
-				        			<td>AADHAR NO. : </td>
+				        			<td>AADHAR NO. : {{bill.customer.addhar_no}}</td>
 				        		</tr>
 				        	</table>
 				        </td>
@@ -205,12 +205,12 @@
 				      <tr>
 				      	<th class="th_head">Sr.</th>
 				      	<th class="th_head">Description</th>
-				      	<th class="th_head">Size</th>
 				      	<th class="th_head">HSN Code</th>
-				      	<th class="th_head">Taga</th>
-				      	<th class="th_head">Rate</th>				      	
+				      	<th class="th_head">Net(mtr)</th>
+				      	<th class="th_head">Price</th>
+				      	<th class="th_head">Taga</th>				      	
 				      	<th class="tab_th">
-				      		<table class="tab_cont"><tr><th class="th_head" colspan="2" style="border-bottom: 1px solid grey !important;">Discount</th></tr>
+				      		<table class="tab_cont"><tr><th class="th_head" colspan="2" style="border-bottom: 1px solid grey !important;">IGST</th></tr>
 				      		<tr><th class="th_head">%</th><th class="th_head">Amt.</th></tr></table>
 				      	</th>
 				      	<th class="tab_th">
@@ -227,21 +227,32 @@
 				      <tr>
 				      	<td>1</td>
 				      	<td>{{i.product_name}}</td>
-				      	<td>32</td>
-				      	<td>{{i.product_name}}</td>
+				      	{% comment %} <td>{{i.hsn}}</td> {% endcomment %}
+						{%if i.hsn %}
+						  <td>{{i.hsn}}</td>
+						{% else %}
+							<td>-</td>
+						{% endif %}
+
+
+				      	<td>{{i.netm}}</td>
 				      	<td>{{i.price}}</td>
-				      	<td>490</td>				      	
+				      	{%if i.taga %}
+						  <td>{{i.taga}}</td>
+						{% else %}
+							<td>0</td>
+						{% endif %}
 				      	<td class="tab_td">
 				      		<table class="tab_cont">
-				      		<tr><td></td><td></td></tr></table>
+				      		<tr><td>-</td><td>-</td></tr></table>
 				      	</td>
 				      	<td class="tab_td">
 				      		<table class="tab_cont">
-				      		<tr><td></td><td></td></tr></table>
+				      		<tr><td>5%</td><td>{{i.CGST}}</td></tr></table>
 				      	</td>
 				      	<td class="tab_td">
 				      		<table class="tab_cont">
-				      		<tr><td>{{i.GST}}</td><td>{{i.CGST}}</td></tr></table>
+				      		<tr><td>5%</td><td>{{i.SGST}}</td></tr></table>
 				      	</td>
 				      	<td style="text-align: right;">{{i.total}}</td>
 					  </tr>
@@ -359,14 +370,14 @@
 				      	<td style="text-align: right;">{{bill.gross_amount}}</td>
 				      </tr>
 				      <tr>
-				      	<td colspan="7">Tax Chargable in Words:<br><b>Rs. Two Thousand twenty Five Only</b></td>
+				      	<td colspan="7">Tax Chargable in Words:<br><b>Rs. {{taxInWord}}</b></td>
 				      	<td class="tab_td" colspan="3">
 				      		<table class="tab_cont1" cellspacing="0">
-				      		<tr><td style="text-align: left;width: 66%;">Taxable value</td><td style="text-align: right;">{{bill.gross_amount}}</td></tr>
+				      		<tr><td style="text-align: left;width: 66%;">Taxable value</td><td style="text-align: right;">{{taxInInt}}</td></tr>
 				      	<tr><td><table class="tab_cont2" cellspacing="0">
-				      		<tr><th>CGST</th><td>0</td></tr>
-				      	<tr><th>SGST</th><td>0</td></tr>
-				      <tr><th>IGST</th><td>2025</td></tr></table></td><td style="text-align: right;">2025</td></tr>
+				      		<tr><th>CGST</th><td>{{bill.sgst}}</td></tr>
+				      	<tr><th>SGST</th><td>{{bill.cgst}}</td></tr>
+				      <tr><th>IGST</th><td></td></tr></table></td><td style="text-align: right;">{% widthratio bill.cgst 1 2 %}</td></tr>
 				      </table>
 				      	</td>
 				      </tr>
@@ -383,13 +394,13 @@
 				      	<td colspan="10"><b>Our bank Details : </b>
 				      	<table class="tab_cont3" cellspacing="0">
 				      		<tr>
-				      			<td>A/c Name : {{user.profile.firm_name}}</td>
-				      			<td>A/c No. : 135805000832</td>
-				      			<td>IFSC : ICIC0001358</td>
+				      			<td>A/c Name : {{user.bank.name}}</td>
+				      			<td>A/c No. : {{user.bank.account_no}}</td>
+				      			<td>IFSC : {{user.bank.ifsc_code}}</td>
 				      		</tr>
 				      		<tr>
-				      			<td>Bank Name : ICICI BANK</td>
-				      			<td>Branch : REGHAR PURA</td>
+				      			<td>Bank Name : {{user.bank.bank_name}}</td>
+				      			<td>Branch : {{user.bank.branch}}</td>
 				      		</tr>
 				      	</table>
 				      	</td>

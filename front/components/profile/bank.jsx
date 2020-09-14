@@ -49,6 +49,7 @@ const Personal = () =>{
     if(error){
     return <div>{error.message}</div>
     }
+    const bank =  C.user.bank
     return <>
         <form onSubmit={handleSubmit(submitPersonal)}>
             <div className="out">
@@ -59,9 +60,9 @@ const Personal = () =>{
                 {
                     isEdit?
                     <input type="text" name="account" ref={register}  placeholder="Account No" 
-                    defaultValue={C.user.bank.accountNo} 
+                    defaultValue={bank==null ?"": bank.accountNo} 
                     className="input is-small" />
-                    :C.user.bank.accountNo
+                    :bank!=null && bank.accountNo
                 }
 
                     
@@ -76,9 +77,9 @@ const Personal = () =>{
                     {
                     isEdit?
                     <input type="text" name="name" ref={register} placeholder="Account Holder Name" 
-                    defaultValue={C.user.bank.name} 
+                    defaultValue={bank==null ?"": bank.name} 
                     className="input is-small" />
-                    :C.user.bank.name
+                    :bank!=null && bank.name
                 }
                 </div>
             </div>
@@ -90,9 +91,9 @@ const Personal = () =>{
                     {
                     isEdit?
                     <input type="text" name="bank" ref={register} placeholder="Bank Name" 
-                    defaultValue={C.user.bank.bankName} 
+                    defaultValue={bank==null ?"": bank.bankName} 
                     className="input is-small" />
-                    :C.user.bank.bankName
+                    :bank!=null && bank.bankName
                 }
                 </div>
             </div>
@@ -104,9 +105,9 @@ const Personal = () =>{
                     {
                     isEdit?
                     <input type="text" name="ifsc" ref={register} placeholder="IFSC code" 
-                    defaultValue={C.user.bank.ifscCode} 
+                    defaultValue={bank==null ?"": bank.ifscCode} 
                     className="input is-small" />
-                    :C.user.bank.ifscCode
+                    :bank!=null && bank.ifscCode
                 }
                 </div>
             </div>
@@ -118,9 +119,9 @@ const Personal = () =>{
                     {
                     isEdit?
                     <input type="text" name="branch" ref={register} placeholder="Branch" 
-                    defaultValue={C.user.bank.branch} 
+                    defaultValue={bank==null ?"": bank.branch} 
                     className="input is-small" />
-                    :C.user.bank.branch
+                    :bank!=null && bank.branch
                 }
                 </div>
             </div>

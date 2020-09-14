@@ -31,6 +31,10 @@ const Modal = ({active,setActive,loading,item,info})=>{
     console.log(info)
     return(
         <div className={`modal ${active}`} >
+            <style jsx>{`
+            .modal-content, .modal-card {
+                .modal-content, .modal-card {
+            `}</style>
             <div className="modal-background" onClick={()=>setActive("")}></div>
                 <div className="modal-content">
                     <div className="box">
@@ -51,7 +55,7 @@ const Modal = ({active,setActive,loading,item,info})=>{
                                     <div style={{float:'right'}}>
                                         <span>
                                             {/* {info.date} */}
-                                            {new Date(info.date).toDateString()}
+                                            {new Date(info.invoiceDate).toDateString()}
                                         </span>
                                         
                                     </div>
@@ -148,7 +152,7 @@ const Result = ({loading,data})=>{
                 <thead>
                     <tr>
                         <th>SN.</th>
-                        <th>Date</th>
+                        {/* <th>Date</th> */}
                         <th>Vendor</th>
                         <th>Company</th>
                         <th>Invoice No.</th>
@@ -166,7 +170,7 @@ const Result = ({loading,data})=>{
                                     {item.node.invoiceNumber}
                                 </a>
                             </td> */}
-                            <td>{item.node.date}</td>
+                            {/* <td>{item.node.date}</td> */}
                             <td>{item.node.vendor.name}</td>
                             <td>{item.node.vendor.company}</td>
 

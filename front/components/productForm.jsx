@@ -274,17 +274,18 @@ function X({productId=null,name=null,purchase=null,setActive=null }){
                     defaultValue={productId!=null?single.productById.typeOfPacking:""}
                     type="text" name="typeofpack" placeholder="Type of Packing" required/>
                 </div> */}
-                <div>
-                    <label className="label">List Price</label>
-                    <input className="input is-small" ref={register}
-                    defaultValue={productId!=null?single.productById.price:""}
-                     type="text" name="listprice"  placeholder="List Price" required/>
-                </div>
+
                 <div>
                     <label className="label">Cost Price</label>
                     <input className="input is-small" ref={register}
                     defaultValue={productId!=null?single.productById.cost:""}
                      type="text" name="cost"  placeholder="Cost Price" required/>
+                </div>
+                <div>
+                    <label className="label">List Price</label>
+                    <input className="input is-small" ref={register}
+                    defaultValue={productId!=null?single.productById.price:""}
+                     type="text" name="listprice"  placeholder="List Price" required/>
                 </div>
                                 
                 

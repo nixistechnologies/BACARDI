@@ -19,6 +19,7 @@ import CustomerForm from '../../components/customerForm'
 // import SelectSearch from 'react-select-search';
 // import { useSelect } from 'react-select-search';
 import $ from 'jquery'
+import Router from "next/router"
 
 const ref = React.createRef();
 
@@ -100,8 +101,8 @@ const Billingform =() =>{
     const [active,setActive] = useState("modal")
     const [cname,setCname] = useState("")
     const [pname,setPname] = useState("")
-    const [cSuggestion,{data:customerTemp,loading:customerloading}] = useLazyQuery(customerSuggestion)
-    const [pSuggestion,{data:productTemp,loading:productloading}] = useLazyQuery(productSuggetionQuery)
+    const [cSuggestion,{data:customerTemp,loading:customerloading}] = useLazyQuery(customerSuggestion,{fetchPolicy:'network-only'})
+    const [pSuggestion,{data:productTemp,loading:productloading}] = useLazyQuery(productSuggetionQuery,{fetchPolicy:'network-only'})
     const [genBill,{data:billData,loading:billLoading}]  = useMutation(generateBillQuery)
     
     const [dropdown1,setDropdown1] = useState("")
@@ -199,19 +200,21 @@ const Billingform =() =>{
         // }
     }
 
-    const BillToServer=(customerId,date,payment,remarks,mlist,invoice_number)=>{
+    const BillToServer=(customerId,date,payment,remarks,mlist,invoice_number,taga)=>{
         // console.log(errors)
         console.log(customerId)
         console.log(date)
         console.log(payment)
         console.log(remarks)
-        console.log(mlist)
+        // console.log(mlist)
         // console.log(mlist)
         genBill({variables:{
             "customerId":customerId,
             "remarks":remarks,
             "date":date,
             "payment":"Cash",
+            "isInstant":false,
+            // "taga":taga,
             "invoice_number":invoice_number,
             "products":mlist,
             // "paid":getValues("paid") === ""?tamount:getValues("paid")
@@ -278,6 +281,7 @@ const Billingform =() =>{
                 "grossm":getValues("grossm").length? getValues("grossm"):1,
                 "price":getValues("price"),
                 "less":getValues("less"),
+                "taga":getValues("taga"),
                 "net":getValues("net"),
                 // "discount":getValues("discount").length?getValues("discount"):0
             }]
@@ -297,6 +301,7 @@ const Billingform =() =>{
             {"grossm":""},
             {"net":""},
             {"price":""},
+            {"taga":""}
             // {"pgst":""}
         ])
     }
@@ -345,8 +350,9 @@ const Billingform =() =>{
     }
     const reset =()=>{
         setMlist([])
-        dispatch(clearBill())
-        setCname("")
+        // dispatch(clearBill())
+        // setCname("")
+        setCustomer({name:""})
         setPname("")
         // billData = undefined
         setValue([
@@ -357,6 +363,7 @@ const Billingform =() =>{
             {"payment":""},
             {"gst":""},
             {"date":""},
+            {"invoice_number":""}
             
         ])
 
@@ -750,6 +757,14 @@ const Billingform =() =>{
                         type="text" name="net" placeholder="Net(mtr)" required disabled/>
                     </div>
                     <input type="hidden" name="pgst" ref={register} />
+                    <div className="column is-1">
+                        <label className="label">Taga</label>
+                        <input className="input is-small" ref={register}
+                        // onChange={()=>setMrp(mrp)} value={mrp} 
+                        defaultValue={0}
+                        type="text" name="taga" placeholder="Taga" required/>
+                    </div>
+
                     <div className="column">
                         <label className="label">Price</label>
                         <input className="input is-small" ref={register}
@@ -790,10 +805,11 @@ const Billingform =() =>{
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Price</th>
                             <th>Gross (mtr)</th>
                             <th>Less(%)</th>
                             <th>Net(mtr)</th>
+                            <th>Taga</th>
+                            <th>Price</th>
                             {/* <th>Total Amount</th> */}
                             <th></th>
                         </tr>
@@ -810,14 +826,16 @@ const Billingform =() =>{
                         //     textTransform: "uppercase"
                         //     }}
                             >
-                            <td style={{fontWeight:'bold',fontFamily:'nfontB'}}>
+                            <td style={{fontWeight:'bold', fontFamily:'nfontB',width:"250px"}}>
                                 {e.name}
                             
                             </td>
-                            <td>{e.price}</td>
                             <td>{e.grossm}</td>
+
                             <td>{e.less}</td>
                             <td>{e.net}</td>
+                            <td>{e.taga}</td>
+                            <td>{e.price}</td>
                             {/* <td>{e.discount??1}</td> */}
                             {/* <td>{(e.price * e.qty??1) - ((e.price * e.qty??1)*e.discount/100)  }</td> */}
                             <td onClick={deletefromtemp.bind(null,i)} style={{cursor:'pointer'}}>
@@ -865,7 +883,7 @@ const Billingform =() =>{
                 
 
                 <a onClick={()=> 
-                    BillToServer( getValues("customerId"),getValues("date"),getValues("payment"),getValues("remarks"),mlist,getValues("invoice_number"))
+                    BillToServer( getValues("customerId"),getValues("date"),getValues("payment"),getValues("remarks"),mlist,getValues("invoice_number"),getValues("taga"))
                 }
                 target={billstore.invoice==null?'_self':'_blank'}>
 
@@ -879,7 +897,7 @@ const Billingform =() =>{
                 :
                     <>
                     <a href={`${server}/invoice/${billData.generateBill.bill.id}/${billData.generateBill.bill.user.id}`} target="_blank" className="button is-primary is-small" >View or Print</a>
-                    <a style={{marginLeft:'30px'}} className="button is-small" onClick={()=>reset()}>Reset</a>
+                    <a style={{marginLeft:'30px'}} className="button is-small" onClick={()=>Router.reload()}>Reset</a>
                     </>
                 }
             </div>

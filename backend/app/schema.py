@@ -179,6 +179,55 @@ class BillingNode(DjangoObjectType):
 
         interfaces = (relay.Node,)
 
+class CSaleFilter(FilterSet):
+    # name_startswith = django_filters.CharFilter(field_name="name", lookup_expr="icontains")
+    isAdded = django_filters.BooleanFilter(field_name="customer__outstanding_add",lookup_expr="exact")
+
+    class Meta:
+        model = CSales
+        fields = ["isAdded",]
+        # filter_fields={
+        #     # "vendor__name":["iexact"],
+        #     "sales":["lte","gte"],
+        
+    @property
+    def qs(self):
+        return super(CSaleFilter,self).qs.filter(user_id = self.request.user.id)
+
+
+class CSalesNode(DjangoObjectType):
+    class Meta:
+        model = CSales
+        # filter_fields = ()
+        filterset_class = CSaleFilter
+        # filter_fields={
+        #     # "vendor__name":["iexact"],
+        #     "sales":["lte","gt"],
+        # }
+        interfaces = (relay.Node,)
+
+
+class VPurchaseNode(DjangoObjectType):
+    class Meta:
+        model = VPurchase
+        filter_fields={
+            "vendor__name":["exact"]
+        }
+        interfaces = (relay.Node,)
+
+
+class CustomerFilter(FilterSet):
+    name = django_filters.CharFilter(field_name="name", lookup_expr="icontains")
+    company_Icontains = django_filters.CharFilter(field_name="company", lookup_expr="icontains")
+    # sales = django_filters.NumberFilter(field_name="")
+    # name_startswith = django_filters.CharFilter(field_name="name", lookup_expr="icontains")
+    class Meta:
+        model = Customer
+        fields = ["name","company","outstanding_add","company_Icontains"]
+    @property
+    def qs(self):
+        return super(CustomerFilter,self).qs.filter(user_id = self.request.user.id)
+
 class CustomerNode(DjangoObjectType):
     sales = graphene.Float()
     paid = graphene.Float()
@@ -189,7 +238,12 @@ class CustomerNode(DjangoObjectType):
     # purchase = graphene.Int()
     class Meta:
         model = Customer
-        filter_fields=()
+        # filter_fields={
+        #     "name":["exact","iexact"]
+        # }
+        filterset_class = CustomerFilter
+
+
         interfaces = (relay.Node,)
     def resolve_sales(self,info):
         return sum([i.net_amount for i in Customer.objects.get(id=self.id).billing_set.all()])
@@ -208,9 +262,10 @@ class Sales_ProductNode(DjangoObjectType):
 
 class VendorFilter(FilterSet):
     name_contains = django_filters.CharFilter(field_name="name",lookup_expr="icontains")
+    company_Icontains = django_filters.CharFilter(field_name="company", lookup_expr="icontains")
     class Meta:
         model = Vendor
-        fields = ["name"]
+        fields = ["name","company","outstanding_add","company_Icontains"]
     @property
     def qs(self):
         return super(VendorFilter,self).qs.filter(user_id = self.request.user.id)
@@ -343,6 +398,7 @@ class MInput(graphene.InputObjectType):
     less = graphene.Float()
     net = graphene.Float()
     price = graphene.Float()
+    taga = graphene.String()
     # gst = graphene.Float()
     # discount = graphene.Float()
     # expiry = graphene.String()
@@ -554,12 +610,14 @@ class CreateBill(graphene.Mutation):
         payment_mode = graphene.String(required = True)
         billing_date = graphene.String(required = True)
         invoice_number = graphene.String(required = True)
+        is_instant = graphene.Boolean(required = True)
+        # taga = gra
         # payment = graphene.Float(required=True)
         # gst = graphene.Float(required = True)
         products = graphene.List(MInput)
     bill = graphene.Field(BillingNode)
     ledger = graphene.Field(LedgerNode)
-    def mutate(self,info,payment_mode,billing_date,products,customerId,remarks,invoice_number):
+    def mutate(self,info,payment_mode,billing_date,products,customerId,remarks,invoice_number,is_instant):
         # print(products[0])
         # user_id = from_global_id(user_id)[1]
         # name = name.replace(" ({})".format(age),"")
@@ -572,12 +630,31 @@ class CreateBill(graphene.Mutation):
 
         user_id = from_global_id(customerId)[1]
 
-
+        # inv_no = 
         bill = Billing.objects.create( 
-            user_id=info.context.user.id,invoice_number=invoice_number.format(user_id),customer_id=user_id,payment_mode=payment_mode,billing_date=datetime.datetime.strptime(billing_date,"%Y-%m-%d")
+            is_instant=is_instant, user_id=info.context.user.id, customer_id=user_id,payment_mode=payment_mode,billing_date=datetime.datetime.strptime(billing_date,"%Y-%m-%d")
             )
-        print(bill)
-        bill.invoice_number = invoice_number
+        # print(bill)
+        if(is_instant):
+            temp_bill = Billing.objects.filter(user_id = info.context.user.id).exclude(is_instant=False).exclude(id=bill.id)
+            print(temp_bill)
+            # Billing.objects.filter(user_id=1).exclude(is_instant=False) 
+            if(temp_bill):
+                print(temp_bill)
+                # print(temp_bill.order_by("-id")[0].invoice_number_instant)
+                # for i in temp_bill.order_by("-id"):
+                #     print(i.invoice_number_instant)
+                
+                if(temp_bill.order_by("-id")[0].invoice_number_instant):
+                    print(temp_bill.order_by("-id")[0].invoice_number_instant)
+                    bill.invoice_number_instant = int(temp_bill.order_by("-id")[0].invoice_number_instant) + 1
+                else:
+                    bill.invoice_number_instant = 1
+            else:
+                bill.invoice_number_instant = 1
+
+        else:
+            bill.invoice_number = invoice_number
 
         gross = total = discount = cgst =  0.0
 
@@ -589,6 +666,7 @@ class CreateBill(graphene.Mutation):
 
             print(i)
             Sales_Product.objects.create(
+                taga = i["taga"],
                 product_id = from_global_id(i["product_id"])[1],
                 product_name = i["name"],
                 lessm = int(i["less"]),
@@ -931,13 +1009,52 @@ class AddPurchasePayment(graphene.Mutation):
         vendor_id = graphene.ID(required=True)
         date = graphene.String(required=True)
         outstanding = graphene.Float(required=True)
+        mode = graphene.String(required=True)
     success = graphene.Boolean()
     partial = graphene.Field(PartialPaymentNode)
-    def mutate(self,info,paid,vendor_id,date,outstanding):
-        p = ParitalPayment.objects.create(vendor_id = from_global_id(vendor_id)[1],date = datetime.datetime.strptime(date,"%Y-%m-%d"),paid=paid,outstanding=outstanding)
+    def mutate(self,info,paid,vendor_id,date,outstanding,mode):
+        p = ParitalPayment.objects.create(mode=mode, vendor_id = from_global_id(vendor_id)[1],date = datetime.datetime.strptime(date,"%Y-%m-%d"),paid=paid,outstanding=outstanding,user_id = info.context.user.id)
         # p = ParitalPayment.objects.all()[::-1][0]
         return AddPurchasePayment(success=True,partial = p)
 
+class AddCustomerOutStanding(graphene.Mutation):
+    class Arguments:
+        outstanding = graphene.Float()
+        customer_id = graphene.ID(required=True)
+    customer = graphene.Field(CustomerNode)
+    def mutate(self,info,outstanding,customer_id):
+        c = Customer.objects.get(id=from_global_id(customer_id)[1])
+        c.outstanding_add = 1
+        out = CSales.objects.filter(customer_id = from_global_id(customer_id)[1])
+        # print(out)
+        if(out):
+            # print()
+            out[0].sales = outstanding + out[0].sales if out[0].sales else outstanding
+            out[0].save()
+        else:
+            CSales.objects.create(customer_id = from_global_id(customer_id)[1],sales = outstanding,user_id=info.context.user.id)
+        c.save()
+        return AddCustomerOutStanding(customer = c)
+        
+
+class AddVendorOutStanding(graphene.Mutation):
+    class Arguments:
+        outstanding = graphene.Float()
+        vendor_id = graphene.ID(required=True)
+    vendor = graphene.Field(VendorNode)
+    def mutate(self,info,outstanding,vendor_id):
+        c = Vendor.objects.get(id=from_global_id(vendor_id)[1])
+        c.outstanding_add = 1
+        out = VPurchase.objects.filter(vendor_id = from_global_id(vendor_id)[1])
+        # print(out)
+        if(out):
+            # print()
+            out[0].purchase = outstanding + out[0].purchase if out[0].purchase else outstanding
+            out[0].save()
+        else:
+            VPurchase.objects.create(vendor_id = from_global_id(vendor_id)[1],purchase = outstanding,user_id=info.context.user.id)
+        c.save()
+        return AddVendorOutStanding(vendor = c)        
 
 class AddSalesPayment(graphene.Mutation):
     class Arguments:
@@ -945,10 +1062,11 @@ class AddSalesPayment(graphene.Mutation):
         customer_id = graphene.ID(required=True)
         date = graphene.String(required=True)
         outstanding = graphene.Float(required=True)
+        mode = graphene.String(required=True)
     success = graphene.Boolean()
     partial = graphene.Field(PartialPaymentNode)
-    def mutate(self,info,paid,customer_id,date,outstanding):
-        p = ParitalPayment.objects.create(customer_id = from_global_id(customer_id)[1],date = datetime.datetime.strptime(date,"%Y-%m-%d"),paid=paid,outstanding=outstanding)
+    def mutate(self,info,paid,customer_id,date,outstanding,mode):
+        p = ParitalPayment.objects.create(user_id=info.context.user.id, mode=mode,customer_id = from_global_id(customer_id)[1],date = datetime.datetime.strptime(date,"%Y-%m-%d"),paid=paid,outstanding=outstanding)
         # p = ParitalPayment.objects.all()[::-1][0]
         return AddSalesPayment(success=True,partial = p)
 
@@ -963,16 +1081,17 @@ class CreateUser(graphene.Mutation):
         phone = graphene.String(required=True)
 
         gst = graphene.String(required=True)
-        tin = graphene.String(required=True)
+        # tin = graphene.String(required=True)
         firm_name = graphene.String(required=True)
         address = graphene.String(required=True)
 
     user = graphene.Field(UserNode)
-    def mutate(self,info,username,password,email,firstname,lastname,gst,tin,firm_name,address,phone):
+    def mutate(self,info,username,password,email,firstname,lastname,gst,firm_name,address,phone):
         user = get_user_model()(username = username,email = email,first_name = firstname,last_name=lastname)
         user.set_password(password)
         user.save()
-        Profile.objects.create(user_id = user.id,GST_no = gst,TIN_no=tin,firm_name=firm_name,address=address,contact_number=phone)
+        Profile.objects.create(user_id = user.id,GST_no = gst,firm_name=firm_name,address=address,contact_number=phone)
+        Bank.objects.create(user_id = user.id)
         return CreateUser(user=user)
 
 import graphql_jwt
@@ -1001,10 +1120,14 @@ class Mutation(graphene.ObjectType):
     add_purchase = AddPurchase.Field()
     add_sales_payment = AddSalesPayment.Field()
     add_purchase_payment = AddPurchasePayment.Field()
+    add_customer_out_standing = AddCustomerOutStanding.Field()
+    add_vendor_out_standing = AddVendorOutStanding.Field()
     
 
 class Query(graphene.AbstractType):
     customers = DjangoFilterConnectionField(CustomerNode,search=graphene.String())
+    customers_by_company = DjangoFilterConnectionField(CSalesNode,search=graphene.String())
+    vendor_by_company = DjangoFilterConnectionField(VPurchaseNode,search=graphene.String())
     customer = graphene.Field(CustomerNode,id=graphene.ID())
     vendor = graphene.Field(VendorNode,id=graphene.ID())
     all_products = DjangoFilterConnectionField(ProductNode,search=graphene.String())
@@ -1012,7 +1135,7 @@ class Query(graphene.AbstractType):
     product_suggestion = graphene.List(ProductNode,suggestion=graphene.String())
     category_suggestion = graphene.List(CategoryNode,suggestion=graphene.String())
     report = DjangoFilterConnectionField(BillingNode,min=graphene.String(),max=graphene.String())
-    history = DjangoFilterConnectionField(BillingNode,slug=graphene.String())
+    history = DjangoFilterConnectionField(BillingNode,slug=graphene.String(),is_instant=graphene.Boolean())
     subcategoy = DjangoFilterConnectionField(SubCategoryNode,id = graphene.ID(),search=graphene.String())
     user = graphene.Field(UserNode)
     customer_suggestion = DjangoFilterConnectionField(CustomerNode,suggestion = graphene.String())
@@ -1037,7 +1160,7 @@ class Query(graphene.AbstractType):
 
 
     def resolve_all_payment(self,info,search,**kwargs):
-        return ParitalPayment.objects.filter(Q(vendor__company__icontains=search) | Q(customer__company__icontains=search)).order_by("-id")
+        return ParitalPayment.objects.filter(Q(vendor__company__icontains=search) | Q(customer__company__icontains=search)).filter(user_id = info.context.user.id).order_by("-id")
 
     def resolve_bank_by_customer(self,info,search,**kwargs):
         return Customer.objects.all()
@@ -1051,14 +1174,18 @@ class Query(graphene.AbstractType):
     def resolve_last_number(self,info,id):
         print(id)
         if(id):
-            if(Billing.objects.filter(invoice_number=id)):
+            if(Billing.objects.filter(invoice_number=id).filter(user_id=info.context.user.id)).filter(is_instant=False):
                 return {"exist":True,"last_number":0}
             else:
                 return {"exist":False,"last_number":0}
         else:
-            bill = Billing.objects.all()
+            bill = Billing.objects.filter(user_id=info.context.user.id).filter(is_instant=False)
             if(bill):
-                return {"last_number":bill[::-1][0].id+1,"exist":False}
+                
+                # num = int(bill[::-1][0].invoice_number) + 1
+                num = int(bill.order_by("-id")[0].invoice_number) + 1
+
+                return {"last_number":num,"exist":False}
             else:
                 return {"last_number":1,"exist":False}
 
@@ -1072,11 +1199,11 @@ class Query(graphene.AbstractType):
         for i in Purchase.objects.filter(user_id=info.context.user.id):
             purchase +=  i.total_bill if i.total_bill else 0
             
-        return {"sales":sales,"purchase":purchase} 
+        return {"sales":sales,"purchase":purchase}
 
     def resolve_vendors_search(self,info,search,**kwargs):
         
-        data =  Vendor.objects.filter(Q(name__icontains=search) | Q(company__icontains=search) | Q(email__icontains=search) | Q(city__name__icontains=search) | Q(state__name__icontains=search) | Q(mobile__icontains=search)) 
+        data =  Vendor.objects.filter(Q(name__icontains=search) | Q(company__icontains=search) | Q(email__icontains=search) | Q(city__name__icontains=search) | Q(state__name__icontains=search) | Q(mobile__icontains=search)).filter(user=info.context.user.id)
         return data
         # print(data)
         # return Vendor.objects.all()
@@ -1089,7 +1216,7 @@ class Query(graphene.AbstractType):
         return City.objects.filter(state_id=from_global_id(stateId)[1])
 
     def resolve_vendors(self,info,search,**kwargs):
-        return Vendor.objects.filter(Q(name__icontains=search) | Q(company__icontains=search) | Q(email__icontains=search) | Q(city__name__icontains=search) | Q(state__name__icontains=search) | Q(mobile__icontains=search)) 
+        return Vendor.objects.filter(Q(name__icontains=search) | Q(company__icontains=search) | Q(email__icontains=search) | Q(city__name__icontains=search) | Q(state__name__icontains=search) | Q(mobile__icontains=search)).filter(user_id=info.context.user.id)
         # return Vendor.objects.filter(user_id = info.context.user.id)
 
     def resolve_customer(self,info,id):
@@ -1101,8 +1228,18 @@ class Query(graphene.AbstractType):
     def resolve_customers(self,info,search,**kwargs):
         return Customer.objects.filter(Q(name__icontains=search) | Q(email__icontains=search) | Q(mobile__icontains=search) | Q(gst_number__icontains=search) | Q(address__icontains=search)).filter(user_id=info.context.user.id)
 
+    def resolve_vendor_by_company(self,info,search,**kwargs):
+        return VPurchase.objects.filter(vendor__company__icontains=search).filter(user_id=info.context.user.id)
+
+    def resolve_customers_by_company(self,info,search,**kwargs):
+        return CSales.objects.filter(customer__company__icontains=search).filter(user_id=info.context.user.id)
+
+        # return Customer.objects.filter(Q(name__icontains=search) | Q(company__icontains=search) ).filter(user_id=info.context.user.id).filter(outstanding_add=False)
+
+
+
     def resolve_customer_suggestion(self,info,suggestion,**kwargs):
-        return Customer.objects.filter(company__icontains=suggestion)
+        return Customer.objects.filter(company__icontains=suggestion).filter(user_id=info.context.user.id)
     # def resolve_customers(self,info):
     #     return Customer.objects.filter(user_id=info.context.user.id)
 
@@ -1120,14 +1257,14 @@ class Query(graphene.AbstractType):
 
     # def resolve_history(self,info,*args):
     #     return Billing.objects.all()
-    def resolve_history(self,info,slug,**kwargs):
+    def resolve_history(self,info,slug,is_instant,**kwargs):
         if(not len(slug)):
-            return Billing.objects.all()
+            return Billing.objects.filter(is_instant=is_instant)
 
-        if(Billing.objects.filter(invoice_number__iexact=slug)):
-            return Billing.objects.filter(invoice_number__iexact=slug)
+        if(Billing.objects.filter(invoice_number__iexact=slug).filter(is_instant=is_instant)):
+            return Billing.objects.filter(invoice_number__iexact=slug).filter(is_instant=is_instant)
         
-        return Billing.objects.filter(customer__name__iexact=slug)
+        return Billing.objects.filter(customer__name__iexact=slug).filter(is_instant=is_instant)
         
     def resolve_purchases(self,info,slug,**kwargs):
         if(not len(slug)):
@@ -1153,7 +1290,7 @@ class Query(graphene.AbstractType):
         return Category.objects.filter(name__icontains=suggestion)
     def resolve_product_suggestion(self,info,suggestion):
         # return Product.objects.all()
-        return Product.objects.filter(name__icontains=suggestion)
+        return Product.objects.filter(name__icontains=suggestion).filter(user_id=info.context.user.id)
 
     def resolve_all_products(self,info,search,**kwargs):
         # print(info.context.user)

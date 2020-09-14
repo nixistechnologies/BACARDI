@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Cash Memo</title>
+
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<style type="text/css">
+	.container{
+		border: 1px solid grey;
+    padding: 2px;
+    border-radius: 3px;
+	}
+.invoice-title{
+	border: 1px solid grey;
+    border-radius: 5px;
+    display: flow-root;
+}
+.bill_top_title{
+	background-color: #e5e2e2;
+    border-radius: 5px;
+    margin: 1%;
+    font-weight: 700;
+    padding: 4%;
+    text-align: right;
+    float: right;
+}
+.row_customer_info{
+	border: 1px solid grey;
+    border-radius: 5px;
+    margin: 2px 0px;
+}
+.consign-addr{
+	border-bottom: 1px solid grey;
+    padding: 1%;
+}
+.row_customer_info .col-xs-7{
+	border-right: 1px solid grey;padding: 1%;
+}
+.row_customer_info .col-xs-5{
+	padding: 1%;
+}
+.row_customer_info .col-xs-5 input{
+	border: none;
+	border-bottom: 1px solid grey;
+	margin-left: 5px;
+}
+.row_customer_info .col-xs-5 .txt_input{
+	margin-bottom: 2%;
+}
+.table_date_row table th,.table_date_row table td{
+	text-align: center;
+	border: 1px solid #d1caca;
+    border-right: 1px solid #8b8989;
+}
+.table_date_row{
+	margin-top: 2px;
+}
+.table_date_row .col_descr{
+	width: 630px;
+}
+.table_date_row table .thead-light th{
+	background-color: #ededed;
+}
+.row_top_header{
+	border: 1px solid grey;margin:unset;border-radius: 5px;
+}
+.row_top_header .col_first h4{
+	font-weight: 600;font-size: 18px;
+}
+.row_top_header .col_first p{
+	margin: unset;
+}
+.txt_input_table{
+	text-align: left;
+}
+.txt_input_table input{
+	border: none;
+	border-bottom: 1px solid grey;
+	margin-left: 5px;
+}
+.row_bill_bottom p.note{
+	font-size: 12px;
+    width: 50%;
+}
+.row_bill_bottom h4{
+	text-align: right;
+}
+.row_bill_bottom .sign{
+	text-align: right;
+	margin-top: 5%;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+        	<div class="row row_top_header">
+    			<div class="col-xs-6 col_first">
+    				<h4>{{user.profile.firm_name}}</h4>
+    				<p>{{user.profile.address}}</p>
+    				<p>{{user.profile.city}} - {{user.profile.zipcode}}</p>
+    				<p>State - {{user.profile.state}}</p>
+    				<p>Mobile : <b>{{user.profile.contact_number}}</b></p>    			
+    			</div>
+    			<div class="col-xs-6">
+    				<h3 class="bill_top_title">DELIVERY CHALLAN</h3>
+    			</div>
+    		</div>
+    		<div class="row row_customer_info">
+    			<div class="col-xs-7">
+    				<strong>Consignee:</strong>
+    				<p class="consign-addr"></p>
+    				<p class="consign-addr"></p>
+    				<p class="consign-addr"></p>
+    			</div>
+    			<div class="col-xs-5">
+    				<div class="txt_input"><strong>Challan No.:</strong><input type="text" name="challan_no"></div>
+    				<div class="txt_input"><strong>Date:</strong> <input type="text" value="{{bill.billing_date}}" name="challan_no"></div>
+    				<div class="txt_input"><strong>Order No.:</strong><input type="text" name="challan_no"></div>
+    			</div>
+    		</div>
+    	</div>
+    </div>
+    
+    <div class="row table_date_row">
+    	<div class="col-md-12">
+    		<div class="panel panel-default">
+    			<table class="table">
+				  <thead class="thead-light">
+				    <tr>
+				      <th scope="col">#</th>
+				      <th scope="col col_descr">Product Description</th>
+				      <th scope="col">HSN Code</th>
+				      <th scope="col">Net(mtr)</th>
+				      <th scope="col">Rate</th>
+				      <th scope="col">Total Amount</th>
+				    </tr>
+				  </thead>
+				  <tbody>
+
+				  {% for i in bill.sales_product_set.all %}
+
+				    <tr>
+				      <th scope="row">1</th>
+				      <td>{{i.product_name}}</td>
+				      {%if i.hsn %}
+						  <td>{{i.hsn}}</td>
+					  {% else %}
+						<td>-</td>
+					  {% endif %}
+
+				      <td>{{i.netm}}</td>
+				      <td>{{i.price}}</td>
+				      <td>{{i.total}}</td>
+				    </tr>
+				{% endfor %}
+				    {% comment %} <tr>
+				      <th scope="row">2</th>
+				      <td>Jacob</td>
+				      <td>Thornton</td>
+				      <td>@fat</td>
+				      <td>@mdo</td>
+				      <td>@mdo</td>
+				    </tr>
+				    <tr>
+				      <th scope="row">3</th>
+				      <td>Larry</td>
+				      <td>the Bird</td>
+				      <td>@mdo</td>
+				      <td>@twitter</td>
+				      <td>@mdo</td>
+				    </tr>
+				    <tr>
+				      <th scope="row">3</th>
+				      <td>Larry</td>
+				      <td>the Bird</td>
+				      <td>@twitter</td>
+				      <td>@mdo</td>
+				      <td>@mdo</td>
+				    </tr>
+				    <tr>
+				      <th scope="row">3</th>
+				      <td>Larry</td>
+				      <td>the Bird</td>
+				      <td>@twitter</td>
+				      <td>@mdo</td>
+				      <td>@mdo</td>
+				    </tr> {% endcomment %}
+				  </tbody>
+				  <tfoot>
+				  	<tr>
+				  		<td colspan="3"><div class="txt_input_table"><strong>Vehicle No.:</strong><input type="text" name="challan_no"></div></td>
+				  		<th colspan="2" style="text-align: right;">Total Amount</th>
+				  		<th>&nbsp;</th>
+				  	</tr>
+				  </tfoot>
+				</table>
+    		</div>
+    	</div>
+    </div>
+    <div class="row row_bill_bottom">
+    			<div class="col-xs-6">
+    				<p class="note"><b>Note : </b> No Complaints will be entertained if the same are received after 24 hours of delivery please return the voucher duty signed.</p>
+    			</div>
+    			<div class="col-xs-6">
+    				<h4>For {{user.profile.firm_name}}</h4>
+    				<p class="sign">Signature</p>
+    			</div>
+    		</div>
+</div>
+</body>
+</html>

@@ -38,6 +38,14 @@ const Records = ({items,getVendor,search,setSearch}) =>{
                 }
         })
     }
+    if(items.length==0)
+        return <>
+            <div>
+                <h1 style={{fontFamily:'nfont',fontSize:'1.5em',textAlign:'center',marginTop:'15%'}}>
+                    No Vendor found
+                </h1>
+            </div>
+        </>
     return (
         <>
         <Modal active={active} setActive={setActive} isNew={false} info={info} />

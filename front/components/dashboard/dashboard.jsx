@@ -10,7 +10,7 @@ import {faPen, faPlus, faEllipsisV, faDolly,faLuggageCart, faRupeeSign, faCoins}
 import { useState } from 'react'
 
 const SalesTable = ()=>{
-    const {data:pageData,loading:pageLoading} = useQuery(historyBySlugQuery,{variables:{"slug":""}})
+    const {data:pageData,loading:pageLoading} = useQuery(historyBySlugQuery,{variables:{"slug":"",isInstant:false}})
     return <>
     {pageLoading===true? <TableLoading/>:
     <>

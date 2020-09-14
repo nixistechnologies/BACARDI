@@ -18,7 +18,7 @@ export const createNewUser = (data) =>{
                 "email": data.email,
                 "phone": data.phone,
                 "gst": data.gst,
-                "tin": data.tin,
+                // "tin": data.tin,
                 "firm": data.firm_name,
                 "address": data.address
             }
@@ -280,6 +280,8 @@ export const toggle_side_bar = (s) =>({
     type:'TOGGLE_SIDEBAR',
     payload:s
 })
+
+// export const bill
 
 export const change_bank_tab = (tab) =>({
     type:"TAB_CHANGED",

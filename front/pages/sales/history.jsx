@@ -104,7 +104,7 @@ const Result = ({loading,data})=>{
                         <th>Date</th>
                         <th>Name</th>
                         <th>Net Amount</th>
-                        <th>Mode</th>
+                        {/* <th>Mode</th> */}
                         {/* <th>Outstanding</th>
                         <th></th> */}
                     </tr>
@@ -119,9 +119,9 @@ const Result = ({loading,data})=>{
                                 </a>
                                 </td>
                             <td>{item.node.billingDate}</td>
-                            <td>{item.node.customer.name}</td>
+                            <td>{item.node.customer.company}</td>
                             <td>{item.node.netAmount}</td>
-                            <td>{item.node.paymentMode}</td>
+                            {/* <td>{item.node.paymentMode}</td> */}
                             {/* <td style={{color:'green',fontWeight:'bold'}}>{item.node.paidAmount}</td> */}
                             {/* <td>{item.node.outstanding}</td> */}
                             {/* <td onClick={()=>{setActive("is-active"),setPaid(item.node.paidAmount),setOutstanding(item.node.outstanding)}}>
@@ -154,7 +154,7 @@ const History = () =>{
     const [min,setMin] = useState("")
     const [max,setMax] = useState("")
     const [getReport, {loading:nloading,nerror,data:ndata}] = useLazyQuery(reportByDateRangeQuery,{variables:{"min":min,"max":max}})
-    const {data:pageData,loading:pageLoading} = useQuery(historyBySlugQuery,{variables:{"slug":""}})
+    const {data:pageData,loading:pageLoading} = useQuery(historyBySlugQuery,{variables:{"slug":"",isInstant:false}})
     const [getHistory, {loading,error,data}] = useLazyQuery(historyBySlugQuery)    
     // console.log(ndata)
     return (
@@ -185,7 +185,7 @@ const History = () =>{
 
                     {byname===true?
                     <div>
-                    <form onSubmit={(e)=> {e.preventDefault(), getHistory({variables:{"slug":slug}})}}>
+                    <form onSubmit={(e)=> {e.preventDefault(), getHistory({variables:{"slug":slug,isInstant:false}})}}>
                     <div>
                         <div className="columns">
                             <div className="column">

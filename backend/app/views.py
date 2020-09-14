@@ -6,9 +6,9 @@ from rest_framework import status,viewsets
 from app.serializer import *
 from num2words import num2words
 from graphene.relay.node import from_global_id
-import pandas as pd
+# import pandas as pd
+# import numpy as np
 from django.db.models import Q
-import numpy as np
 
 
 # Create your views here.
@@ -28,25 +28,25 @@ class PurchaseSer(viewsets.ModelViewSet):
 def exportBankSale(request,search):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(search)
-    if(search == "all"):
-        search = ""
-    df=pd.DataFrame.from_records(Customer.objects.filter(Q(name__icontains=search) | Q(email__icontains=search) | Q(mobile__icontains=search) | Q(gst_number__icontains=search) | Q(address__icontains=search)).order_by("-id").values_list("id","company"),columns=["id","Company"])
-    _sales = []
-    _paid = []
+    # if(search == "all"):
+    #     search = ""
+    # df=pd.DataFrame.from_records(Customer.objects.filter(Q(name__icontains=search) | Q(email__icontains=search) | Q(mobile__icontains=search) | Q(gst_number__icontains=search) | Q(address__icontains=search)).order_by("-id").values_list("id","company"),columns=["id","Company"])
+    # _sales = []
+    # _paid = []
 
-    for i in range(len(df.id)):
-        _sales.append(sum([i.net_amount for i in Customer.objects.get(id=df.id[i]).billing_set.all()]))
+    # for i in range(len(df.id)):
+    #     _sales.append(sum([i.net_amount for i in Customer.objects.get(id=df.id[i]).billing_set.all()]))
 
-    for i in range(len(df.id)):
-        _paid.append(sum([i.paid for i in Customer.objects.get(id=df.id[i]).paritalpayment_set.all()]))
+    # for i in range(len(df.id)):
+    #     _paid.append(sum([i.paid for i in Customer.objects.get(id=df.id[i]).paritalpayment_set.all()]))
     
-    df["Amount"] = pd.Series(_sales)
-    df["Paid"] = pd.Series(_paid)
+    # df["Amount"] = pd.Series(_sales)
+    # df["Paid"] = pd.Series(_paid)
 
-    df = df[df["Amount"]!=0]
-    df["Outstanding"] = np.where(True,df.Amount - df.Paid,0)
-    del df["id"]
-    df.to_csv(response,index=False)
+    # df = df[df["Amount"]!=0]
+    # df["Outstanding"] = np.where(True,df.Amount - df.Paid,0)
+    # del df["id"]
+    # df.to_csv(response,index=False)
     return response 
 
 
@@ -57,23 +57,25 @@ def exportToExcel(request,name):
     response = HttpResponse(content_type='text/csv')
     
     response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(name)
-    if(name == "all"):
-        name = ""
+    # if(name == "all"):
+    #     name = ""
     
 
     
-    df = pd.DataFrame.from_records(ParitalPayment.objects.filter(Q(vendor__company__icontains=name) | Q(customer__company__icontains=name)).order_by("-id").values_list("date","paid","customer__company","vendor__company"),columns=["Date","paid","customer","vendor"])
-    df = df.fillna(0)
-    print(df)
-    df["Particulars"] = np.where(df.customer == 0, df.vendor,df.customer)
-    df["Credit"] = np.where(df.vendor == 0,df.paid,None)
-    df["Debit"] = np.where(df.customer == 0,df.paid,None) 
-    del df["paid"]
-    del df["customer"]
-    del df["vendor"]
+    # df = pd.DataFrame.from_records(ParitalPayment.objects.filter(Q(vendor__company__icontains=name) | Q(customer__company__icontains=name)).order_by("-id").values_list("date","paid","customer__company","vendor__company"),columns=["Date","paid","customer","vendor"])
+    # df = df.fillna(0)
+    # print(df)
+    # df["Particulars"] = np.where(df.customer == 0, df.vendor,df.customer)
+    # df["Credit"] = np.where(df.vendor == 0,df.paid,None)
+    # df["Debit"] = np.where(df.customer == 0,df.paid,None) 
+    # del df["paid"]
+    # del df["customer"]
+    # del df["vendor"]
 
-    df.to_csv(response,index=False)
+    # df.to_csv(response,index=False)
     return response
+
+
 
 def invoice(request,pk,userId):
     # print(request)
@@ -83,8 +85,18 @@ def invoice(request,pk,userId):
         bill = Billing.objects.get(id=from_global_id(pk)[1])
     print(bill.id)
     payble_amount = num2words(bill.net_amount, to='cardinal', lang='en_IN').replace("-"," ").capitalize()
+    taxInWord = num2words(bill.net_amount - (bill.sgst * 2), to='cardinal', lang='en_IN').replace("-"," ").capitalize()
+    taxInInt = bill.net_amount - (bill.sgst * 2)
+    # tax =  bill.cgst*2
+
+
+
     user = User.objects.get(id=from_global_id(userId)[1])
-    return render(request,"invoice.html",{"bill":bill,"user":user,"payble_amount":payble_amount})
+
+    if(bill.is_instant):
+        return render(request,"cash_memo.html",{"bill":bill,"user":user,"payble_amount":payble_amount,"taxInWord":taxInWord,"taxInInt":taxInInt})
+    else:
+        return render(request,"invoice.html",{"bill":bill,"user":user,"payble_amount":payble_amount,"taxInWord":taxInWord,"taxInInt":taxInInt})
 
 def example(request):
     return render(request,"e.html")

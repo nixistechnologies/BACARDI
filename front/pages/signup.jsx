@@ -22,8 +22,18 @@ const SignUp = () =>{
     return (
         // <Layout>
         <Layout sidebar={false} navbar={false} title="SignUp to BACARDI">
-            <div style={{marginTop:'50px'}}>
+            <div>
             <style jsx>{`
+             input{
+                background: transparent;
+                border: none;
+                    border-bottom-color: currentcolor;
+                    border-bottom-style: none;
+                    border-bottom-width: medium;
+                outline: none !important;
+                box-shadow: none !important;
+                border-bottom: 2px solid #00c4a7 !important;
+            }
              td,th{
                  font-size:13px;
              }
@@ -35,23 +45,55 @@ const SignUp = () =>{
              .columns .column{
                 padding:0.2rem
              }
+             .container{
+                 width:100% !important;
+             }
+             .login_form, .login_context{
+                display:flex;
+                align-items:center;
+                padding:20px;
+             }
+             .login_form{
+                 width:50%;
+                    // background: antiquewhite;
+             }
+             .login_context{
+                 width:50%;
+             }
+             .w70{
+                 width:60%;
+                 margin 0 auto;
+                 margin-bottom:20%;
+             }
             `} 
 
             </style>
 
+            <div style={{padding:'10px 0px 0px 20px',fontSize:'1em',fontFamily:'nfontB',letterSpacing:'2px'}}>
+                <h1>BACARDI</h1>
+            </div>
+            <div style={{display:'flex',height:"100vh"}}>
+                
+                <div className="login_context">
+                    <div>
+                        <img src="/company.webp" />
+                        {/* <h1 className="title">Welcome to Bacardi</h1> */}
+                    </div>
+                </div>
+                
 
 
-                <div style={{maxWidth:'400px',margin:'auto',padding:'30px', border:'1px solid rgba(0,0,0,.2)',borderRadius:'5px'}}>
+                <div style={{maxWidth:'400px',margin:'auto',padding:'30px', border:'1px solid rgba(0,0,0,.2)',borderRadius:'5px',background:"white"}}>
                    <div style={{marginTop:'0'}}>
                    
                     <div style={{textAlign:"center"}}>
-                        <div className="subtitle" style={{fontWeight:'300',fontSize:'25px'}}>Welcome to BACARDI</div>
+                        <div className="subtitle" style={{fontWeight:'300',fontSize:'25px',margin:"0"}}>Welcome to BACARDI</div>
                         <div className="error_msg" style={signup.error?{visibility:"initial"}:{visibility:"hidden"}}>Problem in signup contact to adminstation</div>
                     </div>
                     {/* <div className="error_msg" style={login.error?{visibility:"initial"}:{visibility:"hidden"}} >Wrong username and password</div> */}
                     {/* <div className="subtitle">Login</div> */}
                     <form onSubmit={handleSubmit(Submit)}>
-                    <div style={{marginTop:"30px"}}>
+                    <div style={{marginTop:"10px"}}>
                         <div className="columns">
                             <div className="column">
                                 <label className="label">Username</label>
@@ -85,12 +127,12 @@ const SignUp = () =>{
                                 <input type="text" className="input is-small" name="gst" ref={register} placeholder="GST Number" />
                             </div>
                         </div>
-                        <div className="columns">
+                        {/* <div className="columns">
                             <div className="column">
                                 <label className="label">TIN</label>
                                 <input type="text" className="input is-small" name="tin" ref={register} placeholder="TIN Number" />
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className="columns">
                             <div className="column">
@@ -133,6 +175,8 @@ const SignUp = () =>{
                     </div>
                     </form>
                 </div>
+            </div>
+            
             </div>
             </div>
         

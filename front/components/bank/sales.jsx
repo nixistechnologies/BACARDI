@@ -5,7 +5,11 @@ import { TableLoading } from '../skeleton'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAlignCenter, faList } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
+import { NoPayment } from '../../pages/bank/purchase/[purchase]'
 const Records = ({items}) =>{
+    if(items.length == 0)
+        return <NoPayment />
+        
     return <>
     <table className="table is-fullwidth is-hoverable is-bordered">
         <thead>
@@ -21,11 +25,11 @@ const Records = ({items}) =>{
             <tbody>
             {items.map((e,i)=>{
                 return(
-                
+                // e.node.csales !=null &&
                 <tr key={e.node.id}>
                     <td>{i+1}</td>
                     <td className="_heading _w30">
-                        {e.node.company}
+                        {e.node.customer.company}
                     </td>
                     <td>
                         {e.node.sales}
@@ -38,7 +42,7 @@ const Records = ({items}) =>{
                     </td>
                     
                     
-                        <Link href={`bank/[sales]?name=${e.node.company}`} as={`bank/${e.node.id}?name=${e.node.company}`}>
+                        <Link href={`bank/[sales]?name=${e.node.customer.company}`} as={`bank/${e.node.customer.id}?name=${e.node.customer.company}`}>
                             <td style={{cursor:'pointer'}}>
                                 <FontAwesomeIcon icon={faList} />
                             </td>
@@ -57,19 +61,22 @@ const Records = ({items}) =>{
 
 
 const Sales = ({text,setText}) =>{
-    const {data:odata,loading:oloading} = useQuery(BankByCustomerQuery)
+    // const {data:odata,loading:oloading} = useQuery(BankByCustomerQuery,{variables:{search:""}})
     const [searchData,{data,loading}] = useLazyQuery(BankByCustomerQuery)
     useEffect(()=>{
         searchData({variables:{"search":text}})
     },[text])
 
-    if(loading || oloading){
+    if(loading || data==undefined){
         return <TableLoading />
     }
-    return <>
-        <Records items ={
-            odata!=undefined ?odata.customers.edges:data.customers.edges
-        } />
-    </>
+    else{
+        return <>
+            <Records items ={
+                data.customersByCompany.edges
+            } />
+        </>
+    }
+
 }
 export default Sales

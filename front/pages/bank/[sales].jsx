@@ -23,7 +23,8 @@ const Modal = ({active,setActive,paid,outstanding,id})=>{
                 "id":id,
                 "paid":e.paid,
                 "outstanding":e.remain,
-                "date":e.date
+                "date":e.date,
+                "mode":e.mode
             },
             optimisticResponse:true,
             update:(cache,{data})=>{
@@ -112,8 +113,12 @@ const Modal = ({active,setActive,paid,outstanding,id})=>{
                                 </div>
                                 
                                 <div className="column">
-                                    <label className="label">Reamin</label>
+                                    <label className="label">Remain</label>
                                     <input type="text" name="remain" defaultValue={outstanding} ref={register} className="input is-small" disabled/>
+                                </div>
+                                <div className="column">
+                                    <label className="label">Mode</label>
+                                    <input type="text" name="mode" defaultValue={"Cash"} ref={register} className="input is-small"/>
                                 </div>
                             </div>
                             <div className="columns">
@@ -138,6 +143,7 @@ const Records = ({items}) =>{
                 <th className="_w20">Date</th>
                 <th className="_w10">Paid</th>
                 <th className="_w10">OutStanding</th>
+                <th className="_w10">Mode</th>
                 {/* <th className="_w5" colSpan={1}></th> */}
 
                 {/* <th className="_w10">File</th> */}
@@ -159,6 +165,9 @@ const Records = ({items}) =>{
                     </td>
                     <td>
                         {e.node.outstanding}
+                    </td>
+                    <td>
+                        {e.node.mode}
                     </td>
                     {/* <td>
                         0

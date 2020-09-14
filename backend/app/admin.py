@@ -18,6 +18,7 @@ admin.site.register(ParitalPayment)
 admin.site.register(Sales_Product)
 admin.site.register(Bank)
 admin.site.register(Ledgers)
+admin.site.register(CSales)
 
 
 admin.site.site_header = 'BACARDI'

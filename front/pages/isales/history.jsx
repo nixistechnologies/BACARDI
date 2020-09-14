@@ -99,12 +99,12 @@ const Result = ({loading,data})=>{
             <table className="table is-fullwidth is-hoverable is-bordered">
                 <thead>
                     <tr>
-                        {/* <th>SN.</th> */}
+                        <th>SN.</th>
                         <th>Invoice Number</th>
                         <th>Date</th>
                         <th>Name</th>
                         <th>Net Amount</th>
-                        <th>Mode</th>
+                        {/* <th>Mode</th> */}
                         {/* <th>Outstanding</th>
                         <th></th> */}
                     </tr>
@@ -112,16 +112,16 @@ const Result = ({loading,data})=>{
                 <tbody>
                     {data.map((item,i)=>{
                         return (<tr key={item.node.id}>
-                            {/* <td>{i+1}</td> */}
+                            <td>{i+1}</td>
                             <td>
-                                <a href={`${server}/invoice/${item.node.id}/`} target="_blank">
-                                    {item.node.invoiceNumber}
+                                <a href={`${server}/invoice/${item.node.id}/${item.node.user.id}`} target="_blank">
+                                    {item.node.invoiceNumberInstant}
                                 </a>
                                 </td>
                             <td>{item.node.billingDate}</td>
-                            <td>{item.node.customer.name}</td>
+                            <td>{item.node.customer.company}</td>
                             <td>{item.node.netAmount}</td>
-                            <td>{item.node.paymentMode}</td>
+                            {/* <td>{item.node.paymentMode}</td> */}
                             {/* <td style={{color:'green',fontWeight:'bold'}}>{item.node.paidAmount}</td> */}
                             {/* <td>{item.node.outstanding}</td> */}
                             {/* <td onClick={()=>{setActive("is-active"),setPaid(item.node.paidAmount),setOutstanding(item.node.outstanding)}}>
@@ -154,7 +154,7 @@ const History = () =>{
     const [min,setMin] = useState("")
     const [max,setMax] = useState("")
     const [getReport, {loading:nloading,nerror,data:ndata}] = useLazyQuery(reportByDateRangeQuery,{variables:{"min":min,"max":max}})
-    const {data:pageData,loading:pageLoading} = useQuery(historyBySlugQuery,{variables:{"slug":""}})
+    const {data:pageData,loading:pageLoading} = useQuery(historyBySlugQuery,{variables:{"slug":"",isInstant:true}})
     const [getHistory, {loading,error,data}] = useLazyQuery(historyBySlugQuery)    
     // console.log(ndata)
     return (
@@ -185,7 +185,7 @@ const History = () =>{
 
                     {byname===true?
                     <div>
-                    <form onSubmit={(e)=> {e.preventDefault(), getHistory({variables:{"slug":slug}})}}>
+                    <form onSubmit={(e)=> {e.preventDefault(), getHistory({variables:{"slug":slug,isInstant:true}})}}>
                     <div>
                         <div className="columns">
                             <div className="column">

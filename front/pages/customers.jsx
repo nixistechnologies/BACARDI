@@ -45,29 +45,36 @@ const CRecords = ({items}) =>{
     }
 
 
-
+    if(items.length==0)
+    return <>
+        <div>
+            <h1 style={{fontFamily:'nfont',fontSize:'1.5em',textAlign:'center',marginTop:'15%'}}>
+                No Customer found
+            </h1>
+        </div>
+    </>
     return(
         <>
         <CustomerForm active={active} setActive={setActive} isNew={false} info={info} />
         
-        {
+        {/* {
             items.length === 0?
             <h1 className="title" style={{textAlign:'center'}}>No Data Found</h1>
-        :
+        : */}
         
         <table className="table is-fullwidth is-hoverable is-bordered">
                 <thead>
                     <tr>
                         <th>SN.</th>
                         <th className="_w10">Company</th>
-                        <th className="_w20" >Name</th>
-                        <th className="_w20">Address</th>
+                        <th className="" >Name</th>
+                        <th className="">Address</th>
                         
-                        <th className="_w10">Mobile</th>
-                        <th className="_w10">GST</th>
+                        <th className="">Mobile</th>
+                        <th className="">GST</th>
                         {/* <th className="_w10">Aadhar</th> */}
                         {/* <th className="_w10">State</th> */}
-                        <th className="_w10">City</th>
+                        <th className="">City</th>
                         
                         <th className="_w5" colSpan={2}></th>
                         {/* <th className="w5"></th> */}
@@ -78,10 +85,10 @@ const CRecords = ({items}) =>{
                     {items.map((e,i)=>{
                         return(<tr key={e.node.id}>
                             <td>{i+1}</td>
-                            <td>
+                            <td className="mw300">
                                 {e.node.company}
                             </td>
-                            <td className="_heading _w30">
+                            <td className="_heading mw300">
                                 {/* <a> */}
                                     {e.node.name}
                                     {/* <span className="sub">
@@ -89,7 +96,7 @@ const CRecords = ({items}) =>{
                                     </span> */}
                                 {/* </a> */}
                             </td>
-                            <td>
+                            <td className="mw300">
                                 {e.node.address}
                             </td>
                             
@@ -138,7 +145,7 @@ const CRecords = ({items}) =>{
                     </tbody>
                     
             </table>
-            }
+            
 
 
             <div className={`modal ${delactive}`} >

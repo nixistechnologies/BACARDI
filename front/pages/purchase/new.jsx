@@ -50,8 +50,8 @@ const Modal =({active,setActive}) =>{
 
 
 const NewPurchase = () =>{
-    const [getVendor,{data:vendorData,loading:VendorLoading}] = useLazyQuery(vendorSuggestionQuery)
-    const [getProduct,{data:productData,loading:productLoading}] = useLazyQuery(productStartsWithQuery)
+    const [getVendor,{data:vendorData,loading:VendorLoading}] = useLazyQuery(vendorSuggestionQuery,{fetchPolicy:'network-only'})
+    const [getProduct,{data:productData,loading:productLoading}] = useLazyQuery(productStartsWithQuery,{fetchPolicy:'network-only'})
     const { register, handleSubmit, watch, errors,reset,setValue,getValues } = useForm();
     const [vendorFilter,setVendorFilter] = useState("")
     const [vendorDD,setVendorDD] = useState("")

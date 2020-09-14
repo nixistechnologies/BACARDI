@@ -24,19 +24,18 @@ const Login =() =>{
             
             <div>
 
-            {/* <style jsx>{`
-             .error_msg{
-                text-align:center;
-                font-size:12px;
-                margin-top:10px;
-             }
-             .container{
-                 width:100%;
-             }
-            `}>
-            </style> */}
-
             <style jsx>{`
+            
+            input{
+                background: transparent;
+                border: none;
+                    border-bottom-color: currentcolor;
+                    border-bottom-style: none;
+                    border-bottom-width: medium;
+                outline: none !important;
+                box-shadow: none !important;
+                border-bottom: 2px solid #00c4a7 !important;
+            }
              td,th{
                  font-size:13px;
              }

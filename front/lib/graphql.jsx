@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 export const getAllCustomersQuery = gql`
 query($search:String!){
-  customers(search:$search){
+  customers(search:$search,first:25){
     edges{
       node{
         id
@@ -23,8 +23,12 @@ query($search:String!){
 `
 
 export const getAllPaymentLedgerQuery = gql`
-query x($search:String!){
-  allPayment(search:$search){
+query x($search:String!,$after:String!){
+  allPayment(search:$search,first:10,after:$after){
+    pageInfo{
+      endCursor
+      hasNextPage
+    }
     edges{
       node{
         id
@@ -193,6 +197,7 @@ query x($id:ID!){
         node{
           id
           paid
+          mode
           outstanding
           date
         }
@@ -215,6 +220,7 @@ query x($id:ID!){
           id
           paid
           outstanding
+          mode
           date
         }
       }
@@ -224,14 +230,15 @@ query x($id:ID!){
 `
 
 export const addPurchasePaymentQuery = gql`
-mutation x($id:ID!,$paid:Float!,$outstanding:Float!,$date:String!){
-  addPurchasePayment(vendorId:$id,paid:$paid,outstanding:$outstanding,date:$date){
+mutation x($id:ID!,$paid:Float!,$outstanding:Float!,$date:String!,$mode:String!){
+  addPurchasePayment(vendorId:$id,paid:$paid,outstanding:$outstanding,date:$date,mode:$mode){
     success
     partial{
       	id
       	paid
       	outstanding
         date
+        mode
         vendor{
           id
           company
@@ -242,14 +249,15 @@ mutation x($id:ID!,$paid:Float!,$outstanding:Float!,$date:String!){
 `
 
 export const addSalePaymentQuery = gql`
-mutation x($id:ID!,$paid:Float!,$outstanding:Float!,$date:String!){
-  addSalesPayment(customerId:$id,paid:$paid,outstanding:$outstanding,date:$date){
+mutation x($id:ID!,$paid:Float!,$outstanding:Float!,$date:String!,$mode:String!){
+  addSalesPayment(customerId:$id,paid:$paid,outstanding:$outstanding,date:$date,mode:$mode){
     success
     partial{
       	id
       	paid
       	outstanding
         date
+        mode
         customer{
           id
           company
@@ -260,33 +268,37 @@ mutation x($id:ID!,$paid:Float!,$outstanding:Float!,$date:String!){
 `
 
 export const BankByCustomerQuery = gql`
-query{
-  customers(search:""){
+query x($search:String!){
+  customersByCompany(search:$search,first:10){
     edges{
       node{
-        sales
-        outstanding
-        paid
         id
-        name
-        company
+				customer{
+          id
+          company
+          name
+        }
+        sales
+        paid
       }
     }
   }
 }
 `
 export const BankByVendorQuery = gql`
-{
-  vendors(search:"")
+query x($search:String!){
+  vendorByCompany(search:$search,first:10)
   {
     edges{
       node{
         id
-        paid
-        outstanding
+        vendor{
+          id
+          company
+          name
+        }
         purchase
-        name
-        company
+        paid
       }
     }
   }
@@ -451,9 +463,9 @@ mutation($username:String!,$password:String!){
 
 
 export const createUserQuery = gql`
-mutation x($username:String!$password:String!,$firstName:String!,$lastName:String!,$email:String!,$phone:String!,$gst:String!,$tin:String!,$firm:String!,$address:String!){
+mutation x($username:String!$password:String!,$firstName:String!,$lastName:String!,$email:String!,$phone:String!,$gst:String!,$firm:String!,$address:String!){
   createUser(
-    username:$username,address:$address,password:$password,firstname:$firstName,lastname:$lastName,email:$email,phone:$phone,gst:$gst,tin:$tin,firmName:$firm
+    username:$username,address:$address,password:$password,firstname:$firstName,lastname:$lastName,email:$email,phone:$phone,gst:$gst,firmName:$firm
   ){
     user{
       id
@@ -611,15 +623,78 @@ export const dashboardQuery = gql `
 }
 `
 
+export const addOutstandingCustomerQuery = gql`
+mutation x($id:ID!,$outstanding:Float!){
+  addCustomerOutStanding(customerId:$id,outstanding:$outstanding){
+    customer{
+      id
+      company
+      csales{
+        id
+        sales
+        paid
+      }
+    }
+  }
+}
+`
+
+export const addOutstandingVendorQuery = gql`
+mutation x($id:ID!,$outstanding:Float!){
+  addVendorOutStanding(vendorId:$id,outstanding:$outstanding){
+    vendor{
+      id
+      company
+      vpurchase{
+        id
+        purchase
+        paid
+      }
+    }
+  }
+}
+`
+
+
+
+export const vendorsForOutstandingQuery = gql`
+query x($search:String!){
+  vendors(search:"",outstandingAdd:false, companyIcontains:$search){
+    edges{
+      node{
+        id
+        name
+        company
+      }
+    }
+  }
+}
+`
+
+
+export const customersForOutstandingQuery = gql`
+query x($search:String!){
+  customers(search:"",outstandingAdd:false, companyIcontains:$search){
+    edges{
+      node{
+        id
+        name
+        company
+      }
+    }
+  }
+}`
+
 export const historyBySlugQuery = gql`
-query x($slug:String!){
-  history(slug:$slug,first:20){
+query x($slug:String!,$isInstant:Boolean!){
+  history(slug:$slug,first:20,isInstant:$isInstant){
     edges{
       node{
 				discount
         cgst
         sgst
         id
+        invoiceNumberInstant
         invoiceNumber
         invoice
         grossAmount
@@ -634,6 +709,7 @@ query x($slug:String!){
         customer{
           id
           name
+          company
         }
       }
     }
@@ -697,7 +773,7 @@ mutation x($isNew:Boolean!, $name:String!,$email:String!,$mobile:String!,$compan
 
 export const allVendorQuery = gql`
 query x($search:String!){
-  vendors(search:$search){
+  vendors(search:$search,first:25){
     edges{
       node{
         id
@@ -766,8 +842,8 @@ mutation x($paid:Float!, $products:[MInput!],$remarks:String!,$customerId:ID!,$d
 `
 
 export const generateBillQuery = gql`
-mutation x($products:[MInput!],$remarks:String!,$customerId:ID!,$date:String!,$payment:String!,$invoice_number:String!){
-  generateBill(billingDate:$date,products:$products,paymentMode:$payment,customerId:$customerId,remarks:$remarks,invoiceNumber:$invoice_number)
+mutation x($products:[MInput!],$remarks:String!,$customerId:ID!,$date:String!,$payment:String!,$invoice_number:String!,$isInstant:Boolean!){
+  generateBill(billingDate:$date,products:$products,paymentMode:$payment,customerId:$customerId,remarks:$remarks,invoiceNumber:$invoice_number,isInstant:$isInstant)
   {
     bill{
       id
