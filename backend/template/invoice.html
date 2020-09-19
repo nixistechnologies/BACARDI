@@ -225,7 +225,7 @@
 				      </tr>
 					{% for i in bill.sales_product_set.all %}
 				      <tr>
-				      	<td>1</td>
+				      	<td>{{ forloop.counter }}</td>
 				      	<td>{{i.product_name}}</td>
 				      	{% comment %} <td>{{i.hsn}}</td> {% endcomment %}
 						{%if i.hsn %}

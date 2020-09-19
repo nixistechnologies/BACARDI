@@ -35,7 +35,7 @@
 }
 .consign-addr{
 	border-bottom: 1px solid grey;
-    padding: 1%;
+    padding: 5px;
 }
 .row_customer_info .col-xs-7{
 	border-right: 1px solid grey;padding: 1%;
@@ -115,14 +115,14 @@
     		<div class="row row_customer_info">
     			<div class="col-xs-7">
     				<strong>Consignee:</strong>
-    				<p class="consign-addr"></p>
-    				<p class="consign-addr"></p>
-    				<p class="consign-addr"></p>
+    				<p class="consign-addr">{{bill.customer.name}}</p>
+    				<p class="consign-addr">{{bill.customer.address}}</p>
+    				<p class="consign-addr">{{bill.customer.city}} {{bill.customer.state}}</p>
     			</div>
     			<div class="col-xs-5">
     				<div class="txt_input"><strong>Challan No.:</strong><input type="text" name="challan_no"></div>
     				<div class="txt_input"><strong>Date:</strong> <input type="text" value="{{bill.billing_date}}" name="challan_no"></div>
-    				<div class="txt_input"><strong>Order No.:</strong><input type="text" name="challan_no"></div>
+    				<div class="txt_input"><strong>Invoice Number No.:</strong><input type="text" style="font-size: 1.3em;font-weight: bold;" value="{{bill.invoice_number_instant}}" name="challan_no"></div>
     			</div>
     		</div>
     	</div>
@@ -147,7 +147,7 @@
 				  {% for i in bill.sales_product_set.all %}
 
 				    <tr>
-				      <th scope="row">1</th>
+				      <th scope="row">{{ forloop.counter }}</th>
 				      <td>{{i.product_name}}</td>
 				      {%if i.hsn %}
 						  <td>{{i.hsn}}</td>
@@ -197,7 +197,7 @@
 				  	<tr>
 				  		<td colspan="3"><div class="txt_input_table"><strong>Vehicle No.:</strong><input type="text" name="challan_no"></div></td>
 				  		<th colspan="2" style="text-align: right;">Total Amount</th>
-				  		<th>&nbsp;</th>
+				  		<th>{{bill.net_amount}}</th>
 				  	</tr>
 				  </tfoot>
 				</table>
