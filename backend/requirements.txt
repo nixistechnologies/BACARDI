@@ -67,7 +67,7 @@ soupsieve==2.0
 sqlparse==0.3.1
 static3==0.7.0
 traitlets==4.3.3
-urllib3==1.25.8
+urllib3==1.26.5
 virtualenv==20.0.7
 wcwidth==0.1.8
 webdriver-manager==2.3.0
